@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>New Sample Entry</title>
+</head>
+
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>New Sample Form</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#" role="button">Contact</a></li>
+        </ul>
+    </nav>
+    <main class="container">
+        <div class="grid">
+            <section>
+                <hgroup>
+                    <h2>Sample Registration</h2>
+                    <h3>Enter the details for the new sample</h3>
+                </hgroup>
+                <form>
+                    <label for="chipID">Chip ID:</label>
+                    <span>P</span><input type="text" id="chipID" pattern="\d*" required>
+                    
+                    <label for="patientID">Patient ID:</label>
+                    <span>BDx</span><input type="text" id="patientID" pattern="\d*" required>
+
+                    <label for="location">Location</label>
+                    <select id="location" name="location" required>
+                        <option value="">Select Location</option>
+                        <option value="CT - Radiology">CT - Radiology</option>
+                        <option value="BCC - 3rd Floor Clinic">BCC - 3rd Floor Clinic</option>
+                    </select>
+                    <button id="confirm-button">Confirm</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+
+
+    <footer class="container">
+        <small><a href="#">Privacy Policy</a> • <a href="#">Terms of Service</a></small>
+    </footer>
+</body>
+
+</html>
