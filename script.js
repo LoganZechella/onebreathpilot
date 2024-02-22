@@ -31,9 +31,19 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('confirm-button').addEventListener('click', function (event) {
             event.preventDefault();
 
-            let chipID = 'P' + document.getElementById('chipID').value;
-            let patientID = 'BDx' + document.getElementById('patientID').value;
+            // Validate Patient ID Format
+            let patientID = document.getElementById('patientID').value;
+            if (!patientID) {
+                alert('Invalid Patient ID format.');
+                return;
+            }
+
+            // Ensure Location is Selected
             let location = document.getElementById('location').value;
+            if (!location) {
+                alert('Please select a location.');
+                return;
+            }
 
             let sample = {
                 chipID: chipID,
@@ -42,8 +52,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 timestamp: new Date().toISOString() // We'll add a timestamp here
             };
 
-            samples.push(sample);
-            localStorage.setItem('samples', JSON.stringify(samples));
+            sample.status = 'In Process';
+            // Add any additional fields as needed
+            localStorage.setItem('samples', JSON.stringify(samples.concat(sample)));
 
             // Redirect to the confirmation page
             window.location.href = 'confirm.html';
