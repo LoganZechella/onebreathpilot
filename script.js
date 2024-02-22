@@ -1,5 +1,30 @@
 // Check if the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
+
+    // Check if the URL includes any query parameters
+    const queryParams = window.location.search;
+    if (queryParams) {
+        // Query parameters exist
+        document.getElementById('landing-main').style.display = 'none';
+        // Function to get query string parameters
+        function getQueryStringParams(param) {
+            let searchParams = new URLSearchParams(window.location.search);
+            return searchParams.get(param);
+        }
+
+        // Pre-fill the Chip ID field if the parameter is present
+        let chipID = getQueryStringParams('chipID');
+        if (chipID) {
+            document.getElementById('chipID').value = chipID;
+        }
+    } else {
+        // No query parameters
+        document.getElementById('add-sample-main').style.display = 'none';
+        document.getElementById('landing-main').style.display = 'flex';
+        console.log('URL does not include query parameters');
+    }
+    
+
     if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
         let samples = JSON.parse(localStorage.getItem('samples')) || [];
 
@@ -49,22 +74,6 @@ window.addEventListener('beforeunload', function (event) {
     event.returnValue = 'Are you sure you want to leave?';
 });
 
-// Section Sample Creation and Adding
 
-function generateSectionElement() {
-    const sectionElement = document.getElementById('in-process')
-    const chipID = 'P12345';
-    const completionTime = '4:30 - 5:30 PM EST';
 
-    const newElement = document.createElement("div");
-    newElement.className = "section-element-text";
-    newElement.style.display = "flex";
-    newElement.innerHTML = `Chip ID: ${chipID} <br/> Est. Pickup Time: <br/>${completionTime}`;
 
-    sectionElement.appendChild(newElement);
-}
-
-generateSectionElement();
-generateSectionElement();
-
-{/* <div class="section-element-text" style="display: flex;">Chip ID: P12345 <br> Est. Pickup Time: <br>4:30 - 5:30 PM EST</div> */}
