@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('confirm-button').addEventListener('click', function (event) {
             event.preventDefault();
 
+            let chipID = document.getElementById('chipID').value;
+            if (!chipID) {
+                alert('Invalid Chip ID format.');
+                return;
+            }
+
             // Validate Patient ID Format
             let patientID = document.getElementById('patientID').value;
             if (!patientID) {
@@ -71,19 +77,80 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Evacuation started for sample:', lastSample.chipID);
         });
     }
+
+
+    // Function to update the 'In Process' queue
+    let samples = JSON.parse(localStorage.getItem('samples')) || [];
+    function updateInProcessQueue() {
+        let inProcessQueue = samples.filter(sample => sample.status === 'In Process');
+        let inProcessElement = document.getElementById('in-process-section');
+        // inProcessElement.innerHTML = ''; // Clear existing entries
+
+        inProcessQueue.forEach(sample => {
+            let card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <p>Chip ID: ${sample.chipID}</p>
+                <p>Patient ID: ${sample.patientID}</p>
+                <p>Location: ${sample.location}</p>
+                <p>Timer: <span id="timer-${sample.chipID}">00:00:00</span></p>
+            `;
+            inProcessElement.appendChild(card);
+            startCountdownTimer(sample.chipID);
+        });
+    }
+
+    // Function to start a countdown timer for a sample
+    function startCountdownTimer(chipID) {
+        let timerElement = document.getElementById(`timer-${chipID}`);
+        let countdownTime = 120 * 60; // Example: 30 minutes countdown
+        let timerInterval = setInterval(function () {
+            let minutes = parseInt(countdownTime / 60, 10);
+            let seconds = parseInt(countdownTime % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            timerElement.innerText = minutes + ":" + seconds;
+
+            if (--countdownTime < 0) {
+                clearInterval(timerInterval);
+                // Move the sample to the next queue, e.g., 'Ready for Pickup'
+                moveToNextQueue(chipID);
+            }
+        }, 1000);
+    }
+
+    // Call the function to update the 'In Process' queue
+    updateInProcessQueue();
+
+    // Function to move a sample to the next queue
+    function moveToNextQueue(chipID) {
+        let samples = JSON.parse(localStorage.getItem('samples')) || [];
+        let sampleIndex = samples.findIndex(sample => sample.chipID === chipID);
+        if (sampleIndex !== -1) {
+            samples[sampleIndex].status = 'Ready for Pickup'; // Update status
+            localStorage.setItem('samples', JSON.stringify(samples));
+            // Refresh the display of the queues
+            updateSampleQueues();
+        }
+    }
 });
 
-window.addEventListener('beforeunload', function (event) {
-    // Clear form fields
-    document.getElementById('chipID').value = '';
-    document.getElementById('patientID').value = '';
-    document.getElementById('location').value = '';
 
-    // Clear the samples from localStorage if they haven't been confirmed
-    localStorage.removeItem('samples');
 
-    event.returnValue = 'Are you sure you want to leave?';
-});
+
+// window.addEventListener('beforeunload', function (event) {
+//     // Clear form fields
+//     document.getElementById('chipID').value = '';
+//     document.getElementById('patientID').value = '';
+//     document.getElementById('location').value = '';
+
+//     // Clear the samples from localStorage if they haven't been confirmed
+//     localStorage.removeItem('samples');
+
+//     event.returnValue = 'Are you sure you want to leave?';
+// });
 
 
 
