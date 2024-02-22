@@ -140,17 +140,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-// window.addEventListener('beforeunload', function (event) {
-//     // Clear form fields
-//     document.getElementById('chipID').value = '';
-//     document.getElementById('patientID').value = '';
-//     document.getElementById('location').value = '';
+window.addEventListener('beforeunload', function (event) {
+    // Clear form fields
+    document.getElementById('chipID').value = '';
+    document.getElementById('patientID').value = '';
+    document.getElementById('location').value = '';
 
-//     // Clear the samples from localStorage if they haven't been confirmed
-//     localStorage.removeItem('samples');
+    // Clear the samples from localStorage if they haven't been confirmed
+    localStorage.removeItem('samples');
 
-//     event.returnValue = 'Are you sure you want to leave?';
-// });
+    event.returnValue = 'Are you sure you want to leave?';
+});
 
 
 
