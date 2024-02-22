@@ -1,0 +1,93 @@
+h3, h4, h5, h6, p {
+    color: black;
+}
+
+@media screen and (max-width: 480px) {
+    .section {
+        border-radius: 10px;
+        padding: 1rem;
+        box-sizing: border-box;
+        background-color: #f2f2f2;
+        color: black;
+        max-height: 15%;
+        max-width: 95%;
+
+    }   
+
+    #landing-main {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        flex-wrap: wrap;
+        align-content: stretch;
+        justify-content: center;
+    }
+
+    
+}
+
+
+
+
+#new-sample-form {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.section {
+    border-radius: 10px;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    box-sizing: border-box;
+    background-color: #f2f2f2;
+    color: black;
+    min-height: 35vh;
+    min-width: 95%;
+}
+
+#landing-main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: wrap;
+    align-content: stretch;
+    justify-content: center;
+}
+
+.section-element {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    border: 1px solid black;
+    max-width: 250px;
+    aspect-ratio: 1/1;
+}
+
+.section-element-text {
+    text-align: center;
+    flex-wrap: wrap;
+    padding: 0.5em 0 0.5em 0;
+    font-size: larger;
+}
+
+.card {
+    border: 2px solid rgba(0, 0, 0, 0.8);
+    border-radius: 15px;
+    padding: 0.25em 0.25em 0.25em 0.25em;
+    text-align: center;
+    margin: 0.25em 0 0.25em 0;
+}
+
+.ready-for-pickup-button {
+    max-width: 50%;
+    margin-left: 25%;
+}

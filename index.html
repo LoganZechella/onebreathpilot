@@ -5,33 +5,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="/styles.css">
     <title>New Sample Entry</title>
 </head>
 
 <body>
     <nav class="container-fluid">
         <ul>
-            <li><strong>New Sample Form</strong></li>
+            <li><strong>OneBreath Pilot Study</strong></li>
         </ul>
         <ul>
             <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#" role="button">Contact</a></li>
+            <li><a href="#">Sign In</a></li>
         </ul>
     </nav>
-    <main class="container">
+    <main class="container" id="add-sample-main" hidden>
         <div class="grid">
             <section>
                 <hgroup>
                     <h2>Sample Registration</h2>
                     <h3>Enter the details for the new sample</h3>
                 </hgroup>
-                <form>
-                    <label for="chipID">Chip ID:</label>
-                    <span>P</span><input type="text" id="chipID" pattern="\d*" required>
-                    
-                    <label for="patientID">Patient ID:</label>
-                    <span>BDx</span><input type="text" id="patientID" pattern="\d*" required>
+                <form id="new-sample-form">
+                    <label for="chipID">Chip ID: (PXXXXX)</label>
+
+                    <input type="text" id="chipID" pattern="\d*" required>
+
+                    <label for="patientID">Patient ID: (BDx-XXX)</label>
+
+                    <input type="text" id="patientID" pattern="\d*" required>
 
                     <label for="location">Location</label>
                     <select id="location" name="location" required>
@@ -43,6 +45,43 @@
                 </form>
             </section>
         </div>
+    </main>
+
+    <main class="container" id="landing-main">
+        <section class="section in-process-section">
+            <h3>In-Process</h3>
+            <div class="grid">
+                <div class="card">
+                    <h4>Sample 1</h4>
+                    <p>Chip ID: P12345</p>
+                    <p>Patient ID: BDx-123</p>
+                    <p>Location: CT - Radiology</p>
+                    <button class="button ready-for-pickup-button">Pickup Chip</button>
+                </div>
+                <div class="card">
+                    <h4>Sample 2</h4>
+                    <p>Chip ID: P12346</p>
+                    <p>Patient ID: BDx-124</p>
+                    <p>Location: BCC - 3rd Floor Clinic</p>
+                    <button class="button ready-for-pickup-button">Pickup Chip</button>
+                </div>
+            </div>
+        </section>
+        <section class="section pickup-section">
+            <h3>Ready for Pickup</h3>
+            
+
+        </section>
+        <section class="section shipping-section">
+            <h3>Shipping</h3>
+            
+
+        </section>
+        <section class="section elution-section">
+            <h3>Elution</h3>
+            
+
+        </section>
     </main>
 
     <script src="script.js"></script>

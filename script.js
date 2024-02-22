@@ -49,3 +49,22 @@ window.addEventListener('beforeunload', function (event) {
     event.returnValue = 'Are you sure you want to leave?';
 });
 
+// Section Sample Creation and Adding
+
+function generateSectionElement() {
+    const sectionElement = document.getElementById('in-process')
+    const chipID = 'P12345';
+    const completionTime = '4:30 - 5:30 PM EST';
+
+    const newElement = document.createElement("div");
+    newElement.className = "section-element-text";
+    newElement.style.display = "flex";
+    newElement.innerHTML = `Chip ID: ${chipID} <br/> Est. Pickup Time: <br/>${completionTime}`;
+
+    sectionElement.appendChild(newElement);
+}
+
+generateSectionElement();
+generateSectionElement();
+
+{/* <div class="section-element-text" style="display: flex;">Chip ID: P12345 <br> Est. Pickup Time: <br>4:30 - 5:30 PM EST</div> */}
