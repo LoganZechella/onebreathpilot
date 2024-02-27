@@ -64,7 +64,7 @@ function submitSampleToTempBackend(sampleData) {
 
 
     // API call to submit data to the backend
-    fetch('http://127.0.0.1:5000/temp_samples', {
+    fetch('https://onebreathpilot.onrender.com/temp_samples', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
