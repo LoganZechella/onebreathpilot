@@ -53,5 +53,5 @@ def get_temp_sample(sample_id):
     else:
         return jsonify({'error': 'Sample not found'}), 404
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
