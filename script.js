@@ -64,7 +64,7 @@ function submitSampleToTempBackend(sampleData) {
 
 
     // API call to submit data to the backend
-    fetch('http://0.0.0.0:10000/temp_samples', {
+    fetch('https://0.0.0.0:10000/temp_samples', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
