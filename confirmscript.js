@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
         sampleData.timestamp = new Date().toISOString();
 
         // Send the updated sample to the backend
-        fetch('https://onebreathpilot.onrender.com/collectedsamples', {
+        fetch('/collectedsamples', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (window.location.pathname.endsWith('confirm.html') && sampleId) {
-        fetch(`https://onebreathpilot.onrender.com/temp_samples/${sampleId}`)
+        fetch(`/temp_samples/${sampleId}`)
             .then(response => response.json())
             .then(data => {
                 // Assuming the first item is the sample we're interested in
