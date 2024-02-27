@@ -20,19 +20,6 @@
         </ul>
     </nav>
 
-    <!-- <nav>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#sample-registration">Sample Registration</a></li>
-            <li><a href="#in-process">In-Process</a></li>
-            <li><a href="#pickup">Ready for Pickup</a></li>
-            <li><a href="#shipping">Shipping Queue</a></li>
-            <li><a href="#elution">Elution Queue</a></li>
-            <li><a href="#sign-in">Sign In</a></li>
-        </ul>
-    </nav> -->
-
-
     <main class="container" id="add-sample-main" >
         
         <div class="grid">
@@ -69,6 +56,29 @@
     
             </div>
         </section>
+
+        <div id="pickup-form-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Pick Up Sample</h2>
+                <form id="pickup-form">
+                    <input type="text" name="data-chip-id"hidden>
+
+                    <label for="final-volume">Final Volume (mL):</label>
+                    <input type="number" id="final-volume" name="final-volume" required>
+        
+                    <label for="average-co2">Average CO2 (%):</label>
+                    <input type="number" id="average-co2" name="average-co2" required>
+        
+                    <label for="error-codes">Error Codes (Optional):</label>
+                    <input type="text" id="error-codes" name="error-codes">
+        
+                    <button type="submit" id="confirm-pickup">Confirm Pickup</button>
+                </form>
+            </div>
+        </div>
+
+
         <section class="section pickup-section" id="pickup-section">
             <h3>Ready for Pickup</h3>
             

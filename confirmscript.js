@@ -1,24 +1,59 @@
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname.endsWith('confirm.html')) {
-        let samples = JSON.parse(localStorage.getItem('samples'));
-        if (samples && samples.length > 0) {
-            let lastSample = samples[samples.length - 1];
+    const queryParams = new URLSearchParams(window.location.search);
+    const sampleId = queryParams.get('sample_id');
 
-            // Display instructions with Chip ID
-            let message = `Collect breath sample per study protocol. 
-                           Return to this screen when evacuation for sample ${lastSample.chipID} has begun, 
-                           then press the start button below.`;
-            document.getElementById('confirmation-message-text').innerText = message;
+    // Function to add a timestamp and send the sample to the backend
+    function sendSample(sampleData) {
+        // // Add a timestamp to the sample
+        sampleData.timestamp = new Date().toISOString();
 
-            // Start button logic
-            document.getElementById('start-button').addEventListener('click', function () {
-                // Update the sample status to 'Evacuation Started'
-                lastSample.status = 'In Process';
-                localStorage.setItem('samples', JSON.stringify(samples));
+        // Send the updated sample to the backend
+        fetch('http://127.0.0.1:5000/collectedsamples', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sampleData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(json => {
+            console.log('Sample added to the database:', json);
+            document.getElementById('confirmation-message-text').innerText = 'Sample successfully added to the database.';
+        })
+        .catch(error => {
+            console.error('Error adding sample to the database:', error);
+            document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
+        });
+    }
 
-                // Redirect back to the dashboard
-                window.location.href = 'index.html';
+    if (window.location.pathname.endsWith('confirm.html') && sampleId) {
+        fetch(`http://127.0.0.1:5000/temp_samples/${sampleId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Assuming the first item is the sample we're interested in
+                let parseData = JSON.parse(data);
+                const sample = parseData[0].chipID; // This assumes the data is already an object, not a string
+                if (sample) {
+                    let message = `Collect breath per study protocol then return to this page. 
+                        When evacuation for sample ${sample} has started, press the start button below:`;
+                    document.getElementById('confirmation-message-text').innerHTML = message;
+
+                    // Add event listener to the start button
+                    document.getElementById('start-button').addEventListener('click', function() {
+                        sendSample(parseData[0]);
+                    });
+                } else {
+                    // Handle case where sample or chipID is undefined
+                    console.error('Sample data is missing or malformed:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching sample:', error);
             });
-        }
     }
 });
