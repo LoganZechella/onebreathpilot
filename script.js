@@ -75,7 +75,8 @@ function sendSample(sampleData) {
             console.error('Error adding sample to the database:', error);
             // document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
         });
-        window.location.href = `/confirm.html'
+
+    window.location.href = `confirm.html`;
 }
 
 // function submitSampleToTempBackend(sampleData) {
