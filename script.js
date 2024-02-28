@@ -60,8 +60,7 @@ function addPickupButton(sample, cardElement) {
 
 function submitSampleToTempBackend(sampleData) {
     // Add a timestamp to the sampleData object
-    let incomingData = sampleData;
-    sampleData.timestamp = new Date().toISOString();
+    // sampleData.timestamp = new Date().toISOString();
 
     console.log(incomingData);
     // API call to submit data to the backend
