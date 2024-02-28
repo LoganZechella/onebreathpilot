@@ -24,7 +24,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (sampleId) {
-        fetch(`https://onebreathpilot.onrender.com/temp_samples/${sampleId}`)
+        const url = `https://onebreathpilot.onrender.com/temp_samples/` + sampleId;
+        console.log(url);
+        // Fetching data from server using the sampleId
+        fetch(url)
             .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
             .then(data => {
                 // Update to correctly handle the expected data structure
