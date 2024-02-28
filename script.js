@@ -62,7 +62,7 @@ function submitSampleToTempBackend(sampleData) {
     // Add a timestamp to the sampleData object
     // sampleData.timestamp = new Date().toISOString();
 
-    console.log(incomingData);
+    console.log(sampleData);
     // API call to submit data to the backend
     fetch('https://onebreathpilot.onrender.com/temp_samples', {
         method: 'POST',
