@@ -9,7 +9,8 @@ import json
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "https://onebreathpilot.netlify.app"}})
+
 
 # MongoDB settings
 MONGO_URI = os.getenv("MONGO_URI")  # Add your MongoDB URI to your environment variables
