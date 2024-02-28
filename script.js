@@ -70,7 +70,7 @@ function submitSampleToTempBackend(sampleData) {
             'Content-Type': 'application/json',
             
         },
-        body: JSON.stringify(sampleData),
+        body: sampleData,
     })
         .then(response => response.json())
         .then(data => {
