@@ -24,20 +24,38 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (sampleId) {
-        const url = `https://onebreathpilot.onrender.com/temp_samples/ + ${sampleId}`;
+        // Correctly concatenate the sampleId with the URL
+        const url = `https://onebreathpilot.onrender.com/temp_samples/${sampleId}`;
         console.log(url);
 
         fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-
             },
-            body: JSON.stringify(sampleId),
         })
             .then(response => response.json())
             .then(data => {
-                console.log('Success:', data)});
+                console.log('Success:', data);
+                if (data.chipID) { // Assuming data is a single object
+                    let message = `Collect breath per study protocol then return to this page. 
+                                    When evacuation for sample ${data.chipID} has started, press the start button below:`;
+                    document.getElementById('confirmation-message-text').innerHTML = message;
+
+                    document.getElementById('start-button').addEventListener('click', function () {
+                        sendSample(data);
+                    });
+                } else {
+                    console.error('Sample data is missing or malformed:', data);
+                }
+                // Assuming you want to call sendSample with the fetched data
+                // sendSample(data);
+            })
+            .catch(error => {
+                console.error('Error fetching sample:', error);
+            });
+    }
+});
 
 
         // Fetching data from server using the sampleId
@@ -45,20 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
     //         .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
     //         .then(data => {
     //             // Update to correctly handle the expected data structure
-    //             if (data.chipID) { // Assuming data is a single object
-    //                 let message = `Collect breath per study protocol then return to this page. 
-    //                                 When evacuation for sample ${data.chipID} has started, press the start button below:`;
-    //                 document.getElementById('confirmation-message-text').innerHTML = message;
-
-    //                 document.getElementById('start-button').addEventListener('click', function () {
-    //                     sendSample(data);
-    //                 });
-    //             } else {
-    //                 console.error('Sample data is missing or malformed:', data);
-    //             }
+               
     //         })
     //         .catch(error => {
     //             console.error('Error fetching sample:', error);
     //         });
-    }
-});
+   // }
+// });
