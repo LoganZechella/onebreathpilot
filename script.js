@@ -66,15 +66,16 @@ function sendSample(sampleData) {
         },
         body: JSON.stringify(sampleData),
     })
-        .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
-        .then(json => {
-            console.log('Sample added to the database:', json);
-            document.getElementById('confirmation-message-text').innerText = 'Sample successfully added to the database.';
+        .then(response => response.json())
+        .then(data => {
+            console.log('Sample added to the database:', data);
+            // document.getElementById('confirmation-message-text').innerText = 'Sample successfully added to the database.';
         })
         .catch(error => {
             console.error('Error adding sample to the database:', error);
-            document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
+            // document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
         });
+        window.location.href = `/confirm.html'
 }
 
 // function submitSampleToTempBackend(sampleData) {
