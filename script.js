@@ -60,9 +60,9 @@ function addPickupButton(sample, cardElement) {
 
 function submitSampleToTempBackend(sampleData) {
     // Add a timestamp to the sampleData object
-    sampleData.timestamp = new Date().toISOString();
+    // sampleData.timestamp = new Date().toISOString();
 
-
+    console.log(sampleData)
     // API call to submit data to the backend
     fetch('https://onebreathpilot.onrender.com/temp_samples', {
         method: 'POST',
@@ -75,9 +75,8 @@ function submitSampleToTempBackend(sampleData) {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data)
-            let parseData = JSON.parse(data);
-            if (parseData.sample_id) {
-                window.location.href = `confirm.html?sample_id=${parseData.sample_id}`;
+            if (data.sample_id) {
+                window.location.href = `confirm.html?sample_id=${data.sample_id}`;
             } else {
                 console.error('No sample_id returned from the backend:', data);
             }
