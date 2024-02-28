@@ -57,33 +57,52 @@ function addPickupButton(sample, cardElement) {
     cardElement.appendChild(button);
 }
 
+function sendSample(sampleData) {
 
-function submitSampleToTempBackend(sampleData) {
-    // Add a timestamp to the sampleData object
-    // sampleData.timestamp = new Date().toISOString();
-
-    console.log(sampleData);
-    // API call to submit data to the backend
-    fetch('https://onebreathpilot.onrender.com/temp_samples', {
+    fetch('https://onebreathpilot.onrender.com/collectedsamples', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            
         },
         body: JSON.stringify(sampleData),
     })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            if (data.sample_id) {
-                window.location.href = `confirm.html?sample_id=${data.sample_id}`;
-            } else {
-                console.error('No sample_id returned from the backend:', data);
-            }
+        .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
+        .then(json => {
+            console.log('Sample added to the database:', json);
+            document.getElementById('confirmation-message-text').innerText = 'Sample successfully added to the database.';
         })
-        .catch((error) => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error adding sample to the database:', error);
+            document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
+        });
+}
 
-    }
+// function submitSampleToTempBackend(sampleData) {
+//     // Add a timestamp to the sampleData object
+//     // sampleData.timestamp = new Date().toISOString();
+
+//     console.log(sampleData);
+//     // API call to submit data to the backend
+//     fetch('https://onebreathpilot.onrender.com/temp_samples', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+            
+//         },
+//         body: JSON.stringify(sampleData),
+//     })
+//         .then(response => response.json())
+//         .then(data => {
+//             console.log('Success:', data);
+//             if (data.sample_id) {
+//                 window.location.href = `confirm.html?sample_id=${data.sample_id}`;
+//             } else {
+//                 console.error('No sample_id returned from the backend:', data);
+//             }
+//         })
+//         .catch((error) => console.error('Error:', error));
+
+//     }
 
 // Check if the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
@@ -147,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // sample.status = 'In Process';
             // Add any additional fields as needed
             // localStorage.setItem('samples', JSON.stringify(samples.concat(sample)));
-            submitSampleToTempBackend(sample);
+            sendSample(sample);
 
 
             // Redirect to the confirmation page
