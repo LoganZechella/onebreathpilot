@@ -1,72 +1,167 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const queryParams = new URLSearchParams(window.location.search);
-    const sampleId = queryParams.get('sample_id');
+// document.addEventListener('DOMContentLoaded', function () {
+//     const queryParams = new URLSearchParams(window.location.search);
+//     const sampleId = queryParams.get('sample_id');
 
-    function sendSample(sampleData) {
-        sampleData.timestamp = new Date().toISOString();
+//     function sendSample(sampleData) {
+//         sampleData.timestamp = new Date().toISOString();
 
-        fetch('https://onebreathpilot.onrender.com/collectedsamples', {
+//         fetch('https://onebreathpilot.onrender.com/collectedsamples', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify(sampleData),
+//         })
+//             .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
+//             .then(json => {
+//                 console.log('Sample added to the database:', json);
+//                 document.getElementById('confirmation-message-text').innerText = 'Sample successfully added to the database.';
+//             })
+//             .catch(error => {
+//                 console.error('Error adding sample to the database:', error);
+//                 document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
+//             });
+//     }
+
+//     if (sampleId) {
+//         // Correctly concatenate the sampleId with the URL
+//         const url = `https://onebreathpilot.onrender.com/temp_samples/${sampleId}`;
+//         console.log(url);
+
+//         fetch(url, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//         })
+//             .then(response => response.json())
+//             .then(data => {
+//                 console.log('Success:', data);
+//                 if (data.chipID) { // Assuming data is a single object
+//                     let message = `Collect breath per study protocol then return to this page. 
+//                                     When evacuation for sample ${data.chipID} has started, press the start button below:`;
+//                     document.getElementById('confirmation-message-text').innerHTML = message;
+
+//                     document.getElementById('start-button').addEventListener('click', function () {
+//                         sendSample(data);
+//                     });
+//                 } else {
+//                     console.error('Sample data is missing or malformed:', data);
+//                 }
+//                 // Assuming you want to call sendSample with the fetched data
+//                 // sendSample(data);
+//             })
+//             .catch(error => {
+//                 console.error('Error fetching sample:', error);
+//             });
+//     }
+// });
+
+// Configuration for API endpoint to make it flexible for different environments
+const API_BASE_URL = 'https://onebreathpilot.onrender.com';
+const SAMPLES_ENDPOINT = `${API_BASE_URL}/collectedsamples`;
+
+// Utility function for debouncing
+function debounce(func, wait, immediate) {
+    let timeout;
+    return function executedFunction() {
+        let context = this, args = arguments;
+        let later = function () {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        let callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+}
+
+// Simple caching mechanism
+let cache = {};
+
+async function fetchData(url) {
+    if (cache[url]) {
+        return cache[url]; // Return cached data
+    }
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        cache[url] = data; // Cache the fetched data
+        return data;
+    } catch (error) {
+        console.error("Fetch error: ", error);
+    }
+}
+
+async function sendSample(sampleData) {
+    if (!validateSampleData(sampleData)) {
+        console.error("Sample data is invalid.");
+        return;
+    }
+
+    try {
+        const response = await fetch(SAMPLES_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(sampleData),
-        })
-            .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
-            .then(json => {
-                console.log('Sample added to the database:', json);
-                document.getElementById('confirmation-message-text').innerText = 'Sample successfully added to the database.';
-            })
-            .catch(error => {
-                console.error('Error adding sample to the database:', error);
-                document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
-            });
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        console.log("Sample sent successfully");
+        // Provide UI feedback here (e.g., success message, spinner hide)
+    } catch (error) {
+        console.error("Sending sample error: ", error);
+        // Provide UI feedback here (e.g., error message, spinner hide)
     }
+}
 
+function validateSampleData(data) {
+    // Define required fields with expected data types
+    const requiredFields = {
+        chipID: 'string',
+        patientID: 'string',
+        location: 'string',
+        timestamp: 'number', // Assuming the timestamp is in milliseconds
+    };
+
+    // Check for the existence and correct type of all required fields
+    for (const [field, type] of Object.entries(requiredFields)) {
+        const value = data[field];
+
+        // Check for existence
+        if (value === undefined) {
+            console.error(`Validation error: ${field} is missing.`);
+            return false;
+        }
+
+        // Check for correct type
+        if (typeof value !== type) {
+            console.error(`Validation error: ${field} is expected to be a ${type}, but got ${typeof value}.`);
+            return false;
+        }
+    }
+    return true; 
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const sampleId = queryParams.get('sampleId');
     if (sampleId) {
-        // Correctly concatenate the sampleId with the URL
-        const url = `https://onebreathpilot.onrender.com/temp_samples/${sampleId}`;
-        console.log(url);
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                if (data.chipID) { // Assuming data is a single object
-                    let message = `Collect breath per study protocol then return to this page. 
-                                    When evacuation for sample ${data.chipID} has started, press the start button below:`;
-                    document.getElementById('confirmation-message-text').innerHTML = message;
-
-                    document.getElementById('start-button').addEventListener('click', function () {
-                        sendSample(data);
-                    });
-                } else {
-                    console.error('Sample data is missing or malformed:', data);
-                }
-                // Assuming you want to call sendSample with the fetched data
-                // sendSample(data);
-            })
-            .catch(error => {
-                console.error('Error fetching sample:', error);
-            });
+        const sampleDataUrl = `${SAMPLES_ENDPOINT}/${sampleId}`;
+        const sampleData = await fetchData(sampleDataUrl);
+        if (sampleData && sampleData.chipID) {
+            // Display sample data and setup event listeners
+            document.getElementById('sampleDisplay').innerText = sampleData.chipID;
+            // Debounce setup to minimize UI updates
+            const startButton = document.getElementById('startButton');
+            startButton.addEventListener('click', debounce(() => sendSample(sampleData), 250, false));
+        }
     }
 });
-
-
-        // Fetching data from server using the sampleId
-    //     fetch(url)
-    //         .then(response => response.ok ? response.json() : Promise.reject(`HTTP error! status: ${response.status}`))
-    //         .then(data => {
-    //             // Update to correctly handle the expected data structure
-               
-    //         })
-    //         .catch(error => {
-    //             console.error('Error fetching sample:', error);
-    //         });
-   // }
-// });

@@ -57,137 +57,203 @@ function addPickupButton(sample, cardElement) {
     cardElement.appendChild(button);
 }
 
-function sendSample(sampleData) {
+// function sendSample(sampleData) {
 
-    fetch('https://onebreathpilot.onrender.com/collectedsamples', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(sampleData),
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Sample added to the database:', data);
-            // document.getElementById('confirmation-message-text').innerText = 'Sample successfully added to the database.';
-        })
-        .catch(error => {
-            console.error('Error adding sample to the database:', error);
-            // document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
-        });
-
-    window.location.href = `confirm.html`;
-}
-
-// function submitSampleToTempBackend(sampleData) {
-//     // Add a timestamp to the sampleData object
-//     // sampleData.timestamp = new Date().toISOString();
-
-//     console.log(sampleData);
-//     // API call to submit data to the backend
-//     fetch('https://onebreathpilot.onrender.com/temp_samples', {
+//     fetch('https://onebreathpilot.onrender.com/collectedsamples', {
 //         method: 'POST',
 //         headers: {
 //             'Content-Type': 'application/json',
-            
 //         },
 //         body: JSON.stringify(sampleData),
 //     })
 //         .then(response => response.json())
 //         .then(data => {
-//             console.log('Success:', data);
-//             if (data.sample_id) {
-//                 window.location.href = `confirm.html?sample_id=${data.sample_id}`;
-//             } else {
-//                 console.error('No sample_id returned from the backend:', data);
-//             }
+//             console.log('Sample added to the database:', data);
+//             // document.getElementById('confirmation-message-text').innerText = 'Sample successfully added to the database.';
 //         })
-//         .catch((error) => console.error('Error:', error));
+//         .catch(error => {
+//             console.error('Error adding sample to the database:', error);
+//             // document.getElementById('confirmation-message-text').innerText = 'Error adding sample to the database.';
+//         });
 
+//     window.location.href = `confirm.html`;
+// }
+
+// // Check if the DOM is fully loaded
+// document.addEventListener('DOMContentLoaded', function () {
+//     // Check if the URL includes any query parameters
+//     const queryParams = window.location.search;
+//     if (queryParams) {
+//         // Query parameters exist
+//         document.getElementById('landing-main').style.display = 'none';
+//         // Function to get query string parameters
+//         function getQueryStringParams(param) {
+//             let searchParams = new URLSearchParams(window.location.search);
+//             return searchParams.get(param);
+//         }
+
+//         // Pre-fill the Chip ID field if the parameter is present
+//         let chipID = getQueryStringParams('chipID');
+//         if (chipID) {
+//             document.getElementById('chipID').value = chipID;
+//         }
+//     } else {
+//         // No query parameters
+//         updateSampleQueues();
+//         document.getElementById('add-sample-main').style.display = 'none';
+//         document.getElementById('landing-main').style.display = 'flex';
+//         console.log('URL does not include query parameters');
 //     }
 
-// Check if the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function () {
-    // Check if the URL includes any query parameters
-    const queryParams = window.location.search;
-    if (queryParams) {
-        // Query parameters exist
-        document.getElementById('landing-main').style.display = 'none';
-        // Function to get query string parameters
-        function getQueryStringParams(param) {
-            let searchParams = new URLSearchParams(window.location.search);
-            return searchParams.get(param);
+
+//     if (window.location.pathname.includes('index.html') === true || window.location.pathname === '/') {
+//         // let samples = JSON.parse(localStorage.getItem('samples')) || [];
+
+//         document.getElementById('confirm-button').addEventListener('click', function (event) {
+//             event.preventDefault();
+
+//             let chipID = document.getElementById('chipID').value;
+//             if (!chipID) {
+//                 alert('Invalid Chip ID format.');
+//                 return;
+//             }
+
+//             // Validate Patient ID Format
+//             let patientID = document.getElementById('patientID').value;
+//             if (!patientID) {
+//                 alert('Invalid Patient ID format.');
+//                 return;
+//             }
+
+//             // Ensure Location is Selected
+//             let location = document.getElementById('location').value;
+//             if (!location) {
+//                 alert('Please select a location.');
+//                 return;
+//             }
+
+//             let sample = {
+//                 chipID: chipID,
+//                 patientID: patientID,
+//                 location: location,
+//             };
+
+//             // sample.status = 'In Process';
+//             // Add any additional fields as needed
+//             // localStorage.setItem('samples', JSON.stringify(samples.concat(sample)));
+//             sendSample(sample);
+
+
+//             // Redirect to the confirmation page
+            
+//             // window.location.href = `confirm.html?sample_id=${sample.chipID}`;
+//         });
+//     } else if (window.location.pathname.endsWith('confirm.html')) {
+//         let samples = JSON.parse(localStorage.getItem('samples'));
+//         let lastSample = samples[samples.length - 1];
+//         let message = `Collect breath per study protocol then return to this page. 
+//                         When evacuation for sample ${lastSample.chipID} started, press start button below:`;
+//         document.getElementById('confirmation-message-text').innerHTML = message;
+
+//         document.getElementById('start-button').addEventListener('click', function () {
+//             // Here you can add any logic that needs to run when the start button is clicked
+//             console.log('Evacuation started for sample:', lastSample.chipID);
+//         });
+//     }
+// });
+
+// Async function to send sample data to the server
+async function sendSample(sampleData) {
+    try {
+        const response = await fetch('https://onebreathpilot.onrender.com/collectedsamples', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sampleData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Pre-fill the Chip ID field if the parameter is present
-        let chipID = getQueryStringParams('chipID');
+        const data = await response.json();
+        console.log('Sample added to the database:', data);
+        window.location.href = `confirm.html ${data.chipID}`;
+    } catch (error) {
+        console.error('Error adding sample to the database:', error);
+    }
+    
+}
+
+// Utility function for getting query string parameters
+function getQueryStringParams(param) {
+    const searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get(param);
+}
+
+// Function to initialize the application
+async function initApp() {
+    const queryParams = window.location.search;
+
+    // Handle different parts of the application based on URL and queryParams
+    if (queryParams) {
+        document.getElementById('landing-main').style.display = 'none';
+        const chipID = getQueryStringParams('chipID');
         if (chipID) {
             document.getElementById('chipID').value = chipID;
         }
     } else {
-        // No query parameters
-        updateSampleQueues();
         document.getElementById('add-sample-main').style.display = 'none';
         document.getElementById('landing-main').style.display = 'flex';
         console.log('URL does not include query parameters');
     }
 
-
-    if (window.location.pathname.includes('index.html') === true || window.location.pathname === '/') {
-        // let samples = JSON.parse(localStorage.getItem('samples')) || [];
-
-        document.getElementById('confirm-button').addEventListener('click', function (event) {
-            event.preventDefault();
-
-            let chipID = document.getElementById('chipID').value;
-            if (!chipID) {
-                alert('Invalid Chip ID format.');
-                return;
-            }
-
-            // Validate Patient ID Format
-            let patientID = document.getElementById('patientID').value;
-            if (!patientID) {
-                alert('Invalid Patient ID format.');
-                return;
-            }
-
-            // Ensure Location is Selected
-            let location = document.getElementById('location').value;
-            if (!location) {
-                alert('Please select a location.');
-                return;
-            }
-
-            let sample = {
-                chipID: chipID,
-                patientID: patientID,
-                location: location,
-            };
-
-            // sample.status = 'In Process';
-            // Add any additional fields as needed
-            // localStorage.setItem('samples', JSON.stringify(samples.concat(sample)));
-            sendSample(sample);
-
-
-            // Redirect to the confirmation page
-            
-            // window.location.href = `confirm.html?sample_id=${sample.chipID}`;
-        });
+    if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
+        setupFormSubmissionListener();
     } else if (window.location.pathname.endsWith('confirm.html')) {
-        let samples = JSON.parse(localStorage.getItem('samples'));
-        let lastSample = samples[samples.length - 1];
-        let message = `Collect breath per study protocol then return to this page. 
-                        When evacuation for sample ${lastSample.chipID} started, press start button below:`;
-        document.getElementById('confirmation-message-text').innerHTML = message;
-
-        document.getElementById('start-button').addEventListener('click', function () {
-            // Here you can add any logic that needs to run when the start button is clicked
-            console.log('Evacuation started for sample:', lastSample.chipID);
-        });
+        // Replace local storage logic with a more suitable state management approach
+        displayConfirmationMessage();
     }
-});
+}
+
+function setupFormSubmissionListener() {
+    document.getElementById('confirm-button').addEventListener('click', async function (event) {
+        event.preventDefault();
+        const sample = collectSampleFormData();
+        if (sample) {
+            await sendSample(sample);
+            // Redirect or update UI based on the application's flow
+        }
+    });
+}
+
+// Collects form data and validates it
+function collectSampleFormData() {
+    let chipID = document.getElementById('chipID').value;
+    let patientID = document.getElementById('patientID').value;
+    let location = document.getElementById('location').value;
+
+    // Basic validation (expand based on requirements)
+    if (!chipID || !patientID || !location) {
+        alert('Please fill in all required fields.');
+        return null;
+    }
+
+    return {
+        chipID: chipID,
+        patientID: patientID,
+        location: location,
+    };
+}
+
+function displayConfirmationMessage() {
+    // Implement logic to display confirmation message based on the application's state
+    console.log('Display confirmation message for the last sample');
+}
+
+document.addEventListener('DOMContentLoaded', initApp);
+
 
 // Function to update the 'In Process' queue
 let samples = JSON.parse(localStorage.getItem('samples')) || [];
@@ -236,8 +302,6 @@ function startCountdownTimer(sample) {
 
 // Call the function to update the 'In Process' queue
 updateInProcessQueue();
-
-
 
 // Function to move a sample to the next queue
 function moveToNextQueue(chipID) {
