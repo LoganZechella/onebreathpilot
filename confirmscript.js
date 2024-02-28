@@ -59,7 +59,7 @@
 
 // Configuration for API endpoint to make it flexible for different environments
 const API_BASE_URL = 'https://onebreathpilot.onrender.com';
-const SAMPLES_ENDPOINT = `${API_BASE_URL}/collectedsamples`;
+const SAMPLES_ENDPOINT = `/latestsample`;
 
 // Utility function for debouncing
 function debounce(func, wait, immediate) {
@@ -127,8 +127,7 @@ function validateSampleData(data) {
     const requiredFields = {
         chipID: 'string',
         patientID: 'string',
-        location: 'string',
-        timestamp: 'number', // Assuming the timestamp is in milliseconds
+        location: 'string'
     };
 
     // Check for the existence and correct type of all required fields

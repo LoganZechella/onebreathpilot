@@ -5,6 +5,7 @@ from pymongo import MongoClient
 import uuid
 import os
 import json
+from bson.json_util import dumps
 
 load_dotenv()
 
@@ -35,6 +36,21 @@ def add_sample():
     except Exception as e:
         print("Error adding sample to MongoDB:", e)
         return jsonify({"error": "Failed to add sample", "details": str(e)}), 500
+# Get last sample added to MongoDB
+@app.route('/latestsample', methods=['GET'])
+def get_sample():
+    try:
+        # Sort by '_id' in descending order and get the first document
+        sample = collection.find_one(sort=[('_id', -1)])
+        if sample:
+            # Convert the MongoDB document to a JSON string
+            return jsonify({"message": "Latest sample retrieved successfully", "sample": dumps(sample)}), 200
+        else:
+            return jsonify({"error": "No samples found"}), 404
+    except Exception as e:
+        print("Error retrieving sample from MongoDB:", e)
+        return jsonify({"error": "Failed to retrieve sample", "details": str(e)}), 500
+
 
 # Temporary storage for unconfirmed samples
 unconfirmed_samples = {}    
