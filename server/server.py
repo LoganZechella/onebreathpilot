@@ -41,7 +41,7 @@ def store_temp_sample():
         sample_data = request.json
         sample_id = str(uuid.uuid4())
         unconfirmed_samples[sample_id] = sample_data
-        return jsonify({'sample_id': sample_id}), 201
+        return jsonify(unconfirmed_samples[sample_id]), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

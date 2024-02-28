@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 // Assuming the first item is the sample we're interested in
-                let parseData = JSON.parse(data);
-                const sample = parseData[0].chipID; // This assumes the data is already an object, not a string
+
+                const sample = data[0].chipID; // This assumes the data is already an object, not a string
                 if (sample) {
                     let message = `Collect breath per study protocol then return to this page. 
                         When evacuation for sample ${sample} has started, press the start button below:`;
