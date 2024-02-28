@@ -76,7 +76,6 @@ function submitSampleToTempBackend(sampleData) {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
-            incomingData.sample_id = data.sample_id;
             if (data.sample_id) {
                 window.location.href = `confirm.html?sample_id=${data.sample_id}`;
             } else {
