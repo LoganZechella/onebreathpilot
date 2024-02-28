@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // sample.status = 'In Process';
             // Add any additional fields as needed
             // localStorage.setItem('samples', JSON.stringify(samples.concat(sample)));
-            submitSampleToTempBackend(JSON.stringify(sample));
+            submitSampleToTempBackend(sample);
 
 
             // Redirect to the confirmation page
