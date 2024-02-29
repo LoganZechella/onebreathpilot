@@ -58,7 +58,7 @@
 // });
 
 // Configuration for API endpoint to make it flexible for different environments
-const API_BASE_URL = 'https://onebreathpilot.onrender.com';
+const API_BASE_URL = 'http://127.0.0.1:5000';
 const SAMPLES_ENDPOINT = `/latestsample`;
 
 // Utility function for debouncing
@@ -97,25 +97,22 @@ async function fetchData(url) {
     }
 }
 
-async function sendSample(sampleData) {
-    if (!validateSampleData(sampleData)) {
-        console.error("Sample data is invalid.");
-        return;
-    }
-
+async function updateSample(sampleData) {
+    
     try {
-        const response = await fetch(SAMPLES_ENDPOINT, {
+        const response = await fetch('http://127.0.0.1:5000/updateLatestSample', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(sampleData),
         });
-        if (!response.ok) {
+        if (response !== 200) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        console.log("Sample sent successfully");
+        console.log("Sample updated successfully");
         // Provide UI feedback here (e.g., success message, spinner hide)
+        window.location.href = '/index.html';
     } catch (error) {
         console.error("Sending sample error: ", error);
         // Provide UI feedback here (e.g., error message, spinner hide)
@@ -146,21 +143,28 @@ function validateSampleData(data) {
             return false;
         }
     }
-    return true; 
+    return true;
 }
+
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     const queryParams = new URLSearchParams(window.location.search);
-    const sampleId = queryParams.get('sampleId');
+    const sampleId = queryParams.get('chipID');
     if (sampleId) {
-        const sampleDataUrl = `${SAMPLES_ENDPOINT}/${sampleId}`;
-        const sampleData = await fetchData(sampleDataUrl);
-        if (sampleData && sampleData.chipID) {
+        // const sampleDataUrl = `${API_BASE_URL}${SAMPLES_ENDPOINT}`;
+        // const sampleData = await fetchData(sampleDataUrl);
+        // if (sampleData) {
             // Display sample data and setup event listeners
-            document.getElementById('sampleDisplay').innerText = sampleData.chipID;
-            // Debounce setup to minimize UI updates
-            const startButton = document.getElementById('startButton');
-            startButton.addEventListener('click', debounce(() => sendSample(sampleData), 250, false));
-        }
+            let message = `Collect breath per study protocol then return to this page. 
+                         When evacuation for sample ${sampleId} has started, press the start button below:`;
+            document.getElementById('confirmation-message-text').innerHTML = message;
+
+            document.getElementById('start-button').addEventListener('click', function () {
+                    window.location.href = '/index.html';
+            });
+    // }
     }
 });
+
+

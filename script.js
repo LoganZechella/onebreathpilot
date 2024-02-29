@@ -165,7 +165,7 @@ function addPickupButton(sample, cardElement) {
 // Async function to send sample data to the server
 async function sendSample(sampleData) {
     try {
-        const response = await fetch('https://onebreathpilot.onrender.com/collectedsamples', {
+        const response = await fetch('http://127.0.0.1:5000/collectedsamples', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -173,13 +173,13 @@ async function sendSample(sampleData) {
             body: JSON.stringify(sampleData),
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        // if (!response.ok) {
+        //     throw new Error(`HTTP error! status: ${response.status}`);
+        // }
 
         const data = await response.json();
         console.log('Sample added to the database:', data);
-        window.location.href = `confirm.html ${data.chipID}`;
+        
     } catch (error) {
         console.error('Error adding sample to the database:', error);
     }
@@ -222,8 +222,10 @@ function setupFormSubmissionListener() {
         event.preventDefault();
         const sample = collectSampleFormData();
         if (sample) {
+            sample.timestamp = new Date().toISOString();
             await sendSample(sample);
             // Redirect or update UI based on the application's flow
+            window.location.href = `confirm.html?chipID=${sample.chipID}`;
         }
     });
 }
@@ -359,20 +361,6 @@ document.querySelectorAll('.pickup-chip-button').forEach(button => {
 });
 
 
-
-
-
-window.addEventListener('close', function (event) {
-    // Clear form fields
-    document.getElementById('chipID').value = '';
-    document.getElementById('patientID').value = '';
-    document.getElementById('location').value = '';
-
-    // Clear the samples from localStorage if they haven't been confirmed
-    localStorage.removeItem('samples');
-
-    event.returnValue = 'Are you sure you want to leave?';
-});
 
 
 
