@@ -223,6 +223,7 @@ function setupFormSubmissionListener() {
         const sample = collectSampleFormData();
         if (sample) {
             sample.timestamp = new Date().toISOString();
+            sample.status = 'In Process';
             await sendSample(sample);
             // Redirect or update UI based on the application's flow
             window.location.href = `confirm.html?chipID=${sample.chipID}`;
