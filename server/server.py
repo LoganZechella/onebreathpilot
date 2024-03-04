@@ -1,50 +1,64 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from pymongo import MongoClient
-import uuid
+import requests
 import os
-import json
-from bson.json_util import dumps
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "https://onebreathpilot.netlify.app"}})
 
-
-# MongoDB settings
-MONGO_URI = os.getenv("MONGO_URI")  # Add your MongoDB URI to your environment variables
+# MongoDB Data API settings
+MONGODB_DATA_API_URL = "https://us-east-2.aws.data.mongodb-api.com/app/data-kjhpe/endpoint/data/v1"
+MONGODB_DATA_API_KEY = os.getenv("MONGODB_DATA_API_KEY")  # Add your MongoDB Data API Key to your environment variables
 DATABASE_NAME = "pilotstudy2024"  # Replace with your database name
 COLLECTION_NAME = "collectedsamples"  # Replace with your collection name
 
-client = MongoClient(MONGO_URI)
-db = client[DATABASE_NAME]
-collection = db[COLLECTION_NAME]
+headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Request-Headers": "*",
+    "api-key": MONGODB_DATA_API_KEY,
+}
 
 # Proper Storage of Sample in MongoDB
-
 @app.route('/collectedsamples', methods=['POST'])
 def add_sample():
     try:
         sample_data = request.json
-        result = collection.insert_one(sample_data)
-        if result.inserted_id:
-            return jsonify({"message": "Sample added successfully", "sample_id": str(result.inserted_id)}), 201
+        payload = {
+            "dataSource": "Cluster0",
+            "database": DATABASE_NAME,
+            "collection": COLLECTION_NAME,
+            "document": sample_data
+        }
+        response = requests.post(f"{MONGODB_DATA_API_URL}/action/insertOne", headers=headers, json=payload)
+        response_data = response.json()
+        
+        if response.status_code == 200 and response_data["insertedId"]:
+            return jsonify({"message": "Sample added successfully", "sample_id": response_data["insertedId"]}), 201
         else:
             return jsonify({"error": "Failed to add sample"}), 500
     except Exception as e:
         print("Error adding sample to MongoDB:", e)
         return jsonify({"error": "Failed to add sample", "details": str(e)}), 500
+
 # Get last sample added to MongoDB
 @app.route('/latestsample', methods=['GET'])
 def get_sample():
     try:
-        # Sort by '_id' in descending order and get the first document
-        sample = collection.find_one(sort=[('_id', -1)])
-        if sample:
-            # Convert the MongoDB document to a JSON string
-            return jsonify({"message": "Latest sample retrieved successfully", "sample": dumps(sample)}), 200
+        payload = {
+            "dataSource": "Cluster0",
+            "database": DATABASE_NAME,
+            "collection": COLLECTION_NAME,
+            "sort": {"_id": -1},
+            "limit": 1
+        }
+        response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
+        response_data = response.json()
+        
+        if response.status_code == 200 and response_data["documents"]:
+            return jsonify({"message": "Latest sample retrieved successfully", "sample": response_data["documents"][0]}), 200
         else:
             return jsonify({"error": "No samples found"}), 404
     except Exception as e:
@@ -52,38 +66,90 @@ def get_sample():
         return jsonify({"error": "Failed to retrieve sample", "details": str(e)}), 500
 
 
-# Temporary storage for unconfirmed samples
-unconfirmed_samples = {}    
-@app.route('/temp_samples', methods=['POST'])
-def store_temp_sample():
+# Update sample in MongoDB
+@app.route('/updateLatestSample', methods=['POST'])
+def update_latest_sample():
     try:
-        sample_data = request.json
-        # Fallback parsing if sample_data is None or not parsed as expected
-        if sample_data is None:
-            try:
-                sample_data = json.loads(request.data)
-            except json.JSONDecodeError:
-                return jsonify({'error': 'Invalid JSON payload'}), 400
+        # Retrieve the latest sample's ID
+        find_payload = {
+            "dataSource": "Cluster0",
+            "database": DATABASE_NAME,
+            "collection": COLLECTION_NAME,
+            "sort": {"_id": -1},
+            "limit": 1
+        }
+        find_response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=find_payload)
+        find_response_data = find_response.json()
+        
+        if find_response.status_code != 200 or not find_response_data["documents"]:
+            return jsonify({"error": "No samples found to update"}), 404
 
-        if not isinstance(sample_data, dict):
-            return jsonify({'error': 'Expected object in request payload'}), 400
+        latest_sample_id = find_response_data["documents"][0]["_id"]
+        
+        # Update the latest sample with new data from request
+        update_data = request.json  # Assuming the request body contains the update data
+        update_payload = {
+            "dataSource": "Cluster0",
+            "database": DATABASE_NAME,
+            "collection": COLLECTION_NAME,
+            "filter": {"_id": latest_sample_id},  # Filter document by ID
+            "update": {
+                "$set": update_data  # Update operation
+            }
+        }
+        update_response = requests.post(f"{MONGODB_DATA_API_URL}/action/updateOne", headers=headers, json=update_payload)
+        update_response_data = update_response.json()
 
-        sample_id = str(uuid.uuid4())
-        sample_data['sample_id'] = sample_id
-        unconfirmed_samples[sample_id] = sample_data
-        return jsonify(sample_data), 201
+        if update_response.status_code == 200 and update_response_data["modifiedCount"] == 1:
+            return jsonify({"message": "Latest sample updated successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to update the latest sample"}), 500
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# Get a single unconfirmed sample by ID
+        print("Error updating sample in MongoDB:", e)
+        return jsonify({"error": "Failed to update sample", "details": str(e)}), 500
     
-@app.route('/temp_samples/<sample_id>', methods=['GET'])
-def get_temp_sample(sample_id):
-    sample_data = unconfirmed_samples.get(sample_id)
-    if sample_data:
-        return jsonify(sample_data), 200
-    else:
-        return jsonify({'error': 'Sample not found'}), 404
+# Get In Process Samples
+@app.route('/samples/inprocess', methods=['GET'])
+def get_in_process_samples():
+    try:
+        payload = {
+            "dataSource": "Cluster0",
+            "database": DATABASE_NAME,
+            "collection": COLLECTION_NAME,
+            "filter": {
+                "status": "In Process"
+            }
+        }
+        response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
+        response_data = response.json()
+        
+        if response.status_code == 200 and response_data["documents"]:
+            # Convert from MongoDB's format if necessary
+            return jsonify({"samples": response_data["documents"]}), 200
+        else:
+            return jsonify({"message": "No in-process samples found"}), 404
+    except Exception as e:
+        print(f"Error fetching in-process samples: {e}")
+        return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
+
+@app.route('/updateSample/<chipID>', methods=['POST'])
+def update_sample(chipID):
+    try:
+        update_data = request.json
+        update_payload = {
+            "dataSource": "Cluster0",
+            "database": DATABASE_NAME,
+            "collection": COLLECTION_NAME,
+            "filter": {"chipID": chipID},
+            "update": {"$set": update_data}
+        }
+        response = requests.post(f"{MONGODB_DATA_API_URL}/action/updateOne", json=update_payload, headers=headers)
+        if response.status_code == 200:
+            return jsonify({"message": "Sample updated successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to update sample"}), response.status_code
+    except Exception as e:
+        return jsonify({"error": "Server error", "details": str(e)}), 500
 
 # if __name__ == '__main__':
 #     app.run(debug=True)
