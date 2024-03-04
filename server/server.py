@@ -116,20 +116,12 @@ def update_latest_sample():
 @app.route('/samples/inprocess', methods=['GET'])
 def get_in_process_samples():
     try:
-        current_time = datetime.datetime.now()
-        four_hours_ago = current_time - datetime.timedelta(hours=4)
-
-        # Convert four_hours_ago to the format your MongoDB expects for comparison
-        four_hours_ago_iso = four_hours_ago.isoformat()
-
         payload = {
             "dataSource": "Cluster0",
             "database": DATABASE_NAME,
             "collection": COLLECTION_NAME,
             "filter": {
                 "status": "In Process"
-                # Ensure timestamp is stored in a comparable format, adjust if necessary
-                # "timestamp": {"$gte": four_hours_ago_iso}
             }
         }
         response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)

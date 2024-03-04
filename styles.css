@@ -1,6 +1,16 @@
-/* h1, h2, h3, h4, h5, h6, p {
+body {
+    background: #232324;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
     color: black;
-} */
+}
 
 @media screen and (max-width: 480px) {
     .section {
@@ -12,7 +22,7 @@
         max-height: 15%;
         max-width: 95%;
 
-    }   
+    }
 
     #landing-main {
         display: flex;
@@ -23,10 +33,24 @@
         justify-content: center;
     }
 
-    
+    .card {
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        gap: 1rem;
+        border: 1px solid black;
+        max-width: 150px;
+        border: 2px solid rgba(0, 0, 0, 0.8);
+        border-radius: 15px;
+        padding: 0.25em 0.25em 0.25em 0.25em;
+        margin: 0.25em 0 0.25em 0;
+        background: rgba(255, 255, 255, 0.5);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        text-align: center;
+    }
+
 }
-
-
 
 
 #new-sample-form {
@@ -50,6 +74,7 @@
     color: black;
     min-height: 35vh;
     min-width: 95%;
+
 }
 
 #landing-main {
@@ -62,30 +87,24 @@
     justify-content: center;
 }
 
-.section-element {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+.card {
     gap: 1rem;
     border: 1px solid black;
-    max-width: 250px;
-    aspect-ratio: 1/1;
-}
-
-.section-element-text {
-    text-align: center;
-    flex-wrap: wrap;
-    padding: 0.5em 0 0.5em 0;
-    font-size: larger;
-}
-
-.card {
+    max-width: 50%;
     border: 2px solid rgba(0, 0, 0, 0.8);
     border-radius: 15px;
     padding: 0.25em 0.25em 0.25em 0.25em;
-    text-align: center;
     margin: 0.25em 0 0.25em 0;
+    background: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    /* border: 1px solid rgba(255, 255, 255, 0.3); */
+}
+
+#card-text-id {
+    font-weight: bolder;
+    text-decoration: underline;
 }
 
 .ready-for-pickup-button {
@@ -110,12 +129,12 @@
     background-color: #fefefe;
     margin: 15% auto;
     padding: 20px;
-    border: 1px solid #888;
+    border: 1px solid #000000;
     width: 80%;
 }
 
 .close-button {
-    color: #aaa;
+    color: #000000;
     float: right;
     font-size: 28px;
     font-weight: bold;

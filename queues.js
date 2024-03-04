@@ -1,14 +1,16 @@
 async function fetchAndDisplayInProcessSamples() {
     try {
         const response = await fetch('http://127.0.0.1:5000/samples/inprocess');
-        // if (!response.ok) {
-        //     throw new Error('Network response was not ok');
-        // }
+        if (response.status === 404) {
+            console.log('No in-process samples found.'); // Log a message or handle this scenario as needed
+            return; // Exit the function early
+        }
         const data = await response.json();
+        if (!data.samples) {
+            return;
+        }
         const samples = data.samples;
-
-        const inProcessElement = document.getElementById('in-process-section').querySelector('.grid');
-
+        
         function moveToPickupSection(card) {
             const pickupSection = document.getElementById('pickup-section');
             pickupSection.appendChild(card);
@@ -30,8 +32,10 @@ async function fetchAndDisplayInProcessSamples() {
                 }
             }, 1000);
         }
-
-        samples.forEach(sample => {
+        if (!samples) {
+            return;
+        } else {
+           samples.forEach(sample => {
             const card = document.createElement('div');
             card.className = `card ${sample.chipID}`;
 
@@ -44,22 +48,27 @@ async function fetchAndDisplayInProcessSamples() {
             if (timeElapsed < fourHoursInMs) {
                 // Display countdown
                 card.innerHTML = `
-                <p>Chip ID: ${sample.chipID}</p>
-                <p>Status: ${sample.status}</p>
+                <p id="card-text-id">Chip ID: ${sample.chipID}</p>
+                <p id="card-text-status">Status: ${sample.status}</p>
+                <p id="card-text-location">Location: ${sample.location}</p>
                 <p><span id="countdown-${sample.chipID}">${sample.timestamp}</span></p>`;
                 const countdownElement = card.querySelector(`#countdown-${sample.chipID}`);
                 updateCountdown(countdownElement, countdownTargetTime);
                 document.getElementById('in-process-section').querySelector('.grid').appendChild(card);
             } else {
                 // Move to 'pickup-section'
+                sample.status = 'Ready for Pickup';
                 moveToPickupSection(card);
                 card.innerHTML = `
-                <p>Chip ID: ${sample.chipID}</p>
-                <p>Status: ${sample.status}</p>
+                <p id="card-text-id">Chip ID: ${sample.chipID}</p>
+                <p id="card-text-status">Status: ${sample.status}</p>
+                <p id="card-text-location">Location: ${sample.location}</p>
                 <button class="pickup-button" id="${sample.chipID}">Pickup Chip</button>
                 `;
             }
-        });
+        }); 
+        }
+        
     }
     catch (error) {
         console.error('Failed to fetch in-process samples:', error);
