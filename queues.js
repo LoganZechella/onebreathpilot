@@ -1,10 +1,10 @@
 async function fetchAndDisplayInProcessSamples() {
     try {
         const response = await fetch('https://onebreathpilot.onrender.com/samples/inprocess');
-        if (response.status === 404) {
-            console.log('No in-process samples found.'); // Log a message or handle this scenario as needed
-            // return; // Exit the function early
-        }
+        // if (response.status === 404) {
+        //     console.log('No in-process samples found.'); // Log a message or handle this scenario as needed
+        //     // return; // Exit the function early
+        // }
         const data = await response.json();
         if (!data.samples) {
             return;
