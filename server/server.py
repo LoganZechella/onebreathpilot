@@ -117,7 +117,7 @@ def get_in_process_samples():
             "database": DATABASE_NAME,
             "collection": COLLECTION_NAME,
             "filter": {
-                "status": "In Process"
+                "status": "In Process" | "Ready for pickup"
             }
         }
         response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
