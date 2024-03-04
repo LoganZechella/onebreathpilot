@@ -3,7 +3,6 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import requests
 import os
-from bson.json_util import dumps
 
 load_dotenv()
 
