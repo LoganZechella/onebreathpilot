@@ -7,7 +7,7 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://onebreathpilot.netlify.app"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # MongoDB Data API settings
 MONGODB_DATA_API_URL = "https://us-east-2.aws.data.mongodb-api.com/app/data-kjhpe/endpoint/data/v1"
@@ -151,5 +151,5 @@ def update_sample(chipID):
     except Exception as e:
         return jsonify({"error": "Server error", "details": str(e)}), 500
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
