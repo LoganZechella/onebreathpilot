@@ -32,10 +32,7 @@ async function fetchAndDisplayInProcessSamples() {
                 }
             }, 1000);
         }
-        if (!samples) {
-            return;
-        } else {
-           samples.forEach(sample => {
+        samples.forEach(sample => {
             const card = document.createElement('div');
             card.className = `card ${sample.chipID}`;
 
@@ -66,9 +63,8 @@ async function fetchAndDisplayInProcessSamples() {
                 <button class="pickup-button" id="${sample.chipID}">Pickup Chip</button>
                 `;
             }
-        }); 
-        }
         
+        })
     }
     catch (error) {
         console.error('Failed to fetch in-process samples:', error);
