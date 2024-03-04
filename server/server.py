@@ -136,7 +136,6 @@ def get_in_process_samples():
 @app.route('/updateSample/<chipID>', methods=['POST'])
 def update_sample(chipID):
     try:
-        # Remove the line that extracts chipID from JSON, as it's already a parameter
         update_data = request.json
         update_payload = {
             "dataSource": "Cluster0",
@@ -153,5 +152,5 @@ def update_sample(chipID):
     except Exception as e:
         return jsonify({"error": "Server error", "details": str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
