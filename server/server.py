@@ -112,7 +112,7 @@ def update_latest_sample():
         print("Error updating sample in MongoDB:", e)
         return jsonify({"error": "Failed to update sample", "details": str(e)}), 500
     
-# Get All
+# Get In Process Samples
 @app.route('/samples/inprocess', methods=['GET'])
 def get_in_process_samples():
     try:
@@ -125,14 +125,13 @@ def get_in_process_samples():
         payload = {
             "dataSource": "Cluster0",
             "database": DATABASE_NAME,
-            "collection": COLLECTION_NAME
-            # "filter": {
-            #     "status": "In Process",
-            #     # Ensure timestamp is stored in a comparable format, adjust if necessary
-            #     # "timestamp": {"$gte": four_hours_ago_iso}
-            # }
+            "collection": COLLECTION_NAME,
+            "filter": {
+                "status": "In Process"
+                # Ensure timestamp is stored in a comparable format, adjust if necessary
+                # "timestamp": {"$gte": four_hours_ago_iso}
+            }
         }
-        print(payload)
         response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
         response_data = response.json()
         
@@ -144,6 +143,49 @@ def get_in_process_samples():
     except Exception as e:
         print(f"Error fetching in-process samples: {e}")
         return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
+
+@app.route('/updateSample/<chipID>', methods=['POST'])
+def update_sample(chipID):
+    try:
+        # Remove the line that extracts chipID from JSON, as it's already a parameter
+        update_data = request.json
+        update_payload = {
+            "dataSource": "Cluster0",
+            "database": DATABASE_NAME,
+            "collection": COLLECTION_NAME,
+            "filter": {"chipID": chipID},
+            "update": {"$set": update_data}
+        }
+        response = requests.post(f"{MONGODB_DATA_API_URL}/action/updateOne", json=update_payload, headers=headers)
+        if response.status_code == 200:
+            return jsonify({"message": "Sample updated successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to update sample"}), response.status_code
+    except Exception as e:
+        return jsonify({"error": "Server error", "details": str(e)}), 500
+
+# @app.route('/samples/find', methods=['GET'])
+# def find_sample(chipID):
+#     try:
+#         payload = {
+#             "dataSource": "Cluster0",
+#             "database": DATABASE_NAME,
+#             "collection": COLLECTION_NAME,
+#             "filter": {
+#                 "chipID": chipID
+#             }
+#         }
+#         response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
+#         response_data = response.json()
+        
+#         if response.status_code == 200 and response_data["documents"]:
+#             # Convert from MongoDB's format if necessary
+#             return jsonify({"samples": response_data["documents"]}), 200
+#         else:
+#             return jsonify({"message": "No in-process samples found"}), 404
+#     except Exception as e:
+#         print(f"Error fetching in-process samples: {e}")
+#         return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
 
 
 if __name__ == '__main__':

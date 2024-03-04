@@ -8,7 +8,7 @@ async function fetchAndDisplayInProcessSamples() {
         const samples = data.samples;
 
         const inProcessElement = document.getElementById('in-process-section').querySelector('.grid');
-        // inProcessElement.innerHTML = ''; // Clear current content
+
         function moveToPickupSection(card) {
             const pickupSection = document.getElementById('pickup-section');
             pickupSection.appendChild(card);
@@ -33,11 +33,11 @@ async function fetchAndDisplayInProcessSamples() {
 
         samples.forEach(sample => {
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = `card ${sample.chipID}`;
 
             const sampleTimestamp = new Date(sample.timestamp);
             const now = new Date();
-            const fourHoursInMs = 4 * 60 * 60 * 1000;
+            const fourHoursInMs = 1 * 60 * 60 * 1000; // SET TIME FOR COUNTDOWN TIMER HERE
             const timeElapsed = now - sampleTimestamp;
             const countdownTargetTime = new Date(sampleTimestamp.getTime() + fourHoursInMs);
 
@@ -55,14 +55,79 @@ async function fetchAndDisplayInProcessSamples() {
                 moveToPickupSection(card);
                 card.innerHTML = `
                 <p>Chip ID: ${sample.chipID}</p>
-                <p>Status: Ready for Pickup</p>
-                <button class="pickup-button">Pickup Chip</button>
+                <p>Status: ${sample.status}</p>
+                <button class="pickup-button" id="${sample.chipID}">Pickup Chip</button>
                 `;
             }
         });
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Failed to fetch in-process samples:', error);
     }
 }
 
-document.addEventListener('DOMContentLoaded', fetchAndDisplayInProcessSamples);
+
+
+
+// Pickup Form
+
+// Show the pickup form modal when the pickup button is clicked
+document.querySelectorAll('.pickup-button').forEach(button => {
+    button.addEventListener('click', function () {
+        const chipID = this.getElementById;
+        console.log(chipID);
+        document.querySelector('#pickup-form [name="data-chip-id"]').value = chipID;
+        document.getElementById('pickup-form-modal').style.display = 'block';
+    });
+});
+
+// Handle form submission
+document.getElementById('pickup-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    const chipID = this.elements['data-chip-id'].value;
+    const updateData = {
+        chipID: chipID,
+        finalVolume: this.elements['final-volume'].value,
+        averageCO2: this.elements['average-co2'].value,
+        status: 'Picked up, ready for shipment.',
+        errorCode: this.elements['error-codes'].value
+    };
+    console.log(updateData);
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/updateSample/${chipID}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateData)
+        });
+
+        if (response.ok) {
+            alert('Sample updated successfully.');
+            document.getElementById('pickup-form-modal').style.display = 'none';
+            // Refresh or update the UI as needed
+            function moveToShippingSection(card) {
+                const shippingSection = document.getElementById('shipping-section');
+                shippingSection.appendChild(card);
+            }
+            const card = document.querySelector(`.${chipID}`);
+            moveToShippingSection(card);
+        } else {
+            throw new Error('Failed to update sample');
+        }
+    } catch (error) {
+        console.error('Error updating sample:', error);
+    }
+});
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('landing-main').addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('pickup-button')) {
+            const chipID = event.target.id; // Using the button's id as the chipID
+            document.querySelector('#pickup-form [name="data-chip-id"]').value = chipID;
+            document.getElementById('pickup-form-modal').style.display = 'block';
+        }
+    });
+
+    fetchAndDisplayInProcessSamples();
+});
