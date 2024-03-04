@@ -22,7 +22,7 @@ headers = {
 }
 
 # Proper Storage of Sample in MongoDB
-@app.route('/collectedsamples', methods=['POST'])
+@app.route('https://onebreathpilot.onrender.com/collectedsamples', methods=['POST'])
 def add_sample():
     try:
         sample_data = request.json
@@ -44,7 +44,7 @@ def add_sample():
         return jsonify({"error": "Failed to add sample", "details": str(e)}), 500
 
 # Get last sample added to MongoDB
-@app.route('/latestsample', methods=['GET'])
+@app.route('https://onebreathpilot.onrender.com/latestsample', methods=['GET'])
 def get_sample():
     try:
         payload = {
@@ -67,7 +67,7 @@ def get_sample():
 
 
 # Update sample in MongoDB
-@app.route('/updateLatestSample', methods=['POST'])
+@app.route('https://onebreathpilot.onrender.com/updateLatestSample', methods=['POST'])
 def update_latest_sample():
     try:
         # Retrieve the latest sample's ID
@@ -109,7 +109,7 @@ def update_latest_sample():
         return jsonify({"error": "Failed to update sample", "details": str(e)}), 500
     
 # Get In Process Samples
-@app.route('/samples/inprocess', methods=['GET'])
+@app.route('https://onebreathpilot.onrender.com/samples/inprocess', methods=['GET'])
 def get_in_process_samples():
     try:
         payload = {
@@ -132,7 +132,7 @@ def get_in_process_samples():
         print(f"Error fetching in-process samples: {e}")
         return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
 
-@app.route('/updateSample/<chipID>', methods=['POST'])
+@app.route('https://onebreathpilot.onrender.com/updateSample/<chipID>', methods=['POST'])
 def update_sample(chipID):
     try:
         update_data = request.json
