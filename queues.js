@@ -75,9 +75,6 @@ async function fetchAndDisplayInProcessSamples() {
     }
 }
 
-
-
-
 // Pickup Form
 
 // Show the pickup form modal when the pickup button is clicked
