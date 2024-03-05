@@ -45,7 +45,7 @@ async function fetchAndDisplayInProcessSamples() {
             if (timeElapsed < fourHoursInMs) {
                 // Display countdown
                 card.innerHTML = `
-                <p id="card-text-id">Chip ID: ${sample.chipID}</p>
+                <h3 id="card-text-id">Chip ID: ${sample.chipID}</h3>
                 <p id="card-text-status">Status: ${sample.status}</p>
                 <p id="card-text-location">Location: ${sample.location}</p>
                 <p><span id="countdown-${sample.chipID}">${sample.timestamp}</span></p>`;
@@ -57,7 +57,7 @@ async function fetchAndDisplayInProcessSamples() {
                 sample.status = 'Ready for Pickup';
                 moveToPickupSection(card);
                 card.innerHTML = `
-                <p id="card-text-id">Chip ID: ${sample.chipID}</p>
+                <h3 id="card-text-id">Chip ID: ${sample.chipID}</h3>
                 <p id="card-text-status">Status: ${sample.status}</p>
                 <p id="card-text-location">Location: ${sample.location}</p>
                 <button class="pickup-button" id="${sample.chipID}">Pickup Chip</button>
