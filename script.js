@@ -102,7 +102,6 @@ async function initApp() {
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
         setupFormSubmissionListener();
     } else if (window.location.pathname.endsWith('confirm.html')) {
-        // Replace local storage logic with a more suitable state management approach
         displayConfirmationMessage();
     }
 }

@@ -7,7 +7,7 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://onebreathpilot.netlify.app"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # MongoDB Data API settings
 MONGODB_DATA_API_URL = "https://us-east-2.aws.data.mongodb-api.com/app/data-kjhpe/endpoint/data/v1"
@@ -150,6 +150,31 @@ def update_sample(chipID):
             return jsonify({"error": "Failed to update sample"}), response.status_code
     except Exception as e:
         return jsonify({"error": "Server error", "details": str(e)}), 500
+    
+
+# Get Ready for Analysis Samples
+@app.route('/samples/analysis', methods=['GET'])
+def get_ready_for_analysis_samples():
+    try:
+        payload = {
+            "dataSource": "Cluster0",
+            "database": DATABASE_NAME,
+            "collection": COLLECTION_NAME,
+            "filter": {
+                "status": "Picked up, ready for elution and analysis."
+            }
+        }
+        response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
+        response_data = response.json()
+        
+        if response.status_code == 200 and response_data["documents"]:
+            # Convert from MongoDB's format if necessary
+            return jsonify({"samples": response_data["documents"]}), 200
+        else:
+            return jsonify({"message": "No in-process samples found"}), 404
+    except Exception as e:
+        print(f"Error fetching in-process samples: {e}")
+        return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
 
 # if __name__ == '__main__':
 #     app.run(debug=True)
