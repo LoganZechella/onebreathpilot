@@ -23,6 +23,10 @@ p {
     color: black;
 }
 
+.hgroup > * {
+    color: white;
+}
+
 @media screen and (max-width: 480px) {
     .section {
         border-radius: 10px;
@@ -32,7 +36,7 @@ p {
         color: black;
         max-height: 15%;
         max-width: 95%;
-
+        grid-template-columns: 1fr;
     }
 
     #landing-main {
@@ -52,6 +56,16 @@ p {
     flex-direction: column;
 }
 
+#confirmation-message-text > h2 {
+    color: red;
+    text-align: center;
+}
+
+#confirmation-message-text > h3 {
+    color: #f2f2f2;
+    text-align: center;
+}
+
 .dashboard {
     display: flex;
     flex-wrap: wrap;
@@ -68,8 +82,14 @@ p {
     color: black;
     min-height: 35vh;
     min-width: 95%;
-    grid-template-columns: 2fr;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     grid-template-rows: 1fr;
+    justify-items: center;
+}
+
+.section-title {
+    max-height: 50px;
+    max-width: fit-content;
 }
 
 #landing-main {
@@ -88,12 +108,11 @@ p {
     border-radius: 25px;
     text-align: center;
     padding: 15px;
-    max-width: 50%;
     min-width: 100px;
     margin: 0.25em 0.25em 0.5em 0.25em;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
     border: #000000b6 0.9px solid;
-} 
+}
 
 .card h3 {
     font-size: 1em;

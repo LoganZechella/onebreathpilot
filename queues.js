@@ -7,11 +7,14 @@ async function fetchAndDisplayInProcessSamples() {
         // }
         const data = await response.json();
         if (!data.samples) {
+            
             return;
         }
         const samples = data.samples;
         
         function moveToPickupSection(card) {
+            document.getElementById('in-process-section').style.gridTemplateColumns = '1fr';
+            document.getElementById('in-process-section').querySelector('.grid').innerHTML = '<h4>No Samples In Process</h4>';
             const pickupSection = document.getElementById('pickup-section');
             pickupSection.appendChild(card);
         }
@@ -38,7 +41,7 @@ async function fetchAndDisplayInProcessSamples() {
 
             const sampleTimestamp = new Date(sample.timestamp);
             const now = new Date();
-            const fourHoursInMs = 1 * 60 * 60 * 1000; // SET TIME FOR COUNTDOWN TIMER HERE
+            const fourHoursInMs = (2 * 60 * 60 * 1000) + (15 * 60 * 1000); // SET TIME FOR COUNTDOWN TIMER HERE
             const timeElapsed = now - sampleTimestamp;
             const countdownTargetTime = new Date(sampleTimestamp.getTime() + fourHoursInMs);
 
@@ -71,6 +74,40 @@ async function fetchAndDisplayInProcessSamples() {
     }
 }
 
+// Check for Samples Ready for Analysis
+async function fetchAndDisplayAnalysisSamples() {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/samples/analysis');
+        // if (response.status === 404) {
+        //     console.log('No in-process samples found.'); // Log a message or handle this scenario as needed
+        //     // return; // Exit the function early
+        // }
+        const data = await response.json();
+        if (!data.samples) {
+
+            return;
+        }
+        const samples = data.samples;
+
+        function moveToAnalysisSection(card) {
+            const analysisSection = document.getElementById('shipping-section');
+            analysisSection.appendChild(card);
+        }
+        samples.forEach(sample => {
+            const card = document.createElement('div');
+            card.className = `card ${sample.chipID}`;
+            card.innerHTML = `
+                <h3 id="card-text-id">Chip ID: ${sample.chipID}</h3>
+                <p id="card-text-status">Status: ${sample.status}</p>`;
+            moveToAnalysisSection(card);
+        });
+    }
+    catch (error) {
+        console.error('Failed to fetch in-process samples:', error);
+    }
+};
+
+
 // Pickup Form
 
 // Show the pickup form modal when the pickup button is clicked
@@ -91,7 +128,7 @@ document.getElementById('pickup-form').addEventListener('submit', async function
         chipID: chipID,
         finalVolume: this.elements['final-volume'].value,
         averageCO2: this.elements['average-co2'].value,
-        status: 'Picked up, ready for shipment.',
+        status: 'Picked up, ready for elution and analysis.',
         errorCode: this.elements['error-codes'].value
     };
     console.log(updateData);
@@ -109,6 +146,7 @@ document.getElementById('pickup-form').addEventListener('submit', async function
             function moveToShippingSection(card) {
                 const shippingSection = document.getElementById('shipping-section');
                 shippingSection.appendChild(card);
+                card.querySelector('.pickup-button').remove();
             }
             const card = document.querySelector(`.${chipID}`);
             moveToShippingSection(card);
@@ -119,6 +157,29 @@ document.getElementById('pickup-form').addEventListener('submit', async function
         console.error('Error updating sample:', error);
     }
 });
+
+// Format and Add No Samples Message to Sections if Needed
+function noSamplesCheck() {
+    const inProcessSection = document.getElementById('in-process-section');
+    const pickupSection = document.getElementById('pickup-section');
+    const shippingSection = document.getElementById('shipping-section');
+    const elutionSection = document.getElementById('elution-section');
+    if (inProcessSection.querySelector('.grid').childElementCount === 0) {
+        document.getElementById('in-process-section').style.gridTemplateColumns = '1fr';
+        inProcessSection.querySelector('.grid').innerHTML = '<h4>No Samples In Process</h4>';
+    } else if (pickupSection.querySelector('.grid').childElementCount === 0) {
+        document.getElementById('pickup-section').style.gridTemplateColumns = '1fr';
+        pickupSection.querySelector('.grid').innerHTML = '<h4>No Samples Ready for Pickup</h4>';
+    } 
+    if (shippingSection.querySelector('.grid').childElementCount === 0) {
+        document.getElementById('shipping-section').style.gridTemplateColumns = '1fr';
+        shippingSection.querySelector('.grid').innerHTML = '<h4>No Samples Ready for Shipment</h4>';
+    }
+    if (elutionSection.querySelector('.grid').childElementCount === 0) {
+        document.getElementById('elution-section').style.gridTemplateColumns = '1fr';
+        elutionSection.querySelector('.grid').innerHTML = '<h4>No Samples Ready for Elution</h4>';
+    }
+}
 
 
 
@@ -132,4 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     fetchAndDisplayInProcessSamples();
+    // fetchAndDisplayAnalysisSamples();
+    noSamplesCheck();
 });

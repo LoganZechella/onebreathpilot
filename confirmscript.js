@@ -97,10 +97,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // const sampleData = await fetchData(sampleDataUrl);
         // if (sampleData) {
             // Display sample data and setup event listeners
-            let message = `Collect breath per study protocol then return to this page. 
-                         When evacuation for sample ${sampleId} has started, press the start button below:`;
-            document.getElementById('confirmation-message-text').innerHTML = message;
-
+            let message1 = '<h2>COLLECT BREATH PER STUDY PROTOCOL THEN RETURN TO THIS PAGE.</h2>'; 
+            let message2 = `<h3>When evacuation for sample ${sampleId} has started, press the start button below:</h3>`;
+            let messageCombined = `${message1} <br/> ${message2}`;
+            document.getElementById('confirmation-message-text').innerHTML = messageCombined;
             document.getElementById('start-button').addEventListener('click', function () {
                     window.location.href = '/index.html';
             });
