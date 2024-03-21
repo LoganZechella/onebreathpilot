@@ -1,5 +1,6 @@
 // Configuration for API endpoint to make it flexible for different environments
-const API_BASE_URL = 'https://onebreathpilot.onrender.com';
+// const API_BASE_URL = 'https://onebreathpilot.onrender.com';
+const API_BASE_URL = 'http://127.0.0.1:5000';
 const SAMPLES_ENDPOINT = `/latestsample`;
 
 // Utility function for debouncing
@@ -41,7 +42,8 @@ async function fetchData(url) {
 async function updateSample(sampleData) {
     
     try {
-        const response = await fetch('https://onebreathpilot.onrender.com/updateLatestSample', {
+        // const response = await fetch('https://onebreathpilot.onrender.com/updateLatestSample', {
+        const response = await fetch('http://127.0.0.1:5000/updateLatestSample', {    
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
