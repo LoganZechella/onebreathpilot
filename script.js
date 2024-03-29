@@ -147,8 +147,3 @@ function displayConfirmationMessage() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-
-
-
-
-
