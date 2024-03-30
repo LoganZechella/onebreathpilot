@@ -144,6 +144,17 @@ function displayConfirmationMessage() {
     // Implement logic to display confirmation message based on the application's state
     console.log('Display confirmation message for the last sample');
 }
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+    // Show the sign-in form
+    document.getElementById('show-sign-in').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent the link from following the URL
+        document.getElementById('sign-in-container').style.display = 'block';
+    });
 
-document.addEventListener('DOMContentLoaded', initApp);
+    // Optionally, if you have a close button in your form, handle its click event to hide the form
+    document.getElementById('sign-in-close-btn').addEventListener('click', () => {
+        document.getElementById('sign-in-container').style.display = 'none';
+    });
+});
 

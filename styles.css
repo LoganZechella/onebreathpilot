@@ -23,7 +23,7 @@ p {
     color: black;
 }
 
-.hgroup > * {
+.hgroup>* {
     color: white;
 }
 
@@ -57,12 +57,12 @@ p {
     flex-direction: column;
 }
 
-#confirmation-message-text > h2 {
+#confirmation-message-text>h2 {
     color: red;
     text-align: center;
 }
 
-#confirmation-message-text > h3 {
+#confirmation-message-text>h3 {
     color: #f2f2f2;
     text-align: center;
 }
@@ -78,7 +78,7 @@ p {
     grid-template-areas:
         "title"
         "content";
-    grid-template-rows: auto 1fr; 
+    grid-template-rows: auto 1fr;
     border-radius: 10px;
     padding: 0.5em;
     box-sizing: border-box;
@@ -90,35 +90,35 @@ p {
     overflow-y: scroll;
     max-width: 100%;
     min-width: 75%;
-    justify-items: stretch; 
+    justify-items: stretch;
 }
 
 .section-title {
     grid-area: title;
-    width: 100%; 
-    max-height: 50px; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
+    width: 100%;
+    max-height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: 0.75em 0 0.25em 0;
     text-decoration: underline;
 }
 
 .grid {
-    display: grid; 
+    display: grid;
     grid-area: content;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
-    width: 100%; 
-    justify-items: center; 
+    width: 100%;
+    justify-items: center;
 }
 
-.section > .grid > h4 {
+.section>.grid>h4 {
     color: #2196f3;
     text-shadow: -2px 2px 2px #dbdbdb62;
     text-align: center;
 }
-   
+
 #landing-main {
     /* display: flex; */
     display: none;
@@ -234,7 +234,54 @@ p {
     color: black;
 }
 
-#pickup-form > input {
+#pickup-form>input {
     background-color: #fefefe;
     color: black;
+}
+
+/* Sign-in Form Styles */
+#sign-in-container {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+    position: fixed;
+    /* Positioned related to the viewport */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    /* Ensures the modal is above other content */
+    display: none;
+    /* Hidden by default */
+}
+
+#sign-in-container input[type="email"],
+#sign-in-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#sign-in-container button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#sign-in-container button:hover {
+    background-color: #0056b3;
+}
+
+#email,
+#password,
+#email::placeholder,
+#password::placeholder {
+    color: #ffffff;
 }

@@ -3,11 +3,17 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import requests
 import os
+import firebase_admin
+from firebase_admin import credentials, auth
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Firebase Admin SDK settings
+cred = credentials.Certificate('/Users/logan/Git/onebreathpilot-1/server/pilotdash-2466b-firebase-adminsdk-26rdi-b90efa2591.json')
+firebase_admin.initialize_app(cred)
 
 # MongoDB Data API settings
 MONGODB_DATA_API_URL = "https://us-east-2.aws.data.mongodb-api.com/app/data-kjhpe/endpoint/data/v1"
@@ -20,6 +26,20 @@ headers = {
     "Access-Control-Request-Headers": "*",
     "api-key": MONGODB_DATA_API_KEY,
 }
+
+# Authentication with Firebase
+@app.route('/protected-route', methods=['GET', 'POST'])
+def protected_route():
+    # Extract the token from the Authorization header
+    token = request.headers.get('Authorization').split(' ')[1]
+    try:
+        # Verify the token
+        decoded_token = auth.verify_id_token(token)
+        uid = decoded_token['uid']
+        # Proceed with your protected route logic
+        return jsonify({"message": "Access granted", "uid": uid}), 200
+    except Exception as e:
+        return jsonify({"error": "Access denied"}), 401
 
 # Proper Storage of Sample in MongoDB
 @app.route('/collectedsamples', methods=['POST'])

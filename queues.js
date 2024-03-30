@@ -83,15 +83,15 @@ async function fetchAndDisplayAnalysisSamples() {
 
         const data = await response.json();
         if (!data.samples) {
-            const pickupGrid = document.getElementById('pickup-section').querySelector('.grid');
-            pickupGrid.innerHTML = '<h4>No Samples Ready for Pickup</h4>';
-            pickupGrid.style.gridTemplateColumns = 'none';
-
+        
             return;
         }
         const samples = data.samples;
 
         function moveToAnalysisSection(card) {
+            const pickupGrid = document.getElementById('pickup-section').querySelector('.grid');
+            pickupGrid.innerHTML = '<h4>No Samples Ready for Pickup</h4>';
+            pickupGrid.style.gridTemplateColumns = 'none';
             const analysisSection = document.getElementById('shipping-section');
             analysisSection.querySelector('.grid').appendChild(card);
         }
