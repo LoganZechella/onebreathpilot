@@ -1,6 +1,4 @@
-// Import auth instance from firebaseConfig.js
-import { auth } from './firebaseConfig.js';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
 
 // Listen for the document to be loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,19 +11,24 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sign-in-container').style.display = 'block';
         };
     });
-    // Email/Password Sign-In
-    document.getElementById('sign-in').addEventListener('click', async () => {
+        // Email/Password Sign-In
+    document.getElementById('sign-in').addEventListener('click', () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password); // Correctly capturing the result
-            console.log("Email sign-in user:", userCredential.user);
-            // Redirect here or update UI
-            window.location.href = '/index.html'; // Example redirect
-        } catch (error) {
+        
+        fetch('http://127.0.0.1:5000/api/auth/signin', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        })
+        .then(response => response.json())
+        
+        .catch(error => {
             console.error("Error signing in with email:", error);
             alert(error.message); // Display errors to the user
-        }
+        });
     });
 
 
@@ -42,20 +45,4 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(error.message); // Display errors to the user
         }
     });
-});
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // User is signed in, update the UI or redirect
-        console.log("User is signed in", user);
-        let login = document.getElementById('show-sign-in');
-        login.innerHTML = "Sign Out";
-        login.classList.add('logged-in');
-    } else {
-        // User is signed out, update the UI
-        console.log("User is signed out");
-        let login = document.getElementById('show-sign-in');
-        login.innerHTML = "Sign In";
-        login.classList.add('logged-out');
-    }
 });
