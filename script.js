@@ -146,6 +146,8 @@ function displayConfirmationMessage() {
 }
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
+    AOS.refresh();
+    
     // Show the sign-in form
     document.getElementById('show-sign-in').addEventListener('click', (event) => {
         event.preventDefault(); // Prevent the link from following the URL

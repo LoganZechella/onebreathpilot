@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap");
 
+
 :root {
     --primaryFont: "Fredoka", sans-serif;
     --backgroundColor: #19191a;
@@ -11,12 +12,17 @@
 body {
     background: var(--backgroundColor);
     font-family: var(--primaryFont);
-}
+    
 
 .blocker {
     display: flex;
     flex-direction: column;
-    padding: 1em 0 1em 0;
+    margin: 1em 0 1em 0;
+    padding: 1em 0.5em 1em 0.5em;
+    background-image: url('./assets/images/loadingblur.png');
+    background-size: contain;
+    backdrop-filter: blur(10px);
+}
 }
 
 h1,
@@ -34,6 +40,13 @@ p {
 }
 
 @media screen and (max-width: 480px) {
+    body {
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+
     .section {
         border-radius: 10px;
         padding: 1rem;
@@ -254,8 +267,8 @@ p {
     width: 300px;
     position: fixed;
     /* Positioned related to the viewport */
-    left: 50%;
-    top: 50%;
+    left:50vw;
+    top: 50vh;
     transform: translate(-50%, -50%);
     z-index: 100;
     /* Ensures the modal is above other content */
@@ -291,3 +304,4 @@ p {
 #password::placeholder {
     color: #ffffff;
 }
+
