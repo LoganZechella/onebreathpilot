@@ -12,15 +12,6 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Firebase Admin SDK settings
-config = {
-    "apiKey": os.getenv("FIREBASE_API_KEY"),
-    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
-    "projectId": "pilotdash-2466b",
-    "storageBucket": "pilotdash-2466b.appspot.com",
-    "messagingSenderId": "929141041648",
-    "appId": "1:929141041648:web:1f27019dda3624dd885535",
-    "measurementId": "G-R0EETJKW7B"
-}
 cred = credentials.Certificate('server/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
 firebase_admin.initialize_app(cred)
 
@@ -37,59 +28,17 @@ headers = {
     "api-key": MONGODB_DATA_API_KEY,
 }
 
-# Authentication with Firebase
-@app.route('/api/login', methods=['GET', 'POST'])
-def protected_route():
-    # Extract the token from the Authorization header
-    token = request.headers.get('Authorization').split(' ')[1]
-    try:
-        # Verify the token
-        decoded_token = auth.verify_id_token(token)
-        uid = decoded_token['uid']
-        # Proceed with your protected route logic
-        return jsonify({"message": "Access granted", "uid": uid}), 200
-    except Exception as e:
-        return jsonify({"error": "Access denied"}), 401
-    
-# Endpoint for email/password sign-in
-@app.route('/api/auth/signin', methods=['POST', 'GET'])
+@app.route('/api/auth/signin', methods=['POST'])
 def signin():
-    email = request.json['email']
-    password = request.json['password']
-    api_key = os.getenv("FIREBASE_API_KEY")  
-    signin_url = "https://identitytoolkit.googleapis.com/v1accounts:signInWithPassword?key={api_key}"
-
-    request_data = {
-        'email': email,
-        'password': password,
-        'returnSecureToken': True,
-        'content-type': 'application/json',
-        'key': api_key
-    }
-
+    # This endpoint should only receive the ID token from the client and verify it
+    id_token = request.json.get('idToken')
     try:
-        user = auth.get_user_by_email(email)
-        uid = user.uid
-        login_headers = {
-            'Authorization': uid,
-            'Content-Type': 'application/json'
-        }
-        login_response = requests.post('http://localhost:5000/api/login', headers=login_headers)
-        if login_response.ok:
-            client_token = firebase_admin._token_gen.TokenGenerator()
-            return jsonify({'message': 'Sign-in successful', 'user': user, 'token': client_token}), 200
-        
-        response = firebase_admin._auth_utils.validate_email(email)
-        responsetwo = firebase_admin._auth_utils.validate_password(password)
-        if (response and responsetwo):
-            print(response)
-            return jsonify({'message': 'Sign-in successful'}), 200
-        else:
-            app.logger.error('Firebase sign-in error: %s', response.text)  # Log error response
-            return jsonify({'error': 'Authentication failed', 'details': response.text}), response.status_code
+        # Verify the ID token and extract user info
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+        return jsonify({'message': 'User authenticated', 'uid': uid}), 200
     except Exception as e:
-        app.logger.error('Exception occurred: %s', str(e))  # Log any other exceptions
-        return jsonify({'error': 'Server error', 'details': str(e)}), 500
+        return jsonify({'error': str(e)}), 401
 
 # Google Signin
 @app.route('/api/auth/googleSignIn', methods=['POST'])
