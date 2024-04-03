@@ -1,3 +1,7 @@
+pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json
+
+
+
 # Logs
 logs
 *.log
@@ -129,3 +133,4 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+

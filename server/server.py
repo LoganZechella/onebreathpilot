@@ -3,11 +3,18 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import requests
 import os
+import firebase_admin
+from firebase_admin import credentials, auth
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Firebase Admin SDK settings
+cred = credentials.Certificate('server/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
+firebase_admin.initialize_app(cred)
+
 
 # MongoDB Data API settings
 MONGODB_DATA_API_URL = "https://us-east-2.aws.data.mongodb-api.com/app/data-kjhpe/endpoint/data/v1"
@@ -20,6 +27,30 @@ headers = {
     "Access-Control-Request-Headers": "*",
     "api-key": MONGODB_DATA_API_KEY,
 }
+
+@app.route('/api/auth/signin', methods=['POST'])
+def signin():
+    # This endpoint should only receive the ID token from the client and verify it
+    id_token = request.json.get('idToken')
+    try:
+        # Verify the ID token and extract user info
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+        return jsonify({'message': 'User authenticated', 'uid': uid}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 401
+
+# Google Signin
+@app.route('/api/auth/googleSignIn', methods=['POST'])
+def google_sign_in():
+    id_token = request.json['idToken']
+    try:
+        # Verify the ID token and get the user's Firebase UID
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+        return jsonify({'message': 'Google sign-in successful', 'uid': uid}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to authenticate with Google', 'details': str(e)}), 401
 
 # Proper Storage of Sample in MongoDB
 @app.route('/collectedsamples', methods=['POST'])

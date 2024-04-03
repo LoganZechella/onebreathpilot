@@ -6,117 +6,209 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     <link rel="stylesheet" href="/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
     <title>OneBreath Sample Dashboard</title>
 </head>
 
 <body>
+    
     <nav class="container-fluid">
         <ul>
             <li><strong>OneBreath Pilot Study</strong></li>
         </ul>
         <ul>
             <li><a href="#">Home</a></li>
-            <li><a href="#">Sign In</a></li>
+            <li><a href="#" id="show-sign-in" class="logged-out">Sign In</a></li>
         </ul>
     </nav>
 
-    <main class="container" id="add-sample-main" >
-        
-        <div class="grid">
-            <section>
-                <hgroup class="hgroup">
-                    <h2>Sample Registration</h2>
-                    <h3>Enter the details for the new sample</h3>
-                </hgroup>
-                <form id="new-sample-form">
-                    <label for="chipID">Chip ID: (PXXXXX)</label>
+    <!-- sign-in.html -->
+    <div id="sign-in-container" data-aos="fade-up" data-aos-duration="500" >
+        <span class="close-button" id="sign-in-close-btn">&times;</span>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button id="sign-in">Sign In</button>
+        <button id="sign-in-google">Sign In with Google</button>
+    </div>
 
-                    <input type="text" id="chipID" pattern="\d*" required>
+    <div class="blocker">
+        <main class="container" id="add-sample-main">
 
-                    <label for="patientID">Patient ID: (BDx-XXX)</label>
+            <div class="grid">
+                <section>
+                    <hgroup class="hgroup">
+                        <h2>Sample Registration</h2>
+                        <h3>Enter the details for the new sample</h3>
+                    </hgroup>
+                    <form id="new-sample-form">
+                        <label for="chipID">Chip ID: (PXXXXX)</label>
 
-                    <input type="text" id="patientID" pattern="\d*" required>
+                        <input type="text" id="chipID" pattern="\d*" required>
 
-                    <label for="location">Location</label>
-                    <select id="location" name="location" required>
-                        <option value="">Select Location</option>
-                        <option value="CT - Radiology">CT - Radiology</option>
-                        <option value="BCC - 3rd Floor Clinic">BCC - 3rd Floor Clinic</option>
-                    </select>
-                    <button id="confirm-button">Confirm</button>
-                </form>
+                        <label for="patientID">Patient ID: (BDx-XXX)</label>
+
+                        <input type="text" id="patientID" pattern="\d*" required>
+
+                        <label for="location">Location</label>
+                        <select id="location" name="location" required>
+                            <option value="">Select Location</option>
+                            <option value="CT - Radiology">CT - Radiology</option>
+                            <option value="BCC - 3rd Floor Clinic">BCC - 3rd Floor Clinic</option>
+                        </select>
+                        <button id="confirm-button">Confirm</button>
+                    </form>
+                </section>
+            </div>
+        </main>
+
+        <main class="container" id="landing-main">
+
+            <div class="add-button-div" id="add-button-div">
+                <button id="add-new-sample">Add New Sample</button>
+                <button id="qr-close-btn" style="display: none;">Close QR Scanner</button>
+            </div>
+            <div id="reader" style="width: 300px" data-aos="flip-left" data-aos-duration="500"></div>
+
+            <section class="section in-process-section" id="in-process-section" data-aos="fade-in" data-aos-duration="500">
+                <div class="section-title" id="in-process-title">
+                    <h3>In-Process</h3>
+                </div>
+                <div class="grid">
+
+                </div>
             </section>
-        </div>
-    </main>
 
-    <main class="container" id="landing-main">
-        <section class="section in-process-section" id="in-process-section">
-            <div class="section-title" id="in-process-title">
-                <h3>In-Process</h3>
-            </div>
-            <div class="grid">
-                
-            </div>
-        </section>
+            <div id="pickup-form-modal" class="modal" data-aos="fade-up" data-aos-duration="500">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h2>Pick Up Sample</h2>
+                    <form id="pickup-form">
+                        <input type="text" name="data-chip-id" hidden>
 
-        <div id="pickup-form-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-button">&times;</span>
-                <h2>Pick Up Sample</h2>
-                <form id="pickup-form">
-                    <input type="text" name="data-chip-id"hidden>
+                        <label for="final-volume">Final Volume (mL):</label>
+                        <input type="number" id="final-volume" name="final-volume" required>
 
-                    <label for="final-volume">Final Volume (mL):</label>
-                    <input type="number" id="final-volume" name="final-volume" required>
-        
-                    <label for="average-co2">Average CO2 (%):</label>
-                    <input type="number" step="0.1" id="average-co2" name="average-co2" required>
-        
-                    <label for="error-codes">Error Codes (Optional):</label>
-                    <input type="text" id="error-codes" name="error-codes">
-        
-                    <button type="submit" id="confirm-pickup" action="https://onebreathpilot.onrender.com">Confirm Pickup</button>
-                </form>
-            </div>
-        </div>
+                        <label for="average-co2">Average CO2 (%):</label>
+                        <input type="number" step="0.1" id="average-co2" name="average-co2" required>
 
+                        <label for="error-codes">Error Codes (Optional):</label>
+                        <input type="text" id="error-codes" name="error-codes">
 
-        <section class="section pickup-section" id="pickup-section">
-            <div class="section-title" id="ready-for-pickup-title">
-                <h3>Ready for Pickup</h3>
-            </div>
-            <div class="grid">
-            
+                        <button type="submit" id="confirm-pickup" action="https://onebreathpilot.onrender.com">Confirm
+                            Pickup</button>
+                    </form>
+                </div>
             </div>
 
-        </section>
-        <section class="section shipping-section" id="shipping-section">
-            <div class="section-title" id="shipping-title">
-                <h3>Ready for Analysis</h3>
-            </div>
-            <div class="grid">
-            
-            </div>
 
-        </section>
-        <section class="section elution-section" id="elution-section">
-            <div class="section-title" id="elution-title">
-                <h3>Elution</h3>
-            </div>
-            <div class="grid">
-            
-            </div>
 
-        </section>
-    </main>
+            <section class="section pickup-section" id="pickup-section" data-aos="flip-left" data-aos-duration="500">
+                <div class="section-title" id="ready-for-pickup-title">
+                    <h3>Ready for Pickup</h3>
+                </div>
+                <div class="grid">
 
+                </div>
+
+            </section>
+            <section class="section shipping-section" id="shipping-section" data-aos="flip-left" data-aos-duration="500">
+                <div class="section-title" id="shipping-title">
+                    <h3>Ready for Analysis</h3>
+                </div>
+                <div class="grid">
+
+                </div>
+
+            </section>
+            <section class="section elution-section" id="elution-section" data-aos="flip-left" data-aos-duration="500">
+                <div class="section-title" id="elution-title">
+                    <h3>Elution</h3>
+                </div>
+                <div class="grid">
+
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="./server/auth.js" type="module"></script>
+    <script>
+        AOS.init();
+    </script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script>
+        const addNewSampleButton = document.getElementById('add-new-sample');
+        const qrCodeScannerElement = document.getElementById('reader');
+        const bodySections = {
+            'add-button': document.getElementById('add-new-sample'),
+            'in-process': document.getElementById('in-process-section'),
+            'pickup': document.getElementById('pickup-section'),
+            'shipping': document.getElementById('shipping-section'),
+            'elution': document.getElementById('elution-section')
+        }
+
+        addNewSampleButton.addEventListener('click', function () {
+            for (const section in bodySections) {
+                bodySections[section].style.display = 'none';
+                document.getElementById('qr-close-btn').style.display = 'block';
+                AOS.refresh();
+            }
+
+            // Create a new instance of Html5QrcodeScanner
+            const html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 1, qrbox: { width: 250, height: 250 } };
+
+            function onScanSuccess(decodedText, decodedResult) {
+                // Handle the scanned text here.
+                console.log(`QR Code detected: ${decodedText}`);
+                window.location.href = `${decodedText}`;
+                // Possibly hide the scanner or redirect user.
+                html5QrCode.stop().then(() => {
+                    for (const section in bodySections) {
+                        bodySections[section].style.display = 'grid';
+                    }
+                    document.getElementById('qr-close-btn').style.display = 'none';
+                    bodySections[0].style.display = 'block';
+                    AOS.refresh();
+                    console.log('QR Scanner stopped.');
+                }).catch((err) => {
+                    // Stop failed, handle it.
+                    console.error('Failed to stop the QR Scanner', err);
+                });
+            }
+
+            function onScanError(errorMessage) {
+                // handle scan error
+                console.error(`QR scan error: ${errorMessage}`);
+            }
+            document.addEventListener('click', function () {
+            html5QrCode.stop().then(() => {
+                for (const section in bodySections) {
+                    bodySections[section].style.display = 'grid';
+                }
+                document.getElementById('qr-close-btn').style.display = 'none';
+                bodySections[0].style.display = 'block';
+                AOS.refresh();
+            }).catch((err) => {
+                // Stop failed, handle it.
+                console.error('Failed to stop the QR Scanner', err);
+            });
+        })
+
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanError);
+
+        });
+    </script>
+    
     <script src="script.js"></script>
     <script src="queues.js"></script>
 
 
-    <footer class="container">
-        <small><a href="#">Privacy Policy</a> • <a href="#">Terms of Service</a></small>
-    </footer>
 </body>
 
 </html>
