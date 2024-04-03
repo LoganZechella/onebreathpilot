@@ -207,5 +207,5 @@ def get_ready_for_analysis_samples():
         print(f"Error fetching in-process samples: {e}")
         return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
