@@ -1,4 +1,3 @@
-import os from 'os';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
 // Import statements for Firebase v9+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
