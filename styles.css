@@ -258,6 +258,10 @@ p {
     color: black;
 }
 
+#manual-add-btn {
+    display: none;
+}
+
 /* Sign-in Form Styles */
 #sign-in-container {
     background-color: #f9f9f9;

@@ -3,10 +3,11 @@ import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, } from 'https:
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
+
 // Initialize Firebase App
 const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    apiKey: "",
+    authDomain: "pilotdash-2466b.firebaseapp.com",
     projectId: "pilotdash-2466b",
     storageBucket: "pilotdash-2466b.appspot.com",
     messagingSenderId: "929141041648",
@@ -44,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return user.getIdToken();
             })
             .then((idToken) => {
-                return fetch('https://onebreathpilot.onrender.com/api/auth/signin', {
-                // return fetch('http://127.0.0.1:5000/api/auth/signin', {
+                // return fetch('https://onebreathpilot.onrender.com/api/auth/signin', {
+                return fetch('http://127.0.0.1:5000/api/auth/signin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idToken })
@@ -71,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await signInWithPopup(auth, googleProvider);
             // Send ID token to your backend via HTTP POST
             const idToken = await result.user.getIdToken();
-            fetch('https://onebreathpilot.onrender.com/api/auth/googleSignIn', {
-            // fetch('http://127.0.0.1:5000/api/auth/googleSignIn', {
+            // fetch('https://onebreathpilot.onrender.com/api/auth/googleSignIn', {
+            fetch('http://127.0.0.1:5000/api/auth/googleSignIn', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken })
@@ -95,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log('User is signed in:', user);
         document.querySelector('.blocker').style.display = 'flex'; // Hide the blocker
         document.getElementById('sign-in-container').style.display = 'none'; // Hide the sign-in form
         document.getElementById('show-sign-in').classList.add('logged-in'); // Update the UI to show the user is logged in

@@ -60,8 +60,8 @@ function addPickupButton(sample, cardElement) {
 // Async function to send sample data to the server
 async function sendSample(sampleData) {
     try {
-        // const response = await fetch('http://127.0.0.1:5000/collectedsamples', {
-        const response = await fetch('https://onebreathpilot.onrender.com/collectedsamples', {
+        const response = await fetch('http://127.0.0.1:5000/collectedsamples', {
+        // const response = await fetch('https://onebreathpilot.onrender.com/collectedsamples', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -97,7 +97,6 @@ async function initApp() {
     } else {
         document.getElementById('add-sample-main').style.display = 'none';
         document.getElementById('landing-main').style.display = 'flex';
-        console.log('URL does not include query parameters');
     }
 
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
@@ -140,10 +139,18 @@ function collectSampleFormData() {
     };
 }
 
+function manualSampleEntry() {
+    document.getElementById('landing-main').style.display = 'none';
+    document.getElementById('add-sample-main').style.display = 'flex';
+}
+
 function displayConfirmationMessage() {
     // Implement logic to display confirmation message based on the application's state
     console.log('Display confirmation message for the last sample');
 }
+
+document.getElementById('manual-add-btn').addEventListener('click', manualSampleEntry);
+
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
     AOS.refresh();

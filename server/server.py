@@ -12,8 +12,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Firebase Admin SDK settings
-# cred = credentials.Certificate('server/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
-cred = credentials.Certificate('/etc/secrets/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
+cred = credentials.Certificate('server/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
+# cred = credentials.Certificate('/etc/secrets/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
 firebase_admin.initialize_app(cred)
 
 
@@ -208,5 +208,5 @@ def get_ready_for_analysis_samples():
         print(f"Error fetching in-process samples: {e}")
         return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)

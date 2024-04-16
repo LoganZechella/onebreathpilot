@@ -1,7 +1,7 @@
 async function fetchAndDisplayInProcessSamples() {
     try {
-        const response = await fetch('https://onebreathpilot.onrender.com/samples/inprocess');
-        // const response = await fetch('http://127.0.0.1:5000/samples/inprocess');
+        // const response = await fetch('https://onebreathpilot.onrender.com/samples/inprocess');
+        const response = await fetch('http://127.0.0.1:5000/samples/inprocess');
         // if (response.status === 404) {
         //     console.log('No in-process samples found.'); // Log a message or handle this scenario as needed
         //     // return; // Exit the function early
@@ -78,8 +78,8 @@ async function fetchAndDisplayInProcessSamples() {
 // Check for Samples Ready for Analysis
 async function fetchAndDisplayAnalysisSamples() {
     try {
-        const response = await fetch('https://onebreathpilot.onrender.com/samples/analysis');
-        // const response = await fetch('http://127.0.0.1:5000/samples/analysis');
+        // const response = await fetch('https://onebreathpilot.onrender.com/samples/analysis');
+        const response = await fetch('http://127.0.0.1:5000/samples/analysis');
 
         const data = await response.json();
         if (!data.samples) {
@@ -139,8 +139,8 @@ document.getElementById('pickup-form').addEventListener('submit', async function
     };
 
     try {
-        const response = await fetch(`https://onebreathpilot.onrender.com/updateSample/${chipID}`, {
-        // const response = await fetch(`http://127.0.0.1:5000/updateSample/${chipID}`, {    
+        // const response = await fetch(`https://onebreathpilot.onrender.com/updateSample/${chipID}`, {
+        const response = await fetch(`http://127.0.0.1:5000/updateSample/${chipID}`, {    
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updateData)
