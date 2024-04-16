@@ -60,21 +60,16 @@ function addPickupButton(sample, cardElement) {
 // Async function to send sample data to the server
 async function sendSample(sampleData) {
     try {
-        const response = await fetch('http://127.0.0.1:5000/collectedsamples', {
-        // const response = await fetch('https://onebreathpilot.onrender.com/collectedsamples', {
+        const response = await fetch('/.netlify/functions/sampleHandler', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(sampleData),
         });
         const data = await response.json();
         console.log('Sample added to the database:', data);
-        
     } catch (error) {
         console.error('Error adding sample to the database:', error);
     }
-    
 }
 
 // Utility function for getting query string parameters
