@@ -60,21 +60,16 @@ function addPickupButton(sample, cardElement) {
 // Async function to send sample data to the server
 async function sendSample(sampleData) {
     try {
-        // const response = await fetch('http://127.0.0.1:5000/collectedsamples', {
-        const response = await fetch('https://onebreathpilot.onrender.com/collectedsamples', {
+        const response = await fetch('/.netlify/functions/sampleHandler', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(sampleData),
         });
         const data = await response.json();
         console.log('Sample added to the database:', data);
-        
     } catch (error) {
         console.error('Error adding sample to the database:', error);
     }
-    
 }
 
 // Utility function for getting query string parameters
@@ -97,7 +92,6 @@ async function initApp() {
     } else {
         document.getElementById('add-sample-main').style.display = 'none';
         document.getElementById('landing-main').style.display = 'flex';
-        console.log('URL does not include query parameters');
     }
 
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
@@ -140,10 +134,18 @@ function collectSampleFormData() {
     };
 }
 
+function manualSampleEntry() {
+    document.getElementById('landing-main').style.display = 'none';
+    document.getElementById('add-sample-main').style.display = 'flex';
+}
+
 function displayConfirmationMessage() {
     // Implement logic to display confirmation message based on the application's state
     console.log('Display confirmation message for the last sample');
 }
+
+document.getElementById('manual-add-btn').addEventListener('click', manualSampleEntry);
+
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
     AOS.refresh();
@@ -155,6 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Optionally, if you have a close button in your form, handle its click event to hide the form
+    document.getElementById('sample-reg-section').querySelector('.close-button').addEventListener('click', () => {
+        document.getElementById('landing-main').style.display = 'flex';
+        document.getElementById('add-sample-main').style.display = 'none';
+    });
+
     document.getElementById('sign-in-close-btn').addEventListener('click', () => {
         document.getElementById('sign-in-container').style.display = 'none';
     });

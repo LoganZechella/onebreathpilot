@@ -36,7 +36,8 @@
         <main class="container" id="add-sample-main">
 
             <div class="grid">
-                <section>
+                <section id="sample-reg-section">
+                    <span class="close-button" id="sign-in-close-btn">&times;</span>
                     <hgroup class="hgroup">
                         <h2>Sample Registration</h2>
                         <h3>Enter the details for the new sample</h3>
@@ -67,6 +68,7 @@
             <div class="add-button-div" id="add-button-div">
                 <button id="add-new-sample">Add New Sample</button>
                 <button id="qr-close-btn" style="display: none;">Close QR Scanner</button>
+                <button id="manual-add-btn">Enter Data Manually</button>
             </div>
             <div id="reader" style="width: 300px" data-aos="flip-left" data-aos-duration="500"></div>
 
@@ -156,6 +158,7 @@
             for (const section in bodySections) {
                 bodySections[section].style.display = 'none';
                 document.getElementById('qr-close-btn').style.display = 'block';
+                document.getElementById('manual-add-btn').style.display = 'block';
                 AOS.refresh();
             }
 
@@ -192,6 +195,7 @@
                     bodySections[section].style.display = 'grid';
                 }
                 document.getElementById('qr-close-btn').style.display = 'none';
+                document.getElementById('manual-add-btn').style.display = 'none';
                 bodySections[0].style.display = 'block';
                 AOS.refresh();
             }).catch((err) => {

@@ -12,9 +12,11 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Firebase Admin SDK settings
-# cred = credentials.Certificate('server/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
-cred = credentials.Certificate('/etc/secrets/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
+cred = credentials.Certificate('server/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
+# cred = credentials.Certificate('/etc/secrets/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
 firebase_admin.initialize_app(cred)
+fb_admin_cred = os.getenv("FIREBASE_API_KEY")
+fb_admin_domain = os.getenv("FIREBASE_AUTH_DOMAIN")
 
 
 # MongoDB Data API settings

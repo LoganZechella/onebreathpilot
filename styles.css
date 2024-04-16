@@ -12,18 +12,21 @@
 body {
     background: var(--backgroundColor);
     font-family: var(--primaryFont);
-    
+    background-image: url('./assets/images/loadingblur.png');
+    background-size: cover;
+    backdrop-filter: blur(10px);
+    min-height: 100vh;
+    background-position: center;
+}
 
 .blocker {
     display: flex;
     flex-direction: column;
     margin: 1em 0 1em 0;
     padding: 1em 0.5em 1em 0.5em;
-    background-image: url('./assets/images/loadingblur.png');
-    background-size: contain;
-    backdrop-filter: blur(10px);
+    
 }
-}
+
 
 h1,
 h2,
@@ -41,9 +44,9 @@ p {
 
 @media screen and (max-width: 480px) {
     body {
-        background-size: contain;
+        background-size: fill;
         background-repeat: no-repeat;
-        background-position: center;
+        background-position: bottom;
     }
 
 
@@ -76,14 +79,59 @@ p {
     flex-direction: column;
 }
 
+#new-sample-form>label {
+    color: #ffffff;
+}
+
+#sample-reg-section {
+    padding: 1em 1em 1em 1em;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 1em;
+}
+
+#sample-reg-section>.close-button {
+    color: #ffffff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+#confirm-button {
+    background-color: #2196f3;
+}
+
+#add-sample-main>.grid {
+    grid-template-columns: 1fr;
+}
+
 #confirmation-message-text>h2 {
-    color: red;
+    background-color: red;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    border-radius: 0.5em;
+    text-shadow: #000000 2px 3px 5px;
+}
+
+#confirmation-message-text>h2 {
+    color: #ffffff;
     text-align: center;
 }
 
 #confirmation-message-text>h3 {
     color: #f2f2f2;
     text-align: center;
+}
+
+#start-button {
+    background-color: #10d364d3;
+    width: 35%;
+    min-height: 150px;
+    text-shadow: #ffffff9c -1px 1px 5px;
+}
+
+.animate__animated.animate__pulse {
+    --animate-delay: 3s;
+    --animate-duration: 1s;
+    --animate-iteration-count: infinite;
 }
 
 .dashboard {
@@ -256,6 +304,10 @@ p {
 #pickup-form>input {
     background-color: #fefefe;
     color: black;
+}
+
+#manual-add-btn {
+    display: none;
 }
 
 /* Sign-in Form Styles */
