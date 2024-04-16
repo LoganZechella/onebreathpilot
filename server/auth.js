@@ -6,7 +6,7 @@ import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/fir
 
 // Initialize Firebase App
 const firebaseConfig = {
-    apiKey: "",
+    apiKey: "AIzaSyBW0bd6AuFyb3OZmO98DFQX3bgKwwwdxYo",
     authDomain: "pilotdash-2466b.firebaseapp.com",
     projectId: "pilotdash-2466b",
     storageBucket: "pilotdash-2466b.appspot.com",

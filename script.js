@@ -162,6 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Optionally, if you have a close button in your form, handle its click event to hide the form
+    document.getElementById('sample-reg-section').querySelector('.close-button').addEventListener('click', () => {
+        document.getElementById('landing-main').style.display = 'flex';
+        document.getElementById('add-sample-main').style.display = 'none';
+    });
+
     document.getElementById('sign-in-close-btn').addEventListener('click', () => {
         document.getElementById('sign-in-container').style.display = 'none';
     });
