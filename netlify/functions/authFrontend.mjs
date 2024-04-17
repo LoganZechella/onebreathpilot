@@ -3,17 +3,14 @@ import fetch from 'node-fetch';
 export async function authFrontend(event) {
     // Setting CORS headers
     const headers = {
-        'Access-Control-Allow-Origin': '*', // This allows all domains. For production, specify your domain
+        'Access-Control-Allow-Origin': 'https://onebreathpilot.netlify.app',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Content-Type': 'application/json'
     };
 
-    // Handle preflight requests (CORS)
     if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 204,
-            headers
-        };
+        return { statusCode: 204, headers };
     }
 
     try {
