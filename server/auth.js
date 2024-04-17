@@ -49,42 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sign-in-container').style.display = 'block';
         };
     });
-    // // Email Sign-In
-    // document.getElementById('sign-in').addEventListener('click', () => {
-    //     const email = document.getElementById('email').value;
-    //     const password = document.getElementById('password').value;
-
-    //     signInWithEmailAndPassword(auth, email, password)
-    //         .then((userCredential) => {
-    //             const user = userCredential.user;
-    //             return user.getIdToken();
-    //         })
-    //         .then((idToken) => {
-    //             // return fetch('https://onebreathpilot.onrender.com/api/auth/signin', {
-    //             return fetch('http://127.0.0.1:5000/api/auth/signin', {
-    //                 method: 'POST',
-    //                 headers: { 'Content-Type': 'application/json' },
-    //                 body: JSON.stringify({ idToken })
-    //             });
-    //         })
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             document.querySelector('.blocker').style.display = 'flex'; // Hide the blocker
-    //             document.getElementById('sign-in-container').style.display = 'none'; // Hide the sign-in form
-    //             document.getElementById('show-sign-in').classList.add('logged-in'); // Update the UI to show the user is logged in
-    //             document.getElementById('show-sign-in').textContent = 'Sign Out'; // Change the text to "Sign Out"
-    //         })
-    //         .catch(error => {
-    //             console.error('Error signing in with email:', error);
-    //             alert('Login failed: ' + error.message);
-    //         });
-    // });
 
     document.getElementById('sign-in').addEventListener('click', async () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         try {
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/.netlify/functions/authFrontend', { email, password, type: 'emailSignIn' });
+            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/netlify/functions/authFrontend', { email, password, type: 'emailSignIn' });
             // const data = await makeAuthRequest('http://127.0.0.1:5000/.netlify/functions/authFrontend', { email, password, type: 'application/json' });
             console.log('Login successful:', data);
         } catch (error) {
@@ -92,40 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // // Google Sign-In
-    // document.getElementById('sign-in-google').addEventListener('click', async () => {
-    //     const googleProvider = new GoogleAuthProvider();
-    //     try {
-    //         const result = await signInWithPopup(auth, googleProvider);
-    //         // Send ID token to your backend via HTTP POST
-    //         const idToken = await result.user.getIdToken();
-    //         // fetch('https://onebreathpilot.onrender.com/api/auth/googleSignIn', {
-    //         fetch('http://127.0.0.1:5000/api/auth/googleSignIn', {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({ idToken })
-    //         }).then(response => response.json())
-    //             .then(data => {
-    //                 // console.log('Backend response:', data);
-    //                 document.getElementById('sign-in-container').style.display = 'none'; // Hide the sign-in form
-    //                 document.getElementById('show-sign-in').classList.add('logged-in'); // Update the UI to show the user is logged in
-    //                 document.getElementById('show-sign-in').textContent = 'Sign Out'; // Change the text to "Sign Out"
-    //                 // Handle response from your backend
-    //             }).catch(error => {
-    //                 console.error('Error sending ID token to backend:', error);
-    //             });
-    //     } catch (error) {
-    //         console.error("Error with Google sign-in:", error);
-    //         alert(error.message);
-    //     }
-    // });
-
     document.getElementById('sign-in-google').addEventListener('click', async () => {
         const googleProvider = new GoogleAuthProvider();
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/.netlify/functions/authFrontend', { idToken, type: 'googleSignIn' });
+            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/netlify/functions/authFrontend', { idToken, type: 'googleSignIn' });
             // const data = await makeAuthRequest('http://127.0.0.1:5000/.netlify/functions/authFrontend', { idToken, type: 'googleSignIn' });
             console.log('Google sign-in successful:', data);
         } catch (error) {
