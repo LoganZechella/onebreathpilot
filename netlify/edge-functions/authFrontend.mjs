@@ -1,22 +1,25 @@
-import fetch from 'node-fetch';
-
-export async function authFrontend(event) {
-    // Setting CORS headers
+export default async function authFrontend(event, context) {
+    // Setup CORS headers for both production and local development
     const headers = {
-        'Access-Control-Allow-Origin': 'https://onebreathpilot.netlify.app',
+        'Access-Control-Allow-Origin': event.headers.origin || event.headers.Origin || '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Content-Type': 'application/json'
     };
 
+    // Handle preflight OPTIONS request
     if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 204, headers };
+        return new Response(null, { status: 204, headers });
     }
 
     try {
+        if (!event.body) {
+            return new Response(JSON.stringify({ error: "No request body provided" }), { status: 400, headers });
+        }
+
         const { type, email, password, idToken } = JSON.parse(event.body);
-        const backendUrl = process.env.BACKEND_URL;
-        const apiSecret = process.env.API_SECRET;
+        const backendUrl = "https://onebreathpilot.onrender.com";
+        const apiSecret = context.clientContext.environment.API_SECRET;
         let apiUrl = '';
         let fetchOptions = {};
 
@@ -44,32 +47,21 @@ export async function authFrontend(event) {
                 };
                 break;
             default:
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ error: "Invalid request type" }),
-                    headers
-                };
+                return new Response(JSON.stringify({ error: "Invalid request type" }), { status: 400, headers });
         }
 
         const response = await fetch(apiUrl, fetchOptions);
-
         if (!response.ok) {
             throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
-
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify(data)
-        };
+        return new Response(JSON.stringify(data), { status: 200, headers });
 
     } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Internal Server Error: ' + error.message }),
-            headers
-        };
+        console.error('Error processing the request:', error);
+        return new Response(JSON.stringify({ error: 'Internal Server Error: ' + error.message }), { status: 500, headers });
     }
 }
+
+export const config = { path: "/test" };

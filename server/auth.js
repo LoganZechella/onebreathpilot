@@ -4,6 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 
+
 // Initialize Firebase App
 const firebaseConfig = {
     apiKey: "AIzaSyBW0bd6AuFyb3OZmO98DFQX3bgKwwwdxYo",
@@ -24,7 +25,7 @@ async function makeAuthRequest(url, data) {
     try {
         const response = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             body: JSON.stringify(data)
         });
         return response.json();
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         try {
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/netlify/functions/authFrontend', { email, password, type: 'emailSignIn' });
+            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/server/netlify/edge-functions/authFrontend', { email, password, type: 'emailSignIn' });
             // const data = await makeAuthRequest('http://127.0.0.1:5000/.netlify/functions/authFrontend', { email, password, type: 'application/json' });
             console.log('Login successful:', data);
         } catch (error) {
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/netlify/functions/authFrontend', { idToken, type: 'googleSignIn' });
+            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/server/netlify/edge-functions/authFrontend', { idToken, type: 'googleSignIn' });
             // const data = await makeAuthRequest('http://127.0.0.1:5000/.netlify/functions/authFrontend', { idToken, type: 'googleSignIn' });
             console.log('Google sign-in successful:', data);
         } catch (error) {
