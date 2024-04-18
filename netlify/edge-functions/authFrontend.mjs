@@ -64,4 +64,4 @@ export default async function authFrontend(event, context) {
     }
 }
 
-export const config = { path: "/test" };
+export const config = { path: "/" };
