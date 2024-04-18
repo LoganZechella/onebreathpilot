@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         try {
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/server/netlify/edge-functions/authFrontend', { email, password, type: 'emailSignIn' });
+            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { email, password, type: 'emailSignIn' });
             // const data = await makeAuthRequest('http://127.0.0.1:5000/.netlify/functions/authFrontend', { email, password, type: 'application/json' });
             console.log('Login successful:', data);
         } catch (error) {
