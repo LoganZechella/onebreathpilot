@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getIdToken } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
 // Import statements for Firebase v9+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
@@ -55,10 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         try {
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { email, password, type: 'emailSignIn' });
-            // const data = await makeAuthRequest('http://127.0.0.1:5000/.netlify/functions/authFrontend', { email, password, type: 'application/json' });
+            await signInWithEmailAndPassword(auth, email, password);
+            const idToken = await getIdToken(auth.currentUser);
+            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
             console.log('Login successful:', data);
         } catch (error) {
+            console.error('Login failed:', error);
             alert('Login failed: ' + error.message);
         }
     });
@@ -68,10 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/server/netlify/edge-functions/authFrontend', { idToken, type: 'googleSignIn' });
-            // const data = await makeAuthRequest('http://127.0.0.1:5000/.netlify/functions/authFrontend', { idToken, type: 'googleSignIn' });
+            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
             console.log('Google sign-in successful:', data);
         } catch (error) {
+            console.error('Google sign-in failed:', error);
             alert('Google sign-in failed: ' + error.message);
         }
     });
