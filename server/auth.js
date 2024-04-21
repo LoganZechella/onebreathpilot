@@ -30,7 +30,7 @@ async function makeAuthRequest(url, data) {
         });
         return response.json();
     } catch (error) {
-        console.error('Error with auth request:', error);
+        // console.error('Error with auth request:', error);
         throw error;
     }
 }
@@ -58,10 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
             await signInWithEmailAndPassword(auth, email, password);
             const idToken = await getIdToken(auth.currentUser);
             const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
-            console.log('Login successful:', data);
+            // console.log('Login successful:', data);
         } catch (error) {
-            console.error('Login failed:', error);
-            alert('Login failed: ' + error.message);
+            // console.error('Login failed:', error);
+            // alert('Login failed: ' + error.message);
         }
     });
 
@@ -71,10 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
             const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
-            console.log('Google sign-in successful:', data);
+            // console.log('Google sign-in successful:', data);
         } catch (error) {
-            console.error('Google sign-in failed:', error);
-            alert('Google sign-in failed: ' + error.message);
+            // console.error('Google sign-in failed:', error);
+            // alert('Google sign-in failed: ' + error.message);
         }
     });
 
