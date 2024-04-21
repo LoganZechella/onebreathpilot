@@ -60,7 +60,7 @@ function addPickupButton(sample, cardElement) {
 // Async function to send sample data to the server
 async function sendSample(sampleData) {
     try {
-        const response = await fetch('/.netlify/functions/sampleHandler', {
+        const response = await fetch('/collectedsamples', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(sampleData),
