@@ -32,7 +32,7 @@ export default async function authFrontend(event, context) {
                         'Authorization': `Bearer ${apiSecret}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ idToken })  // Updated to send only the idToken
+                    body: JSON.stringify({ email, password })
                 };
                 break;
             case 'googleSignIn':
@@ -63,3 +63,5 @@ export default async function authFrontend(event, context) {
         return new Response(JSON.stringify({ error: 'Internal Server Error: ' + error.message }), { status: 500, headers });
     }
 }
+
+export const config = { path: "/authFrontend" };
