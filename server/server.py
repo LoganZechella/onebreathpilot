@@ -74,7 +74,7 @@ def add_sample():
         else:
             return jsonify({"error": "Failed to add sample"}), 500
     except Exception as e:
-        print("Error adding sample to MongoDB:", e)
+        # print("Error adding sample to MongoDB:", e)
         return jsonify({"error": "Failed to add sample", "details": str(e)}), 500
 
 # Get last sample added to MongoDB
@@ -96,7 +96,7 @@ def get_sample():
         else:
             return jsonify({"error": "No samples found"}), 404
     except Exception as e:
-        print("Error retrieving sample from MongoDB:", e)
+        # print("Error retrieving sample from MongoDB:", e)
         return jsonify({"error": "Failed to retrieve sample", "details": str(e)}), 500
 
 
@@ -139,7 +139,7 @@ def update_latest_sample():
         else:
             return jsonify({"error": "Failed to update the latest sample"}), 500
     except Exception as e:
-        print("Error updating sample in MongoDB:", e)
+        # print("Error updating sample in MongoDB:", e)
         return jsonify({"error": "Failed to update sample", "details": str(e)}), 500
     
 # Get In Process Samples
@@ -163,7 +163,7 @@ def get_in_process_samples():
         else:
             return jsonify({"message": "No in-process samples found"}), 404
     except Exception as e:
-        print(f"Error fetching in-process samples: {e}")
+        # print(f"Error fetching in-process samples: {e}")
         return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
 
 @app.route('/updateSample/<chipID>', methods=['POST'])
@@ -207,7 +207,7 @@ def get_ready_for_analysis_samples():
         else:
             return jsonify({"message": "No in-process samples found"}), 404
     except Exception as e:
-        print(f"Error fetching in-process samples: {e}")
+        # print(f"Error fetching in-process samples: {e}")
         return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
 
 # if __name__ == '__main__':
