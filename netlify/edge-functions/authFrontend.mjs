@@ -59,7 +59,7 @@ export default async function authFrontend(event, context) {
         return new Response(JSON.stringify(data), { status: 200, headers });
 
     } catch (error) {
-        // console.error('Error processing the request:', error);
+        console.error('Error processing the request:', error);
         return new Response(JSON.stringify({ error: 'Internal Server Error: ' + error.message }), { status: 500, headers });
     }
 }

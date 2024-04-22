@@ -35,7 +35,7 @@ async function fetchData(url) {
         cache[url] = data; // Cache the fetched data
         return data;
     } catch (error) {
-        // console.error("Fetch error: ", error);
+        console.error("Fetch error: ", error);
     }
 }
 
@@ -53,11 +53,11 @@ async function updateSample(sampleData) {
         if (response !== 200) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        // console.log("Sample updated successfully");
+        console.log("Sample updated successfully");
         // Provide UI feedback here (e.g., success message, spinner hide)
         window.location.href = '/index.html';
     } catch (error) {
-        // console.error("Sending sample error: ", error);
+        console.error("Sending sample error: ", error);
         // Provide UI feedback here (e.g., error message, spinner hide)
     }
 }
@@ -76,13 +76,13 @@ function validateSampleData(data) {
 
         // Check for existence
         if (value === undefined) {
-            // console.error(`Validation error: ${field} is missing.`);
+            console.error(`Validation error: ${field} is missing.`);
             return false;
         }
 
         // Check for correct type
         if (typeof value !== type) {
-            // console.error(`Validation error: ${field} is expected to be a ${type}, but got ${typeof value}.`);
+            console.error(`Validation error: ${field} is expected to be a ${type}, but got ${typeof value}.`);
             return false;
         }
     }
