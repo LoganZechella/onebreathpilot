@@ -66,9 +66,9 @@ async function sendSample(sampleData) {
             body: JSON.stringify(sampleData),
         });
         const data = await response.json();
-        // console.log('Sample added to the database:', data);
+        console.log('Sample added to the database:', data);
     } catch (error) {
-        // console.error('Error adding sample to the database:', error);
+        console.error('Error adding sample to the database:', error);
     }
 }
 
@@ -141,7 +141,7 @@ function manualSampleEntry() {
 
 function displayConfirmationMessage() {
     // Implement logic to display confirmation message based on the application's state
-    // console.log('Display confirmation message for the last sample');
+    console.log('Display confirmation message for the last sample');
 }
 
 document.getElementById('manual-add-btn').addEventListener('click', manualSampleEntry);
