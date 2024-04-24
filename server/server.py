@@ -168,6 +168,8 @@ def get_in_process_samples():
 
 @app.route('/updateSample/<chipID>', methods=['POST'])
 def update_sample(chipID):
+    if 'status' in update_data and update_data['status'] == 'Complete':
+        update_data['status'] = 'Complete'
     try:
         update_data = request.json
         update_payload = {

@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap");
-
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Old+Standard+TT:ital@1&display=swap');
 
 :root {
-    --primaryFont: "Fredoka", sans-serif;
+    --primaryFont: "Figtree", sans-serif;
     --backgroundColor: #19191a;
     --primaryColor: #6246ea;
     --hTexts: #2b2c34;
@@ -238,7 +238,7 @@ p {
     outline: none;
     background-color: #00ebc7;
     /* box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1), -10px -10px 10px rgba(255, 255, 255, 0.7); */
-    transition: ease all 0.3s;
+    transition: ease all 0.2s;
     cursor: pointer;
 }
 

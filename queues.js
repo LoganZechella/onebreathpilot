@@ -11,7 +11,7 @@ async function fetchAndDisplayInProcessSamples() {
             
             return;
         }
-        const samples = data.samples;
+        const samples = data.samples.filter(sample => sample.status !== 'complete');
         
         function moveToPickupSection(card) {
             document.getElementById('in-process-section').style.gridTemplateColumns = '1fr';
@@ -79,14 +79,14 @@ async function fetchAndDisplayInProcessSamples() {
 async function fetchAndDisplayAnalysisSamples() {
     try {
         const response = await fetch('https://onebreathpilot.onrender.com/samples/analysis');
-        // const response = await fetch('http://127.0.0.1:5000/samples/analysis');
+        // const response = await fetch('http://127.0.0.1:5000/samples/analysis');  
 
         const data = await response.json();
         if (!data.samples) {
         
             return;
         }
-        const samples = data.samples;
+        const samples = data.samples.filter(sample => sample.status !== 'complete');
 
         function moveToAnalysisSection(card) {
             const pickupGrid = document.getElementById('pickup-section').querySelector('.grid');
@@ -100,7 +100,9 @@ async function fetchAndDisplayAnalysisSamples() {
             card.className = `card ${sample.chipID}`;
             card.innerHTML = `
                 <h3 id="card-text-id">Chip ID: ${sample.chipID}</h3>
-                <p id="card-text-status">Status: ${sample.status}</p>`;
+                <p id="card-text-status">Status: ${sample.status}</p>
+                <button class="${sample.chipID}" id="finish-sample-button">Finish</button>`;
+                
             moveToAnalysisSection(card);
             const analysisSection = document.getElementById('shipping-section');
             analysisSection.querySelector('.grid').querySelectorAll('h4').forEach(h4 => h4.remove());
@@ -191,6 +193,38 @@ function noSamplesCheck() {
     }
 }
 
+function removeSampleCard(event) {
+    if (event.target && event.target.classList.contains('finish-sample-button')) {
+        // Assuming the card element is the parent of the button
+        const card = event.target.closest('.card');
+        if (card) {
+            card.remove();  // Remove the card from the DOM
+            console.log(`Sample card for ${event.target.id} removed.`);
+        }
+    }
+}
+
+document.getElementById('shipping-section').addEventListener('click', async (event) => {
+    if (event.target && event.target.classList.contains('finish-sample-button')) {
+        const chipID = event.target.id;
+        try {
+            const response = await fetch(`https://onebreathpilot.onrender.com/updateSample/${chipID}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'complete' })
+            });
+
+            if (response.ok) {
+                console.log(`Sample ${chipID} marked as complete.`);
+                event.target.closest('.card').remove(); // Remove the card from the DOM
+            } else {
+                throw new Error('Failed to mark sample as complete');
+            }
+        } catch (error) {
+            console.error('Error marking sample as complete:', error);
+        }
+    }
+});
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -201,6 +235,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('pickup-form-modal').style.display = 'block';
         }
     });
+
+    const sampleSection = document.getElementById('shipping-section');  // Adjust if your section ID differs
+    sampleSection.addEventListener('click', removeSampleCard);
 
     fetchAndDisplayInProcessSamples();
     fetchAndDisplayAnalysisSamples();
