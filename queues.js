@@ -8,11 +8,11 @@ async function fetchAndDisplayInProcessSamples() {
         // }
         const data = await response.json();
         if (!data.samples) {
-            
+
             return;
         }
         const samples = data.samples.filter(sample => sample.status !== 'complete');
-        
+
         function moveToPickupSection(card) {
             document.getElementById('in-process-section').style.gridTemplateColumns = '1fr';
             document.getElementById('in-process-section').querySelector('.grid').innerHTML = '<h4>No Samples In Process</h4>';
@@ -39,10 +39,9 @@ async function fetchAndDisplayInProcessSamples() {
         samples.forEach(sample => {
             const card = document.createElement('div');
             card.className = `card ${sample.chipID}`;
-
             const sampleTimestamp = new Date(sample.timestamp);
             const now = new Date();
-            const fourHoursInMs = (2 * 60 * 60 * 1000) + (15 * 60 * 1000); // SET TIME FOR COUNTDOWN TIMER HERE
+            const fourHoursInMs = (0 * 60 * 60 * 1000) + (1 * 60 * 1000); // SET TIME FOR COUNTDOWN TIMER HERE
             const timeElapsed = now - sampleTimestamp;
             const countdownTargetTime = new Date(sampleTimestamp.getTime() + fourHoursInMs);
 
@@ -67,7 +66,7 @@ async function fetchAndDisplayInProcessSamples() {
                 <button class="pickup-button" id="${sample.chipID}">Pickup Chip</button>
                 `;
             }
-        
+
         })
     }
     catch (error) {
@@ -83,7 +82,6 @@ async function fetchAndDisplayAnalysisSamples() {
 
         const data = await response.json();
         if (!data.samples) {
-        
             return;
         }
         const samples = data.samples.filter(sample => sample.status !== 'complete');
@@ -101,13 +99,12 @@ async function fetchAndDisplayAnalysisSamples() {
             card.innerHTML = `
                 <h3 id="card-text-id">Chip ID: ${sample.chipID}</h3>
                 <p id="card-text-status">Status: ${sample.status}</p>
-                <button class="${sample.chipID}" id="finish-sample-button">Finish</button>`;
-                
+                <button class="${sample.chipID} finish-sample-button" id="finish-sample-button">Finish</button>`;
             moveToAnalysisSection(card);
             const analysisSection = document.getElementById('shipping-section');
             analysisSection.querySelector('.grid').querySelectorAll('h4').forEach(h4 => h4.remove());
-        
-                
+
+
         });
     }
     catch (error) {
@@ -142,7 +139,7 @@ document.getElementById('pickup-form').addEventListener('submit', async function
 
     try {
         const response = await fetch(`https://onebreathpilot.onrender.com/updateSample/${chipID}`, {
-        // const response = await fetch(`http://127.0.0.1:5000/updateSample/${chipID}`, {    
+            // const response = await fetch(`http://127.0.0.1:5000/updateSample/${chipID}`, {    
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updateData)
@@ -154,7 +151,7 @@ document.getElementById('pickup-form').addEventListener('submit', async function
             // Refresh or update the UI as needed
             function moveToShippingSection(card) {
                 const shippingSection = document.getElementById('shipping-section');
-                shippingSection.querySelector('.grid').appendChild(card); 
+                shippingSection.querySelector('.grid').appendChild(card);
                 shippingSection.querySelector('.grid').querySelectorAll('h4').forEach(h4 => h4.remove());
                 card.querySelector('.pickup-button').remove();
                 card.querySelector('#card-text-status').innerHTML = 'Status: Ready for Elution and Analysis';
@@ -179,10 +176,11 @@ function noSamplesCheck() {
     if (inProcessSection.querySelector('.grid').childElementCount <= 1) {
         document.getElementById('in-process-section').querySelector('.grid').style.gridTemplateColumns = 'none';
         inProcessSection.querySelector('.grid').innerHTML = '<h4>No Samples In Process</h4>';
-    } else if (pickupSection.querySelector('.grid').childElementCount <= 1) {
+    }
+    if (pickupSection.querySelector('.grid').childElementCount <= 1) {
         document.getElementById('pickup-section').querySelector('.grid').style.gridTemplateColumns = 'none';
         pickupSection.querySelector('.grid').innerHTML = '<h4>No Samples Ready for Pickup</h4>';
-    } 
+    }
     if (shippingSection.querySelector('.grid').childElementCount <= 1) {
         document.getElementById('shipping-section').querySelector('.grid').style.gridTemplateColumns = 'none';
         shippingSection.querySelector('.grid').innerHTML = '<h4>No Samples Ready for Shipment</h4>';
@@ -194,50 +192,44 @@ function noSamplesCheck() {
 }
 
 function removeSampleCard(event) {
-    if (event.target && event.target.classList.contains('finish-sample-button')) {
-        // Assuming the card element is the parent of the button
-        const card = event.target.closest('.card');
-        if (card) {
-            card.remove();  // Remove the card from the DOM
-            console.log(`Sample card for ${event.target.id} removed.`);
-        }
+    // Assuming the card element is the parent of the button
+    const card = event.target.closest('.card');
+    if (card) {
+        card.remove();  // Remove the card from the DOM
+        console.log(`Sample card for ${event.target.id} removed.`);
     }
 }
 
-document.getElementById('shipping-section').addEventListener('click', async (event) => {
-    if (event.target && event.target.classList.contains('finish-sample-button')) {
-        const chipID = event.target.id;
-        try {
-            const response = await fetch(`https://onebreathpilot.onrender.com/updateSample/${chipID}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'complete' })
-            });
 
-            if (response.ok) {
-                console.log(`Sample ${chipID} marked as complete.`);
-                event.target.closest('.card').remove(); // Remove the card from the DOM
-            } else {
-                throw new Error('Failed to mark sample as complete');
-            }
-        } catch (error) {
-            console.error('Error marking sample as complete:', error);
-        }
-    }
-});
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('landing-main').addEventListener('click', function (event) {
+    document.getElementById('landing-main').addEventListener('click', async function (event) {
         if (event.target && event.target.classList.contains('pickup-button')) {
             const chipID = event.target.id; // Using the button's id as the chipID
             document.querySelector('#pickup-form [name="data-chip-id"]').value = chipID;
             document.getElementById('pickup-form-modal').style.display = 'block';
         }
-    });
+        if (event.target && event.target.classList.contains('finish-sample-button')) {
+            const chipID = event.target.classList[0];
+            try {
+                const response = await fetch(`https://onebreathpilot.onrender.com/updateSample/${chipID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'complete' })
+                });
 
-    const sampleSection = document.getElementById('shipping-section');  // Adjust if your section ID differs
-    sampleSection.addEventListener('click', removeSampleCard);
+                if (response.ok) {
+                    console.log(`Sample ${chipID} marked as complete.`);
+                    event.target.closest('.card').remove(); // Remove the card from the DOM
+                } else {
+                    throw new Error('Failed to mark sample as complete');
+                }
+            } catch (error) {
+                console.error('Error marking sample as complete:', error);
+            }
+        }
+    });
 
     fetchAndDisplayInProcessSamples();
     fetchAndDisplayAnalysisSamples();

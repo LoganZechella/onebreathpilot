@@ -39,7 +39,7 @@ function refreshQueuesDisplay() {
 function createSampleCard(sample) {
     let card = document.createElement('div');
     card.className = 'card';
-    // card.id = `sample-card-${sample.chipID}`;
+    card.id = `sample-card-${sample.chipID}`;
     card.innerHTML = `
                 <p>Chip ID: ${sample.chipID}</p>
                 <p>Patient ID: ${sample.patientID}</p>
@@ -72,6 +72,20 @@ async function sendSample(sampleData) {
     }
 }
 
+function setupFormSubmissionListener() {
+    document.getElementById('confirm-button').addEventListener('click', async function (event) {
+        event.preventDefault();
+        const sample = collectSampleFormData();
+        if (sample) {
+            sample.timestamp = new Date().toISOString();
+            sample.status = 'In Process';
+            await sendSample(sample);
+            // Redirect or update UI based on the application's flow
+            window.location.href = `confirm.html?chipID=${sample.chipID}`;
+        }
+    });
+}
+
 // Utility function for getting query string parameters
 function getQueryStringParams(param) {
     const searchParams = new URLSearchParams(window.location.search);
@@ -101,19 +115,7 @@ async function initApp() {
     }
 }
 
-function setupFormSubmissionListener() {
-    document.getElementById('confirm-button').addEventListener('click', async function (event) {
-        event.preventDefault();
-        const sample = collectSampleFormData();
-        if (sample) {
-            sample.timestamp = new Date().toISOString();
-            sample.status = 'In Process';
-            await sendSample(sample);
-            // Redirect or update UI based on the application's flow
-            window.location.href = `confirm.html?chipID=${sample.chipID}`;
-        }
-    });
-}
+
 
 // Collects form data and validates it
 function collectSampleFormData() {
@@ -160,6 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sample-reg-section').querySelector('.close-button').addEventListener('click', () => {
         document.getElementById('landing-main').style.display = 'flex';
         document.getElementById('add-sample-main').style.display = 'none';
+    });
+
+    document.getElementById('pickup-close-button').addEventListener('click', () => {
+        document.getElementById('landing-main').style.display = 'flex';
+        document.getElementById('pickup-form-modal').style.display = 'none';
     });
 
     document.getElementById('sign-in-close-btn').addEventListener('click', () => {
