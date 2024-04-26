@@ -168,23 +168,37 @@ def get_in_process_samples():
 
 @app.route('/updateSample/<chipID>', methods=['POST'])
 def update_sample(chipID):
-    if 'status' in update_data and update_data['status'] == 'Complete':
-        update_data['status'] = 'Complete'
     try:
-        update_data = request.json
+        # Parsing JSON from the client request
+        update_data = request.get_json()
+        if not update_data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        # Updating status if the conditions meet
+        if update_data.get('status') == 'Picked up and ready for elution and analysis.':
+            update_data['status'] = 'Complete'
+        
+        # Construct the payload for MongoDB update API
         update_payload = {
             "dataSource": "Cluster0",
             "database": DATABASE_NAME,
             "collection": COLLECTION_NAME,
-            "filter": {"chipID": chipID},
+            "filter": {
+                "chipID": chipID
+            },
             "update": {"$set": update_data}
         }
+
+        # Making a POST request to the MongoDB Data API
         response = requests.post(f"{MONGODB_DATA_API_URL}/action/updateOne", json=update_payload, headers=headers)
+        
         if response.status_code == 200:
             return jsonify({"message": "Sample updated successfully"}), 200
         else:
-            return jsonify({"error": "Failed to update sample"}), response.status_code
+            return jsonify({"error": "Failed to update sample", "reason": response.text}), response.status_code
+
     except Exception as e:
+        # General exception handler to catch unforeseen errors
         return jsonify({"error": "Server error", "details": str(e)}), 500
     
 
