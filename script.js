@@ -35,7 +35,7 @@ function sendSample(sampleData) {
     // fetch('http://127.0.0.1:8080/update_sample', { 
     fetch('https://onebreahtpilot.onrender.com/update_sample', { 
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         body: JSON.stringify(sampleData),
     })
         .then(response => response.json())
