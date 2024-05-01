@@ -32,7 +32,8 @@ function collectSampleFormData() {
 }
 
 function sendSample(sampleData) {
-    fetch('http://127.0.0.1:8080/update_sample', {  // Endpoint updated as per new requirements
+    // fetch('http://127.0.0.1:8080/update_sample', { 
+    fetch('https://onebreahtpilot.onrender.com/update_sample', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sampleData),

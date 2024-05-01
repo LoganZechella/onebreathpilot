@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function fetchSamplesAndUpdateUI() {
-    fetch('http://127.0.0.1:8080/samples')
+    // fetch('http://127.0.0.1:8080/samples')
+    fetch('https://onebreathpilot.onrender.com/samples')
         .then(response => response.json())
         .then(samples => {  // Directly use the array returned from the server
             updateSampleQueues(samples);
