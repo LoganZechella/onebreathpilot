@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    
+
     <nav class="container-fluid">
         <ul>
             <li><strong>OneBreath Pilot Study</strong></li>
@@ -24,7 +24,7 @@
     </nav>
 
     <!-- sign-in.html -->
-    <div id="sign-in-container" data-aos="fade-up" data-aos-duration="500" >
+    <div id="sign-in-container" data-aos="fade-up" data-aos-duration="500">
         <span class="close-button" id="sign-in-close-btn">&times;</span>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
@@ -37,7 +37,7 @@
 
             <div class="grid">
                 <section id="sample-reg-section">
-                    <span class="close-button" id="sign-in-close-btn">&times;</span>
+                    <button class="close-button" id="sample-reg-close-btn">&times;</button>
                     <hgroup class="hgroup">
                         <h2>Sample Registration</h2>
                         <h3>Enter the details for the new sample</h3>
@@ -72,7 +72,8 @@
             </div>
             <div id="reader" style="width: 300px" data-aos="flip-left" data-aos-duration="500"></div>
 
-            <section class="section in-process-section" id="in-process-section" data-aos="fade-in" data-aos-duration="500">
+            <section class="section in-process-section" id="in-process-section" data-aos="fade-in"
+                data-aos-duration="500">
                 <div class="section-title" id="in-process-title">
                     <h3>In-Process</h3>
                 </div>
@@ -114,7 +115,8 @@
                 </div>
 
             </section>
-            <section class="section shipping-section" id="shipping-section" data-aos="flip-left" data-aos-duration="500">
+            <section class="section shipping-section" id="shipping-section" data-aos="flip-left"
+                data-aos-duration="500">
                 <div class="section-title" id="shipping-title">
                     <h3>Ready for Analysis</h3>
                 </div>
@@ -139,6 +141,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="./server/auth.js" type="module"></script>
+    <script src="queues.js"></script>
+    <script src="script.js"></script>
     <script>
         AOS.init();
     </script>
@@ -166,6 +170,15 @@
             const html5QrCode = new Html5Qrcode("reader");
             const config = { fps: 1, qrbox: { width: 250, height: 250 } };
 
+            const manualAddButton = document.getElementById('manual-add-btn');
+            manualAddButton.addEventListener('click', function () {
+                html5QrCode.stop();
+                document.getElementById('reader').style.display = 'none';
+                document.getElementById('add-button-div').style.display = 'none';
+                document.getElementById('add-sample-main').style.display = 'block';
+                
+            });
+
             function onScanSuccess(decodedText, decodedResult) {
                 // Handle the scanned text here.
                 console.log(`QR Code detected: ${decodedText}`);
@@ -189,28 +202,27 @@
                 // handle scan error
                 console.error(`QR scan error: ${errorMessage}`);
             }
-            document.addEventListener('click', function () {
-            html5QrCode.stop().then(() => {
-                for (const section in bodySections) {
-                    bodySections[section].style.display = 'grid';
-                }
-                document.getElementById('qr-close-btn').style.display = 'none';
-                document.getElementById('manual-add-btn').style.display = 'none';
-                bodySections[0].style.display = 'block';
-                AOS.refresh();
-            }).catch((err) => {
-                // Stop failed, handle it.
-                console.error('Failed to stop the QR Scanner', err);
-            });
-        })
+            document.getElementById('qr-close-btn').addEventListener('click', function () {
+                html5QrCode.stop().then(() => {
+                    for (const section in bodySections) {
+                        bodySections[section].style.display = 'grid';
+                    }
+                    document.getElementById('qr-close-btn').style.display = 'none';
+                    document.getElementById('manual-add-btn').style.display = 'none';
+                    bodySections[0].style.display = 'block';
+                    AOS.refresh();
+                }).catch((err) => {
+                    // Stop failed, handle it.
+                    console.error('Failed to stop the QR Scanner', err);
+                });
+            })
 
             html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanError);
 
         });
     </script>
-    
-    <script src="script.js"></script>
-    <script src="queues.js"></script>
+
+
 
 
 </body>
