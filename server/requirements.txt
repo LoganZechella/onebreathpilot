@@ -1,8 +1,5 @@
 Flask==2.0.3
-gevent==21.8.0
-flask-sockets==0.2.1
 Flask-CORS==3.0.10
 firebase-admin==5.2.0
 python-dotenv==0.19.1
-requests==2.26.0
 pymongo==3.12.0
