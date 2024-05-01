@@ -94,6 +94,9 @@ p {
     float: right;
     font-size: 28px;
     font-weight: bold;
+    display: flex;
+    height: 25px;
+    width: 25px;
 }
 
 #confirm-button {
@@ -356,4 +359,3 @@ p {
 #password::placeholder {
     color: #ffffff;
 }
-

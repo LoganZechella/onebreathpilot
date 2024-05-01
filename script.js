@@ -1,88 +1,56 @@
-
-function updateSampleQueues() {
-    let samples = JSON.parse(localStorage.getItem('samples')) || [];
-    let now = new Date().getTime();
-
-    samples.forEach(sample => {
-        if (sample.status === 'In Process') {
-            let endTime = new Date(sample.timestamp).getTime() + (2 * 60 * 60 * 1000);
-            if (now >= endTime) {
-                sample.status = 'Ready for Pickup';
-            }
+document.addEventListener('DOMContentLoaded', () => {
+    const confirmButton = document.getElementById('confirm-button');
+    confirmButton.addEventListener('click', async function (event) {
+        event.preventDefault();
+        const sample = collectSampleFormData();
+        if (sample) {
+            sample.timestamp = new Date().toISOString();
+            sample.status = 'In Process';
+            sendSample(sample);  // Send sample data using HTTP POST
+            alert('Sample submitted successfully!');
         }
+        window.location.reload();
     });
 
-    localStorage.setItem('samples', JSON.stringify(samples));
-    refreshQueuesDisplay();
-}
+    // Initialize application if needed here
+    initApp();
+});
 
-function refreshQueuesDisplay() {
-    let samples = JSON.parse(localStorage.getItem('samples')) || [];
-    let inProcessElement = document.getElementById('in-process-section');
-    let readyForPickupElement = document.getElementById('pickup-section');
 
-    samples.forEach(sample => {
-        let sampleCard = createSampleCard(sample);
 
-        if (sample.status === 'In Process') {
-            inProcessElement.appendChild(sampleCard);
-        } else if (sample.status === 'Ready for Pickup') {
-            readyForPickupElement.appendChild(sampleCard);
-            // Add 'Pick Up Chip' button if not already present
-            if (!sampleCard.querySelector('.pickup-chip-button')) {
-                addPickupButton(sample, sampleCard);
-            }
-        }
-    });
-}
+function collectSampleFormData() {
+    let chip_id = document.getElementById('chipID').value;
+    let patient_id = document.getElementById('patientID').value;
+    let location = document.getElementById('location').value;
 
-function createSampleCard(sample) {
-    let card = document.createElement('div');
-    card.className = 'card';
-    // card.id = `sample-card-${sample.chipID}`;
-    card.innerHTML = `
-                <p>Chip ID: ${sample.chipID}</p>
-                <p>Patient ID: ${sample.patientID}</p>
-                <p>Location: ${sample.location}</p>
-                <p>Timer: <span id="timer-${sample.chipID}">00:00:00</span></p>
-    `;
-    return card;
-}
-
-function addPickupButton(sample, cardElement) {
-    let button = document.createElement('button');
-    button.className = 'pickup-chip-button';
-    button.innerText = 'Pick Up Chip';
-    button.addEventListener('click', () => openPickupForm(sample.chipID));
-    cardElement.appendChild(button);
-}
-
-// Async function to send sample data to the server
-async function sendSample(sampleData) {
-    try {
-        const response = await fetch('https://onebreathpilot.onrender.com/collectedsamples', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sampleData),
-        });
-        const data = await response.json();
-        console.log('Sample added to the database:', data);
-    } catch (error) {
-        console.error('Error adding sample to the database:', error);
+    if (!chip_id || !patient_id || !location) {
+        alert('Please fill in all required fields.');
+        return null;
     }
+
+    return { chip_id, patient_id, location };
 }
 
-// Utility function for getting query string parameters
-function getQueryStringParams(param) {
-    const searchParams = new URLSearchParams(window.location.search);
-    return searchParams.get(param);
+function sendSample(sampleData) {
+    // fetch('http://127.0.0.1:8080/update_sample', { 
+    fetch('https://onebreahtpilot.onrender.com/update_sample', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sampleData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Sample processed:', data);
+            alert('Sample update successful.');
+        })
+        .catch(error => {
+            console.error('Error updating sample:', error);
+            alert('Sample update failed.');
+        });
 }
 
-// Function to initialize the application
-async function initApp() {
+function initApp() {
     const queryParams = window.location.search;
-
-    // Handle different parts of the application based on URL and queryParams
     if (queryParams) {
         document.getElementById('landing-main').style.display = 'none';
         const chipID = getQueryStringParams('chipID');
@@ -93,77 +61,27 @@ async function initApp() {
         document.getElementById('add-sample-main').style.display = 'none';
         document.getElementById('landing-main').style.display = 'flex';
     }
-
-    if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
-        setupFormSubmissionListener();
-    } else if (window.location.pathname.endsWith('confirm.html')) {
-        displayConfirmationMessage();
-    }
-}
-
-function setupFormSubmissionListener() {
-    document.getElementById('confirm-button').addEventListener('click', async function (event) {
-        event.preventDefault();
-        const sample = collectSampleFormData();
-        if (sample) {
-            sample.timestamp = new Date().toISOString();
-            sample.status = 'In Process';
-            await sendSample(sample);
-            // Redirect or update UI based on the application's flow
-            window.location.href = `confirm.html?chipID=${sample.chipID}`;
+    const sampleRegCloseBtn = document.getElementById('sample-reg-close-btn');
+    sampleRegCloseBtn.addEventListener('click', function () {
+        const bodySections = {
+            'add-button': document.getElementById('add-new-sample'),
+            'in-process': document.getElementById('in-process-section'),
+            'pickup': document.getElementById('pickup-section'),
+            'shipping': document.getElementById('shipping-section'),
+            'elution': document.getElementById('elution-section')
+        }
+        for (const section in bodySections) {
+            bodySections[section].style.display = 'grid';
+            document.getElementById('add-sample-main').style.display = 'none';
+            document.getElementById('landing-main').style.display = 'flex';
+            document.getElementById('add-button-div').style.display = 'flex';
+            document.getElementById('qr-close-btn').style.display = 'none';
+            document.getElementById('manual-add-btn').style.display = 'none';
         }
     });
 }
 
-// Collects form data and validates it
-function collectSampleFormData() {
-    let chipID = document.getElementById('chipID').value;
-    let patientID = document.getElementById('patientID').value;
-    let location = document.getElementById('location').value;
-
-    // Basic validation (expand based on requirements)
-    if (!chipID || !patientID || !location) {
-        alert('Please fill in all required fields.');
-        return null;
-    }
-
-    return {
-        chipID: chipID,
-        patientID: patientID,
-        location: location,
-    };
+function getQueryStringParams(param) {
+    const searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get(param);
 }
-
-function manualSampleEntry() {
-    document.getElementById('landing-main').style.display = 'none';
-    document.getElementById('add-sample-main').style.display = 'flex';
-}
-
-function displayConfirmationMessage() {
-    // Implement logic to display confirmation message based on the application's state
-    console.log('Display confirmation message for the last sample');
-}
-
-document.getElementById('manual-add-btn').addEventListener('click', manualSampleEntry);
-
-document.addEventListener('DOMContentLoaded', () => {
-    initApp();
-    AOS.refresh();
-    
-    // Show the sign-in form
-    document.getElementById('show-sign-in').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent the link from following the URL
-        document.getElementById('sign-in-container').style.display = 'block';
-    });
-
-    // Optionally, if you have a close button in your form, handle its click event to hide the form
-    document.getElementById('sample-reg-section').querySelector('.close-button').addEventListener('click', () => {
-        document.getElementById('landing-main').style.display = 'flex';
-        document.getElementById('add-sample-main').style.display = 'none';
-    });
-
-    document.getElementById('sign-in-close-btn').addEventListener('click', () => {
-        document.getElementById('sign-in-container').style.display = 'none';
-    });
-});
-

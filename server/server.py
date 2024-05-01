@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-import requests
 import os
 import firebase_admin
 from firebase_admin import credentials, auth
+from pymongo import MongoClient
 
 load_dotenv()
 
@@ -15,21 +15,6 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 cred = credentials.Certificate('/etc/secrets/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
 # cred = credentials.Certificate('server/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
 firebase_admin.initialize_app(cred)
-fb_admin_cred = os.getenv("FIREBASE_API_KEY")
-fb_admin_domain = os.getenv("FIREBASE_AUTH_DOMAIN")
-
-
-# MongoDB Data API settings
-MONGODB_DATA_API_URL = "https://us-east-2.aws.data.mongodb-api.com/app/data-kjhpe/endpoint/data/v1"
-MONGODB_DATA_API_KEY = os.getenv("MONGODB_DATA_API_KEY")  # Add your MongoDB Data API Key to your environment variables
-DATABASE_NAME = "pilotstudy2024"  # Replace with your database name
-COLLECTION_NAME = "collectedsamples"  # Replace with your collection name
-
-headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Request-Headers": "*",
-    "api-key": MONGODB_DATA_API_KEY,
-}
 
 @app.route('/api/auth/signin', methods=['POST'])
 def signin():
@@ -55,176 +40,64 @@ def google_sign_in():
     except Exception as e:
         return jsonify({'error': 'Failed to authenticate with Google', 'details': str(e)}), 401
 
-# Proper Storage of Sample in MongoDB
-@app.route('/collectedsamples', methods=['POST'])
-def add_sample():
+# MongoDB Data API settings
+MONGODB_DATA_API_URL = "https://us-east-2.aws.data.mongodb-api.com/app/data-kjhpe/endpoint/data/v1"
+MONGODB_DATA_API_KEY = os.getenv("MONGODB_DATA_API_KEY")
+MONGO_URI = os.getenv("MONGO_URI")
+DATABASE_NAME = "pilotstudy2024"
+COLLECTION_NAME = "collectedsamples"
+
+headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Request-Headers": "*",
+    "api-key": MONGODB_DATA_API_KEY,
+}
+
+client = MongoClient(MONGO_URI)
+db = client[DATABASE_NAME]
+collection = db[COLLECTION_NAME]
+
+def get_samples():
+    # Fetches samples from the database with specified statuses.
+    statuses = ["In Process", "Ready for Pickup", "Picked up. Ready for Analysis"]
+    query_result = collection.find({"status": {"$in": statuses}}, {"_id": 0})
+    samples = list(query_result)
+    print(samples)
+    return samples
+
+@app.route('/samples', methods=['GET'])
+def samples():
+    # Endpoint to get samples with certain statuses.
     try:
-        sample_data = request.json
-        payload = {
-            "dataSource": "Cluster0",
-            "database": DATABASE_NAME,
-            "collection": COLLECTION_NAME,
-            "document": sample_data
-        }
-        response = requests.post(f"{MONGODB_DATA_API_URL}/action/insertOne", headers=headers, json=payload)
-        response_data = response.json()
-        
-        if response.status_code == 200 and response_data["insertedId"]:
-            return jsonify({"message": "Sample added successfully", "sample_id": response_data["insertedId"]}), 201
-        else:
-            return jsonify({"error": "Failed to add sample"}), 500
+        sample_data = get_samples()
+        return jsonify(sample_data), 200
     except Exception as e:
-        print("Error adding sample to MongoDB:", e)
-        return jsonify({"error": "Failed to add sample", "details": str(e)}), 500
-
-# Get last sample added to MongoDB
-@app.route('/latestsample', methods=['GET'])
-def get_sample():
-    try:
-        payload = {
-            "dataSource": "Cluster0",
-            "database": DATABASE_NAME,
-            "collection": COLLECTION_NAME,
-            "sort": {"_id": -1},
-            "limit": 1
-        }
-        response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
-        response_data = response.json()
-        
-        if response.status_code == 200 and response_data["documents"]:
-            return jsonify({"message": "Latest sample retrieved successfully", "sample": response_data["documents"][0]}), 200
-        else:
-            return jsonify({"error": "No samples found"}), 404
-    except Exception as e:
-        print("Error retrieving sample from MongoDB:", e)
-        return jsonify({"error": "Failed to retrieve sample", "details": str(e)}), 500
-
-
-# Update sample in MongoDB
-@app.route('/updateLatestSample', methods=['POST'])
-def update_latest_sample():
-    try:
-        # Retrieve the latest sample's ID
-        find_payload = {
-            "dataSource": "Cluster0",
-            "database": DATABASE_NAME,
-            "collection": COLLECTION_NAME,
-            "sort": {"_id": -1},
-            "limit": 1
-        }
-        find_response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=find_payload)
-        find_response_data = find_response.json()
-        
-        if find_response.status_code != 200 or not find_response_data["documents"]:
-            return jsonify({"error": "No samples found to update"}), 404
-
-        latest_sample_id = find_response_data["documents"][0]["_id"]
-        
-        # Update the latest sample with new data from request
-        update_data = request.json  # Assuming the request body contains the update data
-        update_payload = {
-            "dataSource": "Cluster0",
-            "database": DATABASE_NAME,
-            "collection": COLLECTION_NAME,
-            "filter": {"_id": latest_sample_id},  # Filter document by ID
-            "update": {
-                "$set": update_data  # Update operation
-            }
-        }
-        update_response = requests.post(f"{MONGODB_DATA_API_URL}/action/updateOne", headers=headers, json=update_payload)
-        update_response_data = update_response.json()
-
-        if update_response.status_code == 200 and update_response_data["modifiedCount"] == 1:
-            return jsonify({"message": "Latest sample updated successfully"}), 200
-        else:
-            return jsonify({"error": "Failed to update the latest sample"}), 500
-    except Exception as e:
-        print("Error updating sample in MongoDB:", e)
-        return jsonify({"error": "Failed to update sample", "details": str(e)}), 500
+        return jsonify({"error": str(e)}), 500
     
-# Get In Process Samples
-@app.route('/samples/inprocess', methods=['GET'])
-def get_in_process_samples():
+@app.route('/update_sample', methods=['POST'])
+def update_sample():
+    # Endpoint to update a sample based on 'chipID'.
     try:
-        payload = {
-            "dataSource": "Cluster0",
-            "database": DATABASE_NAME,
-            "collection": COLLECTION_NAME,
-            "filter": {
-                "status": "In Process"
-            }
-        }
-        response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
-        response_data = response.json()
+        # Extracting data from request
+        update_data = request.json
+        chip_id = update_data['chip_id']
         
-        if response.status_code == 200 and response_data["documents"]:
-            # Convert from MongoDB's format if necessary
-            return jsonify({"samples": response_data["documents"]}), 200
+        # Finding and updating the document in the database
+        update_result = collection.update_one(
+            {"chip_id": chip_id},
+            {"$set": update_data}
+        )
+        
+        # Check if the document was successfully updated
+        if update_result.modified_count == 1:
+            return jsonify({"success": True, "message": "Sample updated successfully."}), 200
         else:
-            return jsonify({"message": "No in-process samples found"}), 404
+            return jsonify({"success": False, "message": "No sample found with the given chipID or no new data to update."}), 404
+        
+    except KeyError:
+        return jsonify({"error": "Missing chipID in the submitted data."}), 400
     except Exception as e:
-        print(f"Error fetching in-process samples: {e}")
-        return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
-
-@app.route('/updateSample/<chipID>', methods=['POST'])
-def update_sample(chipID):
-    try:
-        # Parsing JSON from the client request
-        update_data = request.get_json()
-        if not update_data:
-            return jsonify({"error": "No data provided"}), 400
-        
-        # Updating status if the conditions meet
-        if update_data.get('status') == 'Picked up and ready for elution and analysis.':
-            update_data['status'] = 'Complete'
-        
-        # Construct the payload for MongoDB update API
-        update_payload = {
-            "dataSource": "Cluster0",
-            "database": DATABASE_NAME,
-            "collection": COLLECTION_NAME,
-            "filter": {
-                "chipID": chipID
-            },
-            "update": {"$set": update_data}
-        }
-
-        # Making a POST request to the MongoDB Data API
-        response = requests.post(f"{MONGODB_DATA_API_URL}/action/updateOne", json=update_payload, headers=headers)
-        
-        if response.status_code == 200:
-            return jsonify({"message": "Sample updated successfully"}), 200
-        else:
-            return jsonify({"error": "Failed to update sample", "reason": response.text}), response.status_code
-
-    except Exception as e:
-        # General exception handler to catch unforeseen errors
-        return jsonify({"error": "Server error", "details": str(e)}), 500
-    
-
-# Get Ready for Analysis Samples
-@app.route('/samples/analysis', methods=['GET'])
-def get_ready_for_analysis_samples():
-    try:
-        payload = {
-            "dataSource": "Cluster0",
-            "database": DATABASE_NAME,
-            "collection": COLLECTION_NAME,
-            "filter": {
-                "status": "Picked up, ready for elution and analysis."
-            }
-        }
-        response = requests.post(f"{MONGODB_DATA_API_URL}/action/find", headers=headers, json=payload)
-        response_data = response.json()
-        
-        if response.status_code == 200 and response_data["documents"]:
-            # Convert from MongoDB's format if necessary
-            return jsonify({"samples": response_data["documents"]}), 200
-        else:
-            return jsonify({"message": "No in-process samples found"}), 404
-    except Exception as e:
-        print(f"Error fetching in-process samples: {e}")
-        return jsonify({"error": "Failed to fetch in-process samples", "details": str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 # if __name__ == '__main__':
-#     app.run(debug=True)
+#     app.run(debug=True, host='127.0.0.1', port=8080, use_reloader=False)
