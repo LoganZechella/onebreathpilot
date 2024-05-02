@@ -7,9 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
             sendSample(sample);  // Send sample data using HTTP POST
-            alert('Sample submitted successfully!');
+            alert('COLLECT BREATH PER STUDY PROTOCOL THEN RETURN TO THIS PAGE. Press OK below to confirm that sample evacuation has begun and return to the dashboard.');
+            window.location.reload();
         }
-        window.location.reload();
+        
     });
 
     // Initialize application if needed here
@@ -33,18 +34,19 @@ function collectSampleFormData() {
 
 function sendSample(sampleData) {
     // fetch('http://127.0.0.1:8080/update_sample', { 
-    fetch('https://onebreahtpilot.onrender.com/update_sample', { 
+    fetch('https://onebreathpilot.onrender.com/update_sample', { 
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify(sampleData),
     })
         .then(response => response.json())
         .then(data => {
-            console.log('Sample processed:', data);
+            // console.log('Sample processed:', data);
             alert('Sample update successful.');
+            window.location.href = '/index.html';
         })
         .catch(error => {
-            console.error('Error updating sample:', error);
+            // console.error('Error updating sample:', error);
             alert('Sample update failed.');
         });
 }
@@ -72,11 +74,6 @@ function initApp() {
         }
         for (const section in bodySections) {
             bodySections[section].style.display = 'grid';
-            document.getElementById('add-sample-main').style.display = 'none';
-            document.getElementById('landing-main').style.display = 'flex';
-            document.getElementById('add-button-div').style.display = 'flex';
-            document.getElementById('qr-close-btn').style.display = 'none';
-            document.getElementById('manual-add-btn').style.display = 'none';
         }
     });
 }

@@ -62,7 +62,7 @@ def get_samples():
     statuses = ["In Process", "Ready for Pickup", "Picked up. Ready for Analysis"]
     query_result = collection.find({"status": {"$in": statuses}}, {"_id": 0})
     samples = list(query_result)
-    print(samples)
+    # print(samples)
     return samples
 
 @app.route('/samples', methods=['GET'])
