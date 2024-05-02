@@ -21,10 +21,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function fetchSamplesAndUpdateUI() {
-    fetch('https://onebreathpilot.onrender.com/samples')
-        .then(response => response.json())
-        .then(samples => updateSampleQueues(samples))
-        .catch(error => console.error('Error fetching samples:', error));
+    setTimeout(() => {
+        fetch('https://onebreathpilot.onrender.com/samples')
+            .then(response => response.json())
+            .then(samples => updateSampleQueues(samples))
+            .catch(error => console.error('Error fetching samples:', error));
+    }, 1000);
 }
 
 function updateSample() {
@@ -86,6 +88,9 @@ function updateSampleQueues(samples) {
 
 function createSampleCard(sample) {
     const card = document.createElement('div');
+    card.setAttribute('data-aos', 'zoom-in');
+    card.setAttribute('data-aos-duration', '500');
+    card.setAttribute('data-aos-delay', '500');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
         <h3>Chip ID: ${sample.chip_id}</h3>
