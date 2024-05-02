@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize application if needed here
+    initApp();
+    
     const confirmButton = document.getElementById('confirm-button');
     confirmButton.addEventListener('click', async function (event) {
         event.preventDefault();
@@ -12,9 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
     });
-
-    // Initialize application if needed here
-    initApp();
 });
 
 
@@ -60,8 +60,9 @@ function initApp() {
             document.getElementById('chipID').value = chipID;
         }
     } else {
-        document.getElementById('add-sample-main').style.display = 'none';
         document.getElementById('landing-main').style.display = 'flex';
+        document.getElementById('add-sample-main').style.display = 'none';
+        
     }
     const sampleRegCloseBtn = document.getElementById('sample-reg-close-btn');
     sampleRegCloseBtn.addEventListener('click', function () {
