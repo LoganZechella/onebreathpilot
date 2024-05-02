@@ -31,8 +31,11 @@
         <button id="sign-in">Sign In</button>
         <button id="sign-in-google" disabled>Sign In with Google</button>
     </div>
+    
+
 
     <div class="blocker">
+        <div class="loader" display="none"></div>
         <main class="container" id="add-sample-main">
 
             <div class="grid">
@@ -98,7 +101,7 @@
                         <label for="error-codes">Error Codes (Optional):</label>
                         <input type="text" id="error-codes" name="error-codes">
 
-                        <button type="submit" id="confirm-pickup" action="https://onebreathpilot.onrender.com">Confirm
+                        <button id="confirm-pickup-button">Confirm
                             Pickup</button>
                     </form>
                 </div>
@@ -168,6 +171,7 @@
 
             // Create a new instance of Html5QrcodeScanner
             const html5QrCode = new Html5Qrcode("reader");
+            document.getElementById('reader').style.display = 'block';
             const config = { fps: 1, qrbox: { width: 250, height: 250 } };
 
             const manualAddButton = document.getElementById('manual-add-btn');
@@ -181,7 +185,7 @@
 
             function onScanSuccess(decodedText, decodedResult) {
                 // Handle the scanned text here.
-                console.log(`QR Code detected: ${decodedText}`);
+                // console.log(`QR Code detected: ${decodedText}`);
                 window.location.href = `${decodedText}`;
                 // Possibly hide the scanner or redirect user.
                 html5QrCode.stop().then(() => {
@@ -191,16 +195,16 @@
                     document.getElementById('qr-close-btn').style.display = 'none';
                     bodySections[0].style.display = 'block';
                     AOS.refresh();
-                    console.log('QR Scanner stopped.');
+                    // console.log('QR Scanner stopped.');
                 }).catch((err) => {
                     // Stop failed, handle it.
-                    console.error('Failed to stop the QR Scanner', err);
+                    // console.error('Failed to stop the QR Scanner', err);
                 });
             }
 
             function onScanError(errorMessage) {
                 // handle scan error
-                console.error(`QR scan error: ${errorMessage}`);
+                // console.error(`QR scan error: ${errorMessage}`);
             }
             document.getElementById('qr-close-btn').addEventListener('click', function () {
                 html5QrCode.stop().then(() => {
@@ -209,11 +213,11 @@
                     }
                     document.getElementById('qr-close-btn').style.display = 'none';
                     document.getElementById('manual-add-btn').style.display = 'none';
-                    bodySections[0].style.display = 'block';
+                    bodySections[0].style.display = 'flex';
                     AOS.refresh();
                 }).catch((err) => {
                     // Stop failed, handle it.
-                    console.error('Failed to stop the QR Scanner', err);
+                    // console.error('Failed to stop the QR Scanner', err);
                 });
             })
 
