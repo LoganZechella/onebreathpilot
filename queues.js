@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('pickup-button')) {
             showPickupForm(event.target.id);
-            document.getElementById('pickup-form-modal').style.display = 'none';
         }
         if (event.target.classList.contains('finish-button')) {
             completeSample(event.target.id);
+            document.getElementById('pickup-form-modal').style.display = 'none';
         }
     });
 });
