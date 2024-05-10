@@ -354,7 +354,7 @@ p {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    border: 1px solid #ddd;
+    border: 1px solid light-dark(#222, #ddd);
     border-radius: 4px;
 }
 
@@ -375,7 +375,7 @@ p {
 #password,
 #email::placeholder,
 #password::placeholder {
-    color: #ffffff;
+    color: light-dark(#000000, #ffffff);
 }
 
 .loader {
