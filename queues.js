@@ -18,8 +18,28 @@ document.addEventListener('DOMContentLoaded', function () {
             completeSample(event.target.id);
             document.getElementById('pickup-form-modal').style.display = 'none';
         }
+        if (event.target.classList.contains('sample-reg-close-btn')) {
+            resetSampleRegistration();
+        }
     });
 });
+
+function resetSampleRegistration() {
+    const bodySections = {
+        'add-button-div': document.getElementById('add-button-div'),
+        'add-button': document.getElementById('add-new-sample'),
+        'in-process': document.getElementById('in-process-section'),
+        'pickup': document.getElementById('pickup-section'),
+        'shipping': document.getElementById('shipping-section'),
+        'elution': document.getElementById('elution-section')
+    };
+    document.getElementById('sample-reg-section').style.display = 'none';
+    document.getElementById('qr-close-btn').style.display = 'none';
+    document.getElementById('manual-add-btn').style.display = 'none';
+    document.getElementById('add-button-div').querySelector('.add-new-sample').style.display = 'flex';
+    Object.values(bodySections).forEach(section => section.style.display = 'flex');
+    AOS.refresh();
+}
 
 function fetchSamplesAndUpdateUI() {
     setTimeout(() => {
@@ -79,7 +99,7 @@ function updateSampleQueues(samples) {
             case 'Picked up. Ready for Analysis': shippingElement.appendChild(sampleCard); break;
         }
     });
-    
+
     for (const element of [inProcessElement, pickupElement, shippingElement, analysisElement]) {
         element.style.display = 'grid';
     }
@@ -94,9 +114,9 @@ function createSampleCard(sample) {
     card.setAttribute('data-aos-delay', '500');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
-        <h3>Chip ID: ${sample.chip_id}</h3>
-        <p>Status: ${sample.status}</p>
-        <p>Location: ${sample.location}</p>
+        <h3>${sample.chip_id}</h3>
+        <p>Status:<br/> <strong>${sample.status}</strong></p>
+        <p>Location:<br/> <strong>${sample.location}</strong></p>
         <div class="timer" id="timer-${sample.chip_id}"></div>
     `;
     appendButtonsBasedOnStatus(card, sample);
@@ -167,6 +187,7 @@ function showPickupForm(chipId) {
     const form = document.getElementById('pickup-form');
     form.elements['data-chip-id'].value = chipId;
     document.getElementById('pickup-form-modal').style.display = 'block';
+    document.getElementById('pickup-form-modal').scrollIntoView({ behavior: 'smooth' });
 }
 
 function completeSample(chipId) {
@@ -193,6 +214,7 @@ function completeSample(chipId) {
 function displayNoSamplesMessage(elements) {
     elements.forEach(el => {
         if (el.children.length === 0) {
+            el.style.display = 'flex';
             el.innerHTML = '<p>No samples in this category.</p>';
         }
     });

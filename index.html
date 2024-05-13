@@ -45,10 +45,10 @@
 
             <div class="grid">
                 <section id="sample-reg-section">
-                    <span class="close-button" id="sample-reg-close-btn">&times;</span>
+                    <span class="close-button sample-reg-close-btn" id="sample-reg-close-btn">&times;</span>
                     <hgroup class="hgroup">
                         <h2>Sample Registration</h2>
-                        <h3>Enter the details for the new sample</h3>
+                        <h3>Enter the details for the new sample below:</h3>
                     </hgroup>
                     <form id="new-sample-form">
                         <label for="chipID">Chip ID: (PXXXXX)</label>
@@ -74,7 +74,7 @@
         <main class="container" id="landing-main">
 
             <div class="add-button-div" id="add-button-div">
-                <button id="add-new-sample">Add New Sample</button>
+                <button class="add-new-sample" id="add-new-sample">Add New Sample</button>
                 <button id="qr-close-btn" style="display: none;">Close QR Scanner</button>
                 <button id="manual-add-btn">Enter Data Manually</button>
             </div>
@@ -154,84 +154,6 @@
     <script src="queues.js"></script>
     <script src="script.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <script>
-        const addNewSampleButton = document.getElementById('add-new-sample');
-        const qrCodeScannerElement = document.getElementById('reader');
-        const bodySections = {
-            'add-button': document.getElementById('add-new-sample'),
-            'in-process': document.getElementById('in-process-section'),
-            'pickup': document.getElementById('pickup-section'),
-            'shipping': document.getElementById('shipping-section'),
-            'elution': document.getElementById('elution-section')
-        }
-
-        addNewSampleButton.addEventListener('click', function () {
-            for (const section in bodySections) {
-                bodySections[section].style.display = 'none';
-                document.getElementById('qr-close-btn').style.display = 'block';
-                document.getElementById('manual-add-btn').style.display = 'block';
-                AOS.refresh();
-            }
-
-            // Create a new instance of Html5QrcodeScanner
-            const html5QrCode = new Html5Qrcode("reader");
-            document.getElementById('reader').style.display = 'block';
-            const config = { fps: 1, qrbox: { width: 250, height: 250 } };
-
-            const manualAddButton = document.getElementById('manual-add-btn');
-            manualAddButton.addEventListener('click', function () {
-                html5QrCode.stop();
-                document.getElementById('reader').style.display = 'none';
-                document.getElementById('add-button-div').style.display = 'none';
-                document.getElementById('add-sample-main').style.display = 'block';
-                
-            });
-
-            function onScanSuccess(decodedText, decodedResult) {
-                // Handle the scanned text here.
-                // console.log(`QR Code detected: ${decodedText}`);
-                window.location.href = `${decodedText}`;
-                // Possibly hide the scanner or redirect user.
-                html5QrCode.stop().then(() => {
-                    for (const section in bodySections) {
-                        bodySections[section].style.display = 'grid';
-                    }
-                    document.getElementById('qr-close-btn').style.display = 'none';
-                    bodySections[0].style.display = 'block';
-                    AOS.refresh();
-                    // console.log('QR Scanner stopped.');
-                }).catch((err) => {
-                    // Stop failed, handle it.
-                    // console.error('Failed to stop the QR Scanner', err);
-                });
-            }
-
-            function onScanError(errorMessage) {
-                // handle scan error
-                // console.error(`QR scan error: ${errorMessage}`);
-            }
-            document.getElementById('qr-close-btn').addEventListener('click', function () {
-                html5QrCode.stop().then(() => {
-                    for (const section in bodySections) {
-                        bodySections[section].style.display = 'grid';
-                    }
-                    document.getElementById('qr-close-btn').style.display = 'none';
-                    document.getElementById('manual-add-btn').style.display = 'none';
-                    bodySections[0].style.display = 'flex';
-                    AOS.refresh();
-                }).catch((err) => {
-                    // Stop failed, handle it.
-                    // console.error('Failed to stop the QR Scanner', err);
-                });
-            })
-
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanError);
-
-        });
-    </script>
-
-
-
 
 </body>
 
