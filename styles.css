@@ -99,7 +99,7 @@ p {
 }
 
 #new-sample-form>label {
-    color: #ffffff;
+    color: #000000;
 }
 
 #sample-reg-section {
@@ -344,6 +344,13 @@ p {
     border: 1px solid #000000;
     max-width: 600px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#chipID,
+#patientID,
+#chipID::placeholder,
+#patientID::placeholder {
+    color: light-dark(#000000, #ffffff);
 }
 
 .close-button {
