@@ -187,6 +187,7 @@ function showPickupForm(chipId) {
     const form = document.getElementById('pickup-form');
     form.elements['data-chip-id'].value = chipId;
     document.getElementById('pickup-form-modal').style.display = 'block';
+    document.getElementById('pickup-form-modal').style.marginTop = '25%';
     document.getElementById('pickup-form-modal').scrollIntoView({ behavior: 'smooth' });
 }
 
