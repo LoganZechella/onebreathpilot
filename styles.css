@@ -70,11 +70,6 @@ p {
         justify-content: center;
     }
 
-    .modal-content {
-        width: 80%;
-        margin: 10% auto;
-    }
-
     .card button {
         max-height: 50px;
         width: 95%;
