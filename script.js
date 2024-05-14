@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
     setupSampleConfirmation();
+    setupPatientIntakeForm();
     setupQRCodeScanner();
     fetchSamplesAndUpdateUI();
     setupSampleEventListeners();
+    setupPatientIntakeEventListeners();
 });
 
 function initApp() {
@@ -66,6 +68,137 @@ function sendSample(sampleData) {
         .catch(error => {
             alert('Sample update failed.');
         });
+}
+
+function setupPatientIntakeForm() {
+    document.getElementById('add-new-sample').addEventListener('click', () => {
+        document.getElementById('patient-intake-form-section').style.display = 'block';
+    });
+
+    document.getElementById('patient-intake-form-confirm-button').addEventListener('click', (event) => {
+        event.preventDefault();
+        const patientInfo = collectPatientFormData();
+        if (patientInfo) {
+            sendPatientInfo(patientInfo).then(() => {
+                document.getElementById('patient-intake-form-section').style.display = 'none';
+                initializeDocumentScanner();
+            }).catch(error => {
+                console.error('Failed to submit patient info:', error);
+                alert('Failed to submit patient information.');
+            });
+        }
+    });
+
+    document.getElementById('patient-intake-form-close-btn').addEventListener('click', () => {
+        document.getElementById('patient-intake-form-section').style.display = 'none';
+    });
+
+    setupConditionalFields();
+}
+
+function setupConditionalFields() {
+    document.querySelectorAll('input[name="personal_lung_cancer"]').forEach(input => {
+        input.addEventListener('change', () => {
+            document.getElementById('lung_cancer_details').style.display = input.value === 'yes' ? 'block' : 'none';
+        });
+    });
+
+    document.querySelectorAll('input[name="personal_other_cancer"]').forEach(input => {
+        input.addEventListener('change', () => {
+            document.getElementById('other_cancer_details').style.display = input.value === 'yes' ? 'block' : 'none';
+        });
+    });
+}
+
+function collectPatientFormData() {
+    const formData = {
+        insurance: document.querySelector('input[name="insurance"]:checked')?.value,
+        occupation: document.getElementById('occupation').value,
+        asbestos_exposure: document.querySelector('input[name="asbestos_exposure"]:checked')?.value,
+        lung_disease: document.querySelector('input[name="lung_disease"]:checked')?.value,
+        diabetes: document.querySelector('input[name="diabetes"]:checked')?.value,
+        family_lung_cancer: document.querySelector('input[name="family_lung_cancer"]:checked')?.value,
+        smoking_history: document.querySelector('input[name="smoking_history"]:checked')?.value,
+        pack_years: document.querySelector('input[name="pack_years"]').value,
+        time_since_last_cigarette: document.getElementById('time_since_last_cigarette').value,
+        current_diagnosis: document.querySelector('input[name="current_diagnosis"]:checked')?.value,
+        personal_lung_cancer: document.querySelector('input[name="personal_lung_cancer"]:checked')?.value,
+        lung_cancer_details: {
+            diagnosis_date: document.querySelector('input[name="lung_cancer_diagnosis_date"]').value,
+            stage: document.querySelector('input[name="lung_cancer_stage"]').value,
+            histology: document.querySelector('input[name="lung_cancer_histology"]').value,
+            treatment: Array.from(document.querySelectorAll('input[name="lung_cancer_treatment"]:checked')).map(el => el.value)
+        },
+        personal_other_cancer: document.querySelector('input[name="personal_other_cancer"]:checked')?.value,
+        other_cancer_details: {
+            diagnosis_date: document.querySelector('input[name="other_cancer_diagnosis_date"]').value,
+            stage: document.querySelector('input[name="other_cancer_stage"]').value,
+            histology: document.querySelector('input[name="other_cancer_histology"]').value,
+            treatment: Array.from(document.querySelectorAll('input[name="other_cancer_treatment"]:checked')).map(el => el.value)
+        },
+        dentition: document.querySelector('input[name="dentition"]:checked')?.value,
+        time_since_last_meal: document.getElementById('time_since_last_meal').value,
+        meal_consumed: document.getElementById('meal_consumed').value,
+        ketogenic_diet: document.querySelector('input[name="ketogenic_diet"]:checked')?.value
+    };
+
+    if (!formData.insurance || !formData.occupation || !formData.asbestos_exposure || !formData.lung_disease || !formData.diabetes || !formData.family_lung_cancer || !formData.smoking_history || !formData.current_diagnosis || !formData.personal_lung_cancer || !formData.personal_other_cancer || !formData.dentition || !formData.ketogenic_diet) {
+        alert('Please fill in all required fields.');
+        return null;
+    }
+    return formData;
+}
+
+async function sendPatientInfo(patientInfo) {
+    return fetch('https://onebreathpilot.onrender.com/update_patient_info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patientInfo),
+    })
+        .then(response => response.json())
+        .then(data => {
+            alert('Patient information submitted successfully.');
+            return data;
+        });
+}
+
+function initializeDocumentScanner() {
+    ScannerJS.scanToPdf({
+        onComplete: async (pdf, mimeType, file) => {
+            try {
+                const formData = new FormData();
+                formData.append('document', file, 'patient-form.pdf');
+                const response = await fetch('https://onebreathpilot.onrender.com/upload_document', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Document scanned and uploaded successfully.');
+                } else {
+                    alert('Failed to upload document.');
+                }
+            } catch (error) {
+                console.error('Error scanning or uploading document:', error);
+                alert('Error scanning or uploading document.');
+            }
+        },
+        onError: (error) => {
+            console.error('Error during scanning:', error);
+            alert('Error during scanning.');
+        }
+    });
+}
+
+function setupPatientIntakeEventListeners() {
+    document.getElementById('patient-intake-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        updatePatient();
+    });
+
+    document.getElementById('patient-intake-form-close-btn').addEventListener('click', function () {
+        document.getElementById('patient-intake-form-section').style.display = 'none';
+    });
 }
 
 function setupQRCodeScanner() {
@@ -142,10 +275,11 @@ function resetSampleRegistration() {
         'elution': document.getElementById('elution-section')
     };
     document.getElementById('sample-reg-section').style.display = 'none';
+    document.getElementById('patient-intake-form-section').style.display = 'none';
     document.getElementById('qr-close-btn').style.display = 'none';
     document.getElementById('manual-add-btn').style.display = 'none';
     document.getElementById('add-button-div').querySelector('.add-new-sample').style.display = 'flex';
-    Object.values(bodySections).forEach(section => section.style.display = 'flex');
+    Object.values(bodySections).forEach(section => section.style.display = 'grid');
     AOS.refresh();
 }
 
@@ -156,37 +290,6 @@ function fetchSamplesAndUpdateUI() {
             .then(samples => updateSampleQueues(samples))
             .catch(error => console.error('Error fetching samples:', error));
     }, 1000);
-}
-
-function updateSample() {
-    const form = document.getElementById('pickup-form');
-    const chipID = form.elements['data-chip-id'].value;
-    const finalVolume = form.elements['final-volume'].value;
-    const avgCO2 = form.elements['average-co2'].value;
-    const errorCodes = form.elements['error-codes'].value;
-
-    const sampleData = {
-        chip_id: chipID,
-        final_volume: finalVolume,
-        avg_co2: avgCO2,
-        error_code: errorCodes,
-        status: "Picked up. Ready for Analysis"
-    };
-
-    fetch('https://onebreathpilot.onrender.com/update_sample', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sampleData),
-    })
-        .then(response => response.json())
-        .then(data => {
-            alert('Sample updated successfully.');
-            document.getElementById('pickup-form-modal').style.display = 'none';
-            fetchSamplesAndUpdateUI();
-        })
-        .catch(error => {
-            alert('Failed to update sample.');
-        });
 }
 
 function updateSampleQueues(samples) {
@@ -353,7 +456,8 @@ function updateTimerDisplay(timerElement, distance) {
 function setupSampleEventListeners() {
     document.getElementById('pickup-form').addEventListener('submit', function (event) {
         event.preventDefault();
-        updateSample();
+        const formId = event.target.elements['data-chip-id'].value;
+        updateStatusToReadyForPickup(formId);
     });
 
     document.getElementById('pickup-close-button').addEventListener('click', function () {
@@ -370,6 +474,9 @@ function setupSampleEventListeners() {
         }
         if (event.target.classList.contains('sample-reg-close-btn')) {
             resetSampleRegistration();
+        }
+        if (event.target.classList.contains('patient-intake-form-close-btn')) {
+            document.getElementById('patient-intake-form-section').style.display = 'none';
         }
     });
 }

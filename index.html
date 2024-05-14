@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+    <!-- <script src="//cdn.asprise.com/scannerjs/scanner.js" type="text/javascript"></script> -->
     <title>OneBreath Sample Dashboard</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
 </head>
@@ -69,6 +70,129 @@
                         <button id="confirm-button">Confirm</button>
                     </form>
                 </section>
+
+                <section id="patient-intake-form-section">
+                    <span class="close-button patient-intake-form-close-btn" id="patient-intake-form-close-btn">&times;</span>
+                    <hgroup class="hgroup">
+                        <h2>Patient Intake Form</h2>
+                        <h3>Complete the patient information below:</h3>
+                    </hgroup>
+                    <form id="patient-intake-form">
+                        <fieldset>
+                            <legend>Insurance:</legend>
+                            <label><input type="radio" name="insurance" value="private"> Private</label>
+                            <label><input type="radio" name="insurance" value="medicare_medicaid"> Medicare/Medicaid</label>
+                            <label><input type="radio" name="insurance" value="passport"> Passport</label>
+                            <label><input type="radio" name="insurance" value="none"> None</label>
+                        </fieldset>
+                
+                        <label for="occupation">Occupation:</label>
+                        <input type="text" id="occupation" name="occupation">
+                
+                        <fieldset>
+                            <legend>Occupational Asbestos Exposure:</legend>
+                            <label><input type="radio" name="asbestos_exposure" value="yes"> Yes</label>
+                            <label><input type="radio" name="asbestos_exposure" value="no"> No</label>
+                        </fieldset>
+                
+                        <fieldset>
+                            <legend>Chronic Lung Disease:</legend>
+                            <label><input type="radio" name="lung_disease" value="none"> None</label>
+                            <label><input type="radio" name="lung_disease" value="copd"> COPD</label>
+                            <label><input type="radio" name="lung_disease" value="emphysema"> Emphysema</label>
+                            <label><input type="radio" name="lung_disease" value="bronchiolitis"> Bronchiolitis</label>
+                            <label><input type="radio" name="lung_disease" value="fibrosis"> Fibrosis</label>
+                            <label><input type="radio" name="lung_disease" value="other"> Other</label>
+                        </fieldset>
+                
+                        <fieldset>
+                            <legend>Diabetes:</legend>
+                            <label><input type="radio" name="diabetes" value="none"> None</label>
+                            <label><input type="radio" name="diabetes" value="iddm"> IDDM</label>
+                            <label><input type="radio" name="diabetes" value="niddm"> NIDDM</label>
+                        </fieldset>
+                
+                        <fieldset>
+                            <legend>Family History of Lung Cancer:</legend>
+                            <label><input type="radio" name="family_lung_cancer" value="yes"> Yes</label>
+                            <label><input type="radio" name="family_lung_cancer" value="no"> No</label>
+                        </fieldset>
+                
+                        <fieldset>
+                            <legend>Smoking History:</legend>
+                            <label><input type="radio" name="smoking_history" value="past"> Past</label>
+                            <label><input type="radio" name="smoking_history" value="active"> Active</label>
+                            <label><input type="radio" name="smoking_history" value="never"> Never</label>
+                            <label>Total pack years: <input type="number" name="pack_years"></label>
+                        </fieldset>
+                
+                        <label for="time_since_last_cigarette">Time since last cigarette:</label>
+                        <input type="text" id="time_since_last_cigarette" name="time_since_last_cigarette">
+                
+                        <fieldset>
+                            <legend>Current Diagnosis:</legend>
+                            <label><input type="radio" name="current_diagnosis" value="imaging_pending"> Imaging Pending</label>
+                            <label><input type="radio" name="current_diagnosis" value="known_lung_cancer"> Known Lung Cancer</label>
+                        </fieldset>
+                
+                        <fieldset>
+                            <legend>Personal History of Lung Cancer:</legend>
+                            <label><input type="radio" name="personal_lung_cancer" value="yes"> Yes</label>
+                            <div id="lung_cancer_details" style="margin-left: 20px; display: none;">
+                                <label>Date of diagnosis: <input type="date" name="lung_cancer_diagnosis_date"></label>
+                                <label>Stage of lung cancer: <input type="text" name="lung_cancer_stage"></label>
+                                <label>Histology of lung cancer: <input type="text" name="lung_cancer_histology"></label>
+                                <fieldset>
+                                    <legend>Treatment:</legend>
+                                    <label><input type="checkbox" name="lung_cancer_treatment" value="surgery"> Surgery</label>
+                                    <label><input type="checkbox" name="lung_cancer_treatment" value="chemotherapy">
+                                        Chemotherapy</label>
+                                    <label><input type="checkbox" name="lung_cancer_treatment" value="radiation"> Radiation</label>
+                                </fieldset>
+                            </div>
+                            <label><input type="radio" name="personal_lung_cancer" value="no"> No</label>
+                        </fieldset>
+                
+                        <fieldset>
+                            <legend>Personal History of Other Cancer:</legend>
+                            <label><input type="radio" name="personal_other_cancer" value="yes"> Yes</label>
+                            <div id="other_cancer_details" style="margin-left: 20px; display: none;">
+                                <label>Date of diagnosis: <input type="date" name="other_cancer_diagnosis_date"></label>
+                                <label>Stage of cancer: <input type="text" name="other_cancer_stage"></label>
+                                <label>Histology of cancer: <input type="text" name="other_cancer_histology"></label>
+                                <fieldset>
+                                    <legend>Treatment:</legend>
+                                    <label><input type="checkbox" name="other_cancer_treatment" value="surgery"> Surgery</label>
+                                    <label><input type="checkbox" name="other_cancer_treatment" value="chemotherapy">
+                                        Chemotherapy</label>
+                                    <label><input type="checkbox" name="other_cancer_treatment" value="radiation"> Radiation</label>
+                                </fieldset>
+                            </div>
+                            <label><input type="radio" name="personal_other_cancer" value="no"> No</label>
+                        </fieldset>
+                
+                        <fieldset>
+                            <legend>Dentition:</legend>
+                            <label><input type="radio" name="dentition" value="good"> Good</label>
+                            <label><input type="radio" name="dentition" value="bad"> Bad</label>
+                        </fieldset>
+                
+                        <label for="time_since_last_meal">Time Since Last Meal:</label>
+                        <input type="text" id="time_since_last_meal" name="time_since_last_meal">
+                
+                        <label for="meal_consumed">What was consumed:</label>
+                        <input type="text" id="meal_consumed" name="meal_consumed">
+                
+                        <fieldset>
+                            <legend>Ketogenic Diet:</legend>
+                            <label><input type="radio" name="ketogenic_diet" value="yes"> Yes</label>
+                            <label><input type="radio" name="ketogenic_diet" value="no"> No</label>
+                        </fieldset>
+                
+                        <button id="patient-intake-form-confirm-button">Confirm</button>
+                    </form>
+                </section>
+
             </div>
         </main>
 

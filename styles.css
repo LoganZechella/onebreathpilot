@@ -255,6 +255,53 @@ p {
     justify-content: center;
 }
 
+#patient-intake-form-section {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+#patient-intake-form-section>.hgroup>* {
+    color: #000000;
+}
+
+#patient-intake-form fieldset {
+    border: none;
+    margin-bottom: 10px;
+    color: #000000;
+}
+
+#patient-intake-form legend {
+    font-weight: bold;
+}
+
+#patient-intake-form label {
+    margin-right: 10px;
+    color: #000000;
+}
+
+#patient-intake-form input[type="text"],
+#patient-intake-form input[type="number"],
+#patient-intake-form input[type="date"] {
+    margin-bottom: 10px;
+}
+
+#patient-intake-form-confirm-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+#patient-intake-form-confirm-button:hover {
+    background-color: #0056b3;
+}
+
 .card {
     background-color: #f2f4f6b0;
     backdrop-filter: blur(20px);

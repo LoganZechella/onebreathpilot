@@ -5,6 +5,7 @@ import os
 import firebase_admin
 from firebase_admin import credentials, auth
 from pymongo import MongoClient
+from werkzeug.utils import secure_filename
 
 load_dotenv()
 
@@ -96,6 +97,76 @@ def update_sample():
         
     except KeyError:
         return jsonify({"error": "Missing chipID in the submitted data."}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/update_patient_info', methods=['POST'])
+def update_patient_info():
+    try:
+        patient_info = request.json
+        chip_id = patient_info.get('chip_id')
+        
+        if not chip_id:
+            return jsonify({"error": "Missing chipID in the submitted data."}), 400
+        
+        # Locate the sample based on chip_id
+        sample = collection.find_one({"chip_id": chip_id})
+        
+        if not sample:
+            return jsonify({"success": False, "message": "No sample found with the given chipID."}), 404
+        
+        # Append patient info to the sample's existing data
+        update_result = collection.update_one(
+            {"chip_id": chip_id},
+            {"$set": {"patient_info": patient_info}}
+        )
+        
+        if update_result.modified_count == 1:
+            return jsonify({"success": True, "message": "Patient information added successfully to the sample."}), 200
+        else:
+            return jsonify({"success": False, "message": "Failed to add patient information to the sample."}), 500
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/upload_document', methods=['POST'])
+def upload_document():
+    try:
+        # Extract the chip_id from the form data
+        chip_id = request.form.get('chip_id')
+        if not chip_id:
+            return jsonify({"success": False, "message": "Missing chipID in the request."}), 400
+
+        # Locate the sample based on chip_id
+        sample = collection.find_one({"chip_id": chip_id})
+        if not sample:
+            return jsonify({"success": False, "message": "No sample found with the given chipID."}), 404
+
+        if 'document' not in request.files:
+            return jsonify({"success": False, "message": "No document part in the request."}), 400
+
+        file = request.files['document']
+        if file.filename == '':
+            return jsonify({"success": False, "message": "No file selected."}), 400
+
+        if file:
+            filename = secure_filename(file.filename)
+            save_path = os.path.join('/path/to/save/documents', filename)
+            file.save(save_path)
+
+            # Append the document path to the sample's existing data
+            update_result = collection.update_one(
+                {"chip_id": chip_id},
+                {"$set": {"document_path": save_path}}
+            )
+
+            if update_result.modified_count == 1:
+                return jsonify({"success": True, "message": "Document uploaded and added to the sample successfully.", "path": save_path}), 200
+            else:
+                return jsonify({"success": False, "message": "Failed to add the document to the sample."}), 500
+        else:
+            return jsonify({"success": False, "message": "Document upload failed."}), 400
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
