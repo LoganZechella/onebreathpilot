@@ -383,6 +383,26 @@ function updateStatusToReadyForPickup(chipId) {
         });
 }
 
+function updateStatusToReadyForAnalysis(chipId) {
+    const sampleData = {
+        chip_id: chipId,
+        status: "Picked up. Ready for Analysis"
+    };
+
+    fetch('https://onebreathpilot.onrender.com/update_sample', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sampleData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            fetchSamplesAndUpdateUI();
+        })
+        .catch(error => {
+            console.error('Error updating sample status:', error);
+        });
+}
+
 function clearElements(elements) {
     elements.forEach(el => {
         el.innerHTML = '';
@@ -456,8 +476,8 @@ function updateTimerDisplay(timerElement, distance) {
 function setupSampleEventListeners() {
     document.getElementById('pickup-form').addEventListener('submit', function (event) {
         event.preventDefault();
-        const formId = event.target.elements['data-chip-id'].value;
-        updateStatusToReadyForPickup(formId);
+        updateStatusToReadyForAnalysis(event.target.elements['data-chip-id'].value);
+        document.getElementById('pickup-form-modal').style.display = 'none';
     });
 
     document.getElementById('pickup-close-button').addEventListener('click', function () {
@@ -470,7 +490,6 @@ function setupSampleEventListeners() {
         }
         if (event.target.classList.contains('finish-button')) {
             completeSample(event.target.id);
-            document.getElementById('pickup-form-modal').style.display = 'none';
         }
         if (event.target.classList.contains('sample-reg-close-btn')) {
             resetSampleRegistration();
