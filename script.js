@@ -35,7 +35,7 @@ function setupSampleConfirmation() {
             sample.status = 'In Process';
             sendSample(sample);
             alert('COLLECT BREATH PER STUDY PROTOCOL THEN RETURN TO THIS PAGE. Press OK below to confirm that sample evacuation has begun and return to the dashboard.');
-            window.location.reload();
+            window.location.href = '/index.html';
         }
     });
 }
