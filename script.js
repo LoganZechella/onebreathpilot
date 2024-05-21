@@ -123,6 +123,7 @@ function showOptionButtons() {
 
 // Back button for patient intake form section
 document.getElementById('back-button-intake').addEventListener('click', () => {
+    document.getElementById('scanner-container').style.display = 'none';
     document.getElementById('patient-intake-form-section').style.display = 'none';
     document.getElementById('option-container').style.display = 'flex';
     document.getElementById('back-button-intake').style.display = 'none';
@@ -130,6 +131,7 @@ document.getElementById('back-button-intake').addEventListener('click', () => {
 
 function startDocumentScanning() {
     document.getElementById('scanner-container').style.display = 'block';
+    document.getElementById('back-button-intake-container').style.display = 'flex';
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const resultCanvas = document.getElementById('result');

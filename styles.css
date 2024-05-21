@@ -143,10 +143,17 @@ p {
 
 #scanner-container {
     display: none;
-    width: 100%;
+    max-width: 95%;
     border: 1px solid #ccc;
     position: relative;
-    height: 95vh;
+    max-height: 75vh;
+    overflow: hidden;
+    border-radius: 1em;
+}
+
+#back-button-intake {
+    border-radius: 1em;
+    background-color: #ffffff;
 }
 
 #scanned-images {
