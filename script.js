@@ -161,7 +161,7 @@ function setupBackButtonIntakeEventListener() {
 let scannerStream = null;
 let scannerInterval = null;
 let videoDevices = [];
-let currentCameraIndex = 0;
+let currentCameraIndex = 1;
 
 function enumerateVideoDevices() {
     navigator.mediaDevices.enumerateDevices()
