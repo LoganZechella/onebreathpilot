@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchSamplesAndUpdateUI();
     setupSampleEventListeners();
     setupPatientIntakeEventListeners();
+    setupOptionContainerEventListeners(); 
+    setupBackButtonIntakeEventListener();
+    enumerateVideoDevices()
 });
 
 function initApp() {
@@ -121,13 +124,59 @@ function showOptionButtons() {
     document.body.appendChild(optionContainer);
 }
 
-// Back button for patient intake form section
-document.getElementById('back-button-intake').addEventListener('click', () => {
-    document.getElementById('scanner-container').style.display = 'none';
-    document.getElementById('patient-intake-form-section').style.display = 'none';
-    document.getElementById('option-container').style.display = 'flex';
-    document.getElementById('back-button-intake').style.display = 'none';
-});
+function setupOptionContainerEventListeners() {
+    const digitalFormButton = document.getElementById('digital-form-button');
+    const scanDocumentButton = document.getElementById('scan-document-button');
+    const backButton = document.getElementById('back-button');
+
+    digitalFormButton.addEventListener('click', () => {
+        document.getElementById('patient-intake-form-section').style.display = 'block';
+        document.getElementById('option-container').style.display = 'none';
+        document.getElementById('back-button-intake').style.display = 'block';
+    });
+
+    scanDocumentButton.addEventListener('click', () => {
+        startDocumentScanning();
+        document.getElementById('option-container').style.display = 'none';
+    });
+
+    backButton.addEventListener('click', () => {
+        document.getElementById('sample-reg-section').style.display = 'block';
+        document.getElementById('option-container').style.display = 'none';
+    });
+}
+
+function setupBackButtonIntakeEventListener() {
+    const backButtonIntake = document.getElementById('back-button-intake');
+    backButtonIntake.addEventListener('click', () => {
+        stopDocumentScanning();
+        document.getElementById('patient-intake-form-section').style.display = 'none';
+        document.getElementById('option-container').style.display = 'flex';
+        document.getElementById('back-button-intake-container').style.display = 'none';
+        setupOptionContainerEventListeners(); // Re-setup event listeners
+        setupBackButtonIntakeEventListener(); // Re-setup event listener
+    });
+}
+
+let scannerStream = null;
+let scannerInterval = null;
+let videoDevices = [];
+let currentCameraIndex = 0;
+
+function enumerateVideoDevices() {
+    navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            videoDevices = devices.filter(device => device.kind === 'videoinput');
+            if (videoDevices.length > 0) {
+                // Default to rear camera if available
+                const rearCameraIndex = videoDevices.findIndex(device => device.label.toLowerCase().includes('rear') || device.label.toLowerCase().includes('main'));
+                currentCameraIndex = rearCameraIndex !== -1 ? rearCameraIndex : 0;
+            }
+        })
+        .catch(error => {
+            console.error('Error enumerating media devices.', error);
+        });
+}
 
 function startDocumentScanning() {
     document.getElementById('scanner-container').style.display = 'block';
@@ -139,20 +188,74 @@ function startDocumentScanning() {
     const canvasCtx = canvas.getContext("2d");
     const resultCtx = resultCanvas.getContext("2d");
 
-    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-        video.srcObject = stream;
-        video.onloadedmetadata = () => {
-            video.play();
-            setInterval(() => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const highlightedCanvas = scanner.highlightPaper(canvas);
-                resultCtx.drawImage(highlightedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
-            }, 100);
-        };
-    }).catch(error => {
-        console.error('Error accessing media devices.', error);
+    if (videoDevices.length > 0) {
+        const selectedDevice = videoDevices[currentCameraIndex];
+        navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedDevice.deviceId } })
+            .then((stream) => {
+                scannerStream = stream;
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    scannerInterval = setInterval(() => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const highlightedCanvas = scanner.highlightPaper(canvas);
+                        resultCtx.drawImage(highlightedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
+                    }, 100);
+                };
+            })
+            .catch(error => {
+                console.error('Error accessing media devices.', error);
+            });
+    } else {
+        console.error('No video devices found.');
+    }
+}
+
+function stopDocumentScanning() {
+    if (scannerStream) {
+        scannerStream.getTracks().forEach(track => track.stop());
+        scannerStream = null;
+    }
+    if (scannerInterval) {
+        clearInterval(scannerInterval);
+        scannerInterval = null;
+    }
+    document.getElementById('scanner-container').style.display = 'none';
+}
+
+function changeCamera() {
+    stopDocumentScanning();
+    currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
+    startDocumentScanning();
+}
+
+// Back button for patient intake form section
+function setupBackButtonIntakeEventListener() {
+    const backButtonIntake = document.getElementById('back-button-intake');
+    backButtonIntake.addEventListener('click', () => {
+        stopDocumentScanning();
+        document.getElementById('patient-intake-form-section').style.display = 'none';
+        document.getElementById('option-container').style.display = 'flex';
+        document.getElementById('back-button-intake-container').style.display = 'none';
+        setupOptionContainerEventListeners(); // Re-setup event listeners
+        setupBackButtonIntakeEventListener(); // Re-setup event listener
+    });
+}
+
+function handleDocumentScanResult(result) {
+    const scannedImages = result.images.map(image => image.imageUrl);
+    console.log('Scanned images:', scannedImages);
+
+    // Display scanned images
+    const imagesContainer = document.getElementById('scanned-images');
+    imagesContainer.innerHTML = ''; // Clear existing images
+    scannedImages.forEach(imageUrl => {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.style.width = '100%';
+        imagesContainer.appendChild(img);
     });
 }
 
@@ -307,21 +410,6 @@ function setupQRCodeScanner() {
             },
             (errorMessage) => console.error(`QR scan error: ${errorMessage}`)
         );
-    });
-}
-
-function handleDocumentScanResult(result) {
-    const scannedImages = result.images.map(image => image.imageUrl);
-    console.log('Scanned images:', scannedImages);
-
-    // Display scanned images
-    const imagesContainer = document.getElementById('scanned-images');
-    imagesContainer.innerHTML = ''; // Clear existing images
-    scannedImages.forEach(imageUrl => {
-        const img = document.createElement('img');
-        img.src = imageUrl;
-        img.style.width = '100%';
-        imagesContainer.appendChild(img);
     });
 }
 
@@ -585,8 +673,10 @@ function setupSampleEventListeners() {
             document.getElementById('patient-intake-form-section').style.display = 'none';
         }
         if (event.target.id === 'start-scanning') {
-            initializeScanbotSDK();
             startDocumentScanning();
+        }
+        if (event.target.id === 'change-camera-button') {
+            changeCamera();
         }
     });
 }
