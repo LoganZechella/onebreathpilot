@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchSamplesAndUpdateUI();
     setupSampleEventListeners();
     setupPatientIntakeEventListeners();
+    setupOptionContainerEventListeners(); 
+    setupBackButtonIntakeEventListener();
+    enumerateVideoDevices()
 });
 
 function initApp() {
@@ -36,8 +39,8 @@ function setupSampleConfirmation() {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
             sendSample(sample);
-            alert('COLLECT BREATH PER STUDY PROTOCOL THEN RETURN TO THIS PAGE. Press OK below to confirm that sample evacuation has begun and return to the dashboard.');
-            window.location.href = '/index.html';
+            document.getElementById('sample-reg-section').style.display = 'none';
+            showOptionButtons();
         }
     });
 }
@@ -63,25 +66,207 @@ function sendSample(sampleData) {
         .then(response => response.json())
         .then(data => {
             alert('Sample update successful.');
-            window.location.href = '/index.html';
         })
         .catch(error => {
             alert('Sample update failed.');
         });
 }
 
-function setupPatientIntakeForm() {
-    document.getElementById('add-new-sample').addEventListener('click', () => {
+function showOptionButtons() {
+    const optionContainer = document.createElement('div');
+    optionContainer.id = 'option-container';
+    optionContainer.style.display = 'flex';
+    optionContainer.style.flexDirection = 'column';
+    optionContainer.style.alignItems = 'center';
+    optionContainer.style.justifyContent = 'center';
+    optionContainer.style.marginTop = '20px';
+
+    const message = document.createElement('div');
+    message.id = 'option-message';
+    message.innerText = 'Please choose an option:';
+
+    const digitalFormButton = document.createElement('button');
+    digitalFormButton.id = 'digital-form-button';
+    digitalFormButton.innerText = 'Fill Patient Intake Form';
+    digitalFormButton.style.margin = '10px';
+
+    const scanDocumentButton = document.createElement('button');
+    scanDocumentButton.id = 'scan-document-button';
+    scanDocumentButton.innerText = 'Proceed to Document Scanning';
+    scanDocumentButton.style.margin = '10px';
+
+    const backButton = document.createElement('button');
+    backButton.id = 'back-button';
+    backButton.innerText = 'Back';
+    backButton.style.margin = '10px';
+
+    digitalFormButton.addEventListener('click', () => {
         document.getElementById('patient-intake-form-section').style.display = 'block';
+        optionContainer.style.display = 'none';
+        document.getElementById('back-button-intake').style.display = 'block';
     });
 
+    scanDocumentButton.addEventListener('click', () => {
+        startDocumentScanning();
+        optionContainer.style.display = 'none';
+    });
+
+    backButton.addEventListener('click', () => {
+        document.getElementById('sample-reg-section').style.display = 'block';
+        optionContainer.style.display = 'none';
+    });
+
+    optionContainer.appendChild(message);
+    optionContainer.appendChild(digitalFormButton);
+    optionContainer.appendChild(scanDocumentButton);
+    optionContainer.appendChild(backButton);
+
+    document.body.appendChild(optionContainer);
+}
+
+function setupOptionContainerEventListeners() {
+    const digitalFormButton = document.getElementById('digital-form-button');
+    const scanDocumentButton = document.getElementById('scan-document-button');
+    const backButton = document.getElementById('back-button');
+
+    digitalFormButton.addEventListener('click', () => {
+        document.getElementById('patient-intake-form-section').style.display = 'block';
+        document.getElementById('option-container').style.display = 'none';
+        document.getElementById('back-button-intake').style.display = 'block';
+    });
+
+    scanDocumentButton.addEventListener('click', () => {
+        startDocumentScanning();
+        document.getElementById('option-container').style.display = 'none';
+    });
+
+    backButton.addEventListener('click', () => {
+        document.getElementById('sample-reg-section').style.display = 'block';
+        document.getElementById('option-container').style.display = 'none';
+    });
+}
+
+function setupBackButtonIntakeEventListener() {
+    const backButtonIntake = document.getElementById('back-button-intake');
+    backButtonIntake.addEventListener('click', () => {
+        stopDocumentScanning();
+        document.getElementById('patient-intake-form-section').style.display = 'none';
+        document.getElementById('option-container').style.display = 'flex';
+        document.getElementById('back-button-intake-container').style.display = 'none';
+        setupOptionContainerEventListeners(); // Re-setup event listeners
+        setupBackButtonIntakeEventListener(); // Re-setup event listener
+    });
+}
+
+let scannerStream = null;
+let scannerInterval = null;
+let videoDevices = [];
+let currentCameraIndex = 0;
+
+function enumerateVideoDevices() {
+    navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            videoDevices = devices.filter(device => device.kind === 'videoinput');
+            if (videoDevices.length > 0) {
+                // Default to rear camera if available
+                const rearCameraIndex = videoDevices.findIndex(device => device.label.toLowerCase().includes('rear') || device.label.toLowerCase().includes('main'));
+                currentCameraIndex = rearCameraIndex !== -1 ? rearCameraIndex : 0;
+            }
+        })
+        .catch(error => {
+            console.error('Error enumerating media devices.', error);
+        });
+}
+
+function startDocumentScanning() {
+    document.getElementById('scanner-container').style.display = 'block';
+    document.getElementById('back-button-intake-container').style.display = 'flex';
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const resultCanvas = document.getElementById('result');
+    const scanner = new jscanify();
+    const canvasCtx = canvas.getContext("2d");
+    const resultCtx = resultCanvas.getContext("2d");
+
+    if (videoDevices.length > 0) {
+        const selectedDevice = videoDevices[currentCameraIndex];
+        navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedDevice.deviceId } })
+            .then((stream) => {
+                scannerStream = stream;
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    scannerInterval = setInterval(() => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const highlightedCanvas = scanner.highlightPaper(canvas);
+                        resultCtx.drawImage(highlightedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
+                    }, 100);
+                };
+            })
+            .catch(error => {
+                console.error('Error accessing media devices.', error);
+            });
+    } else {
+        console.error('No video devices found.');
+    }
+}
+
+function stopDocumentScanning() {
+    if (scannerStream) {
+        scannerStream.getTracks().forEach(track => track.stop());
+        scannerStream = null;
+    }
+    if (scannerInterval) {
+        clearInterval(scannerInterval);
+        scannerInterval = null;
+    }
+    document.getElementById('scanner-container').style.display = 'none';
+}
+
+function changeCamera() {
+    stopDocumentScanning();
+    currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
+    startDocumentScanning();
+}
+
+// Back button for patient intake form section
+function setupBackButtonIntakeEventListener() {
+    const backButtonIntake = document.getElementById('back-button-intake');
+    backButtonIntake.addEventListener('click', () => {
+        stopDocumentScanning();
+        document.getElementById('patient-intake-form-section').style.display = 'none';
+        document.getElementById('option-container').style.display = 'flex';
+        document.getElementById('back-button-intake-container').style.display = 'none';
+        setupOptionContainerEventListeners(); // Re-setup event listeners
+        setupBackButtonIntakeEventListener(); // Re-setup event listener
+    });
+}
+
+function handleDocumentScanResult(result) {
+    const scannedImages = result.images.map(image => image.imageUrl);
+    console.log('Scanned images:', scannedImages);
+
+    // Display scanned images
+    const imagesContainer = document.getElementById('scanned-images');
+    imagesContainer.innerHTML = ''; // Clear existing images
+    scannedImages.forEach(imageUrl => {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.style.width = '100%';
+        imagesContainer.appendChild(img);
+    });
+}
+
+function setupPatientIntakeForm() {
+    // Display the patient intake form when appropriate
     document.getElementById('patient-intake-form-confirm-button').addEventListener('click', (event) => {
         event.preventDefault();
         const patientInfo = collectPatientFormData();
         if (patientInfo) {
             sendPatientInfo(patientInfo).then(() => {
                 document.getElementById('patient-intake-form-section').style.display = 'none';
-                initializeDocumentScanner();
             }).catch(error => {
                 console.error('Failed to submit patient info:', error);
                 alert('Failed to submit patient information.');
@@ -112,6 +297,7 @@ function setupConditionalFields() {
 
 function collectPatientFormData() {
     const formData = {
+        chip_id: document.getElementById('chipID').value,
         insurance: document.querySelector('input[name="insurance"]:checked')?.value,
         occupation: document.getElementById('occupation').value,
         asbestos_exposure: document.querySelector('input[name="asbestos_exposure"]:checked')?.value,
@@ -119,21 +305,21 @@ function collectPatientFormData() {
         diabetes: document.querySelector('input[name="diabetes"]:checked')?.value,
         family_lung_cancer: document.querySelector('input[name="family_lung_cancer"]:checked')?.value,
         smoking_history: document.querySelector('input[name="smoking_history"]:checked')?.value,
-        pack_years: document.querySelector('input[name="pack_years"]').value,
+        pack_years: document.querySelector('input[name="pack_years"]')?.value,
         time_since_last_cigarette: document.getElementById('time_since_last_cigarette').value,
         current_diagnosis: document.querySelector('input[name="current_diagnosis"]:checked')?.value,
         personal_lung_cancer: document.querySelector('input[name="personal_lung_cancer"]:checked')?.value,
         lung_cancer_details: {
-            diagnosis_date: document.querySelector('input[name="lung_cancer_diagnosis_date"]').value,
-            stage: document.querySelector('input[name="lung_cancer_stage"]').value,
-            histology: document.querySelector('input[name="lung_cancer_histology"]').value,
+            diagnosis_date: document.querySelector('input[name="lung_cancer_diagnosis_date"]')?.value,
+            stage: document.querySelector('input[name="lung_cancer_stage"]')?.value,
+            histology: document.querySelector('input[name="lung_cancer_histology"]')?.value,
             treatment: Array.from(document.querySelectorAll('input[name="lung_cancer_treatment"]:checked')).map(el => el.value)
         },
         personal_other_cancer: document.querySelector('input[name="personal_other_cancer"]:checked')?.value,
         other_cancer_details: {
-            diagnosis_date: document.querySelector('input[name="other_cancer_diagnosis_date"]').value,
-            stage: document.querySelector('input[name="other_cancer_stage"]').value,
-            histology: document.querySelector('input[name="other_cancer_histology"]').value,
+            diagnosis_date: document.querySelector('input[name="other_cancer_diagnosis_date"]')?.value,
+            stage: document.querySelector('input[name="other_cancer_stage"]')?.value,
+            histology: document.querySelector('input[name="other_cancer_histology"]')?.value,
             treatment: Array.from(document.querySelectorAll('input[name="other_cancer_treatment"]:checked')).map(el => el.value)
         },
         dentition: document.querySelector('input[name="dentition"]:checked')?.value,
@@ -162,38 +348,18 @@ async function sendPatientInfo(patientInfo) {
         });
 }
 
-function initializeDocumentScanner() {
-    ScannerJS.scanToPdf({
-        onComplete: async (pdf, mimeType, file) => {
-            try {
-                const formData = new FormData();
-                formData.append('document', file, 'patient-form.pdf');
-                const response = await fetch('https://onebreathpilot.onrender.com/upload_document', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                if (data.success) {
-                    alert('Document scanned and uploaded successfully.');
-                } else {
-                    alert('Failed to upload document.');
-                }
-            } catch (error) {
-                console.error('Error scanning or uploading document:', error);
-                alert('Error scanning or uploading document.');
-            }
-        },
-        onError: (error) => {
-            console.error('Error during scanning:', error);
-            alert('Error during scanning.');
-        }
-    });
-}
-
 function setupPatientIntakeEventListeners() {
     document.getElementById('patient-intake-form').addEventListener('submit', function (event) {
         event.preventDefault();
-        updatePatient();
+        const patientInfo = collectPatientFormData();
+        if (patientInfo) {
+            sendPatientInfo(patientInfo).then(() => {
+                document.getElementById('patient-intake-form-section').style.display = 'none';
+            }).catch(error => {
+                console.error('Failed to submit patient info:', error);
+                alert('Failed to submit patient information.');
+            });
+        }
     });
 
     document.getElementById('patient-intake-form-close-btn').addEventListener('click', function () {
@@ -238,7 +404,8 @@ function setupQRCodeScanner() {
             (decodedText, decodedResult) => {
                 window.location.href = `${decodedText}`;
                 html5QrCode.stop().then(() => {
-                    resetSampleRegistration();
+                    // resetSampleRegistration();
+
                 }).catch((err) => console.error('Failed to stop the QR Scanner', err));
             },
             (errorMessage) => console.error(`QR scan error: ${errorMessage}`)
@@ -258,7 +425,7 @@ function showManualEntryForm() {
 
     document.getElementById('qr-close-btn').style.display = 'none';
     document.getElementById('manual-add-btn').style.display = 'none';
-
+    document.getElementById('patient-intake-form-section').style.display = 'none';
     document.getElementById('add-sample-main').style.display = 'block';
     document.getElementById('sample-reg-section').style.display = 'block';
     AOS.refresh();
@@ -278,7 +445,7 @@ function resetSampleRegistration() {
     document.getElementById('patient-intake-form-section').style.display = 'none';
     document.getElementById('qr-close-btn').style.display = 'none';
     document.getElementById('manual-add-btn').style.display = 'none';
-    document.getElementById('add-button-div').querySelector('.add-new-sample').style.display = 'flex';
+    document.getElementById('add-button-div').querySelector('.add-new-sample').style.display = 'block';
     Object.values(bodySections).forEach(section => section.style.display = 'grid');
     AOS.refresh();
 }
@@ -320,7 +487,7 @@ function createSampleCard(sample) {
     const card = document.createElement('div');
     card.setAttribute('data-aos', 'zoom-in');
     card.setAttribute('data-aos-duration', '500');
-    card.setAttribute('data-aos-delay', '500');
+    card.setAttribute('data-aos-delay', '200');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
         <h3>${sample.chip_id}</h3>
@@ -330,8 +497,10 @@ function createSampleCard(sample) {
     `;
     appendButtonsBasedOnStatus(card, sample);
 
-    document.body.appendChild(card);
+    // Ensure the card is appended before initializing any countdown or accessing any child
+    document.getElementById('in-process-section').querySelector('.grid').appendChild(card);
 
+    // Check and initialize countdown after the card is in the DOM
     if (sample.status === 'In Process' && sample.timestamp) {
         initializeCountdown(sample.timestamp, `timer-${sample.chip_id}`, sample.chip_id);
     }
@@ -339,13 +508,14 @@ function createSampleCard(sample) {
     return card;
 }
 
+
 function initializeCountdown(timestamp, timerId, chipId) {
-    const endTime = new Date(timestamp).getTime() + 7200000;
+    const endTime = new Date(timestamp).getTime() + 7200000; // 2 hours from timestamp
     const timerElement = document.getElementById(timerId);
 
     if (!timerElement) {
-        console.error(`Timer element with ID ${timerId} not found.`);
-        return;
+        console.error(`Timer element with ID ${timerId} not found. Skipping countdown.`);
+        return;  // Exit if no timer element is found
     }
 
     const interval = setInterval(() => {
@@ -354,14 +524,19 @@ function initializeCountdown(timestamp, timerId, chipId) {
 
         if (distance < 0) {
             clearInterval(interval);
-            timerElement.parentElement.removeChild(timerElement);
+            timerElement.innerHTML = "Time's up";
             updateStatusToReadyForPickup(chipId);
             return;
         }
 
-        updateTimerDisplay(timerElement, distance);
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s remaining`;
     }, 1000);
 }
+
 
 function updateStatusToReadyForPickup(chipId) {
     const sampleData = {
@@ -496,6 +671,12 @@ function setupSampleEventListeners() {
         }
         if (event.target.classList.contains('patient-intake-form-close-btn')) {
             document.getElementById('patient-intake-form-section').style.display = 'none';
+        }
+        if (event.target.id === 'start-scanning') {
+            startDocumentScanning();
+        }
+        if (event.target.id === 'change-camera-button') {
+            changeCamera();
         }
     });
 }

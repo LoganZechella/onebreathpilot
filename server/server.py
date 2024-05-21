@@ -103,31 +103,28 @@ def update_sample():
 @app.route('/update_patient_info', methods=['POST'])
 def update_patient_info():
     try:
-        patient_info = request.json
-        chip_id = patient_info.get('chip_id')
+        data = request.json
+        chip_id = data.get('chipID')
+        patient_info = data.get('patientInfo')
         
-        if not chip_id:
-            return jsonify({"error": "Missing chipID in the submitted data."}), 400
+        if not chip_id or not patient_info:
+            return jsonify({"success": False, "message": "Invalid data."}), 400
         
-        # Locate the sample based on chip_id
-        sample = collection.find_one({"chip_id": chip_id})
+        # Replace '<DB_CONNECTION_STRING>' with your MongoDB connection string
+        client = MongoClient(MONGO_URI)
+        db = client.get_database(DATABASE_NAME)
+        patient_collection = db.get_collection(COLLECTION_NAME)
         
-        if not sample:
-            return jsonify({"success": False, "message": "No sample found with the given chipID."}), 404
-        
-        # Append patient info to the sample's existing data
-        update_result = collection.update_one(
+        # Upsert the patient info based on chip ID
+        patient_collection.update_one(
             {"chip_id": chip_id},
-            {"$set": {"patient_info": patient_info}}
+            {"$set": patient_info},
+            upsert=True
         )
-        
-        if update_result.modified_count == 1:
-            return jsonify({"success": True, "message": "Patient information added successfully to the sample."}), 200
-        else:
-            return jsonify({"success": False, "message": "Failed to add patient information to the sample."}), 500
 
+        return jsonify({"success": True, "message": "Patient information updated successfully."}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @app.route('/upload_document', methods=['POST'])
 def upload_document():
