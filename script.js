@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchSamplesAndUpdateUI();
     setupSampleEventListeners();
     setupPatientIntakeEventListeners();
-    setupOptionContainerEventListeners(); 
+    setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
     enumerateVideoDevices()
 });
@@ -161,7 +161,7 @@ function setupBackButtonIntakeEventListener() {
 let scannerStream = null;
 let scannerInterval = null;
 let videoDevices = [];
-let currentCameraIndex = 1;
+let currentCameraIndex = 0;
 
 function enumerateVideoDevices() {
     navigator.mediaDevices.enumerateDevices()
@@ -169,7 +169,7 @@ function enumerateVideoDevices() {
             videoDevices = devices.filter(device => device.kind === 'videoinput');
             if (videoDevices.length > 0) {
                 // Default to rear camera if available
-                const rearCameraIndex = videoDevices.findIndex(device => device.label.toLowerCase().includes('rear') || device.label.toLowerCase().includes('main'));
+                const rearCameraIndex = videoDevices.findIndex(device => device.label.toLowerCase().includes('environment') || device.label.toLowerCase().includes('main'));
                 currentCameraIndex = rearCameraIndex !== -1 ? rearCameraIndex : 0;
             }
         })
@@ -185,23 +185,34 @@ function startDocumentScanning() {
     const canvas = document.getElementById('canvas');
     const resultCanvas = document.getElementById('result');
     const scanner = new jscanify();
-    const canvasCtx = canvas.getContext("2d");
+    const canvasCtx = canvas.getContext("2d", { willReadFrequently: true });
     const resultCtx = resultCanvas.getContext("2d");
+
+    video.setAttribute('playsinline', '');
 
     if (videoDevices.length > 0) {
         const selectedDevice = videoDevices[currentCameraIndex];
-        navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedDevice.deviceId } })
+        const constraints = {
+            video: {
+                deviceId: selectedDevice.deviceId ? { exact: selectedDevice.deviceId } : undefined,
+                facingMode: selectedDevice.label.toLowerCase().includes('environment') ? { exact: "environment" } : "environment"
+            }
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
             .then((stream) => {
                 scannerStream = stream;
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     video.play();
+                    video.style.display = 'none';
+                    canvas.style.display = 'none';
                     scannerInterval = setInterval(() => {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        // canvas.width = video.videoWidth;
+                        // canvas.height = video.videoHeight;
+                        canvasCtx.drawImage(video, 0, 0);
                         const highlightedCanvas = scanner.highlightPaper(canvas);
-                        resultCtx.drawImage(highlightedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
+                        resultCtx.drawImage(highlightedCanvas, 0, 0);
                     }, 100);
                 };
             })
