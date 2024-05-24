@@ -144,7 +144,7 @@ def generate_presigned_url():
 
         secure_file_name = secure_filename(file_name)
         blob = bucket.blob(secure_file_name)
-        presigned_url = blob.generate_signed_url(expiration=3600, method='PUT')
+        presigned_url = blob.generate_signed_url(expiration=None, method='GET')
 
         return jsonify({"success": True, "url": presigned_url}), 200
 
