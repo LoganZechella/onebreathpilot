@@ -48,19 +48,14 @@ MONGODB_DATA_API_KEY = os.getenv("MONGODB_DATA_API_KEY")
 MONGO_URI = os.getenv("MONGO_URI")
 DATABASE_NAME = "pilotstudy2024"
 COLLECTION_NAME = "collectedsamples"
-DOCUMENTS_SAVE_PATH = '/var/lib/data'
 
 # Google Cloud Storage Configuration
 GCS_BUCKET = os.getenv("GCS_BUCKET")
-GCS_CREDENTIALS = 'etc/secrets/dashboard-424301-b4f33024df1a.json'
+GCS_CREDENTIALS = '/etc/secrets/dashboard-424301-b4f33024df1a.json'
 
 # Initialize GCS client
 storage_client = storage.Client.from_service_account_json(GCS_CREDENTIALS)
 bucket = storage_client.bucket(GCS_BUCKET)
-
-# Ensure the directory exists
-if not os.path.exists(DOCUMENTS_SAVE_PATH):
-    os.makedirs(DOCUMENTS_SAVE_PATH)
 
 headers = {
     "Content-Type": "application/json",
