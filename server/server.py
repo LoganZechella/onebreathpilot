@@ -6,6 +6,7 @@ import firebase_admin
 from firebase_admin import credentials, auth
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
+from google.cloud import storage
 
 load_dotenv()
 
@@ -47,6 +48,19 @@ MONGODB_DATA_API_KEY = os.getenv("MONGODB_DATA_API_KEY")
 MONGO_URI = os.getenv("MONGO_URI")
 DATABASE_NAME = "pilotstudy2024"
 COLLECTION_NAME = "collectedsamples"
+DOCUMENTS_SAVE_PATH = '/var/lib/data'
+
+# Google Cloud Storage Configuration
+GCS_BUCKET = 'your-gcs-bucket-name'
+GCS_CREDENTIALS = 'path/to/your/credentials.json'
+
+# Initialize GCS client
+storage_client = storage.Client.from_service_account_json(GCS_CREDENTIALS)
+bucket = storage_client.bucket(GCS_BUCKET)
+
+# Ensure the directory exists
+if not os.path.exists(DOCUMENTS_SAVE_PATH):
+    os.makedirs(DOCUMENTS_SAVE_PATH)
 
 headers = {
     "Content-Type": "application/json",
@@ -126,43 +140,43 @@ def update_patient_info():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
-@app.route('/upload_document', methods=['POST'])
-def upload_document():
+@app.route('/generate_presigned_url', methods=['POST'])
+def generate_presigned_url():
     try:
-        # Extract the chip_id from the form data
-        chip_id = request.form.get('chip_id')
-        if not chip_id:
-            return jsonify({"success": False, "message": "Missing chipID in the request."}), 400
+        file_name = request.json.get('file_name')
+        if not file_name:
+            return jsonify({"success": False, "message": "Missing file name in the request."}), 400
 
-        # Locate the sample based on chip_id
+        secure_file_name = secure_filename(file_name)
+        blob = bucket.blob(secure_file_name)
+        presigned_url = blob.generate_signed_url(expiration=3600, method='PUT')
+
+        return jsonify({"success": True, "url": presigned_url}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/upload_document_metadata', methods=['POST'])
+def upload_document_metadata():
+    try:
+        chip_id = request.json.get('chip_id')
+        document_urls = request.json.get('document_urls')
+        if not chip_id or not document_urls:
+            return jsonify({"success": False, "message": "Missing chipID or document URLs in the request."}), 400
+
         sample = collection.find_one({"chip_id": chip_id})
         if not sample:
             return jsonify({"success": False, "message": "No sample found with the given chipID."}), 404
 
-        if 'document' not in request.files:
-            return jsonify({"success": False, "message": "No document part in the request."}), 400
+        update_result = collection.update_one(
+            {"chip_id": chip_id},
+            {"$set": {"document_urls": document_urls}}
+        )
 
-        file = request.files['document']
-        if file.filename == '':
-            return jsonify({"success": False, "message": "No file selected."}), 400
-
-        if file:
-            filename = secure_filename(file.filename)
-            save_path = os.path.join('/path/to/save/documents', filename)
-            file.save(save_path)
-
-            # Append the document path to the sample's existing data
-            update_result = collection.update_one(
-                {"chip_id": chip_id},
-                {"$set": {"document_path": save_path}}
-            )
-
-            if update_result.modified_count == 1:
-                return jsonify({"success": True, "message": "Document uploaded and added to the sample successfully.", "path": save_path}), 200
-            else:
-                return jsonify({"success": False, "message": "Failed to add the document to the sample."}), 500
+        if update_result.modified_count == 1:
+            return jsonify({"success": True, "message": "Document URLs added to the sample successfully."}), 200
         else:
-            return jsonify({"success": False, "message": "Document upload failed."}), 400
+            return jsonify({"success": False, "message": "Failed to add the document URLs to the sample."}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

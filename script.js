@@ -186,7 +186,8 @@ function startDocumentScanning() {
     const resultCanvas = document.getElementById('result');
     const scanner = new jscanify();
     const canvasCtx = canvas.getContext("2d", { willReadFrequently: true });
-    const resultCtx = resultCanvas.getContext("2d");
+    const resultCtx = resultCanvas.getContext("2d", { willReadFrequently: true });
+    let imageCapture;
 
     video.setAttribute('playsinline', '');
 
@@ -203,17 +204,39 @@ function startDocumentScanning() {
             .then((stream) => {
                 scannerStream = stream;
                 video.srcObject = stream;
+                
                 video.onloadedmetadata = () => {
                     video.play();
-                    video.style.display = 'none';
-                    canvas.style.display = 'none';
+                    // video.style.display = 'none';
+                    // canvas.style.display = 'none';
                     scannerInterval = setInterval(() => {
-                        // canvas.width = video.videoWidth;
-                        // canvas.height = video.videoHeight;
-                        canvasCtx.drawImage(video, 0, 0);
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        resultCanvas.width = video.videoWidth; 
+                        resultCanvas.height = video.videoHeight; 
+                        canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
                         const highlightedCanvas = scanner.highlightPaper(canvas);
-                        resultCtx.drawImage(highlightedCanvas, 0, 0);
+                        resultCtx.clearRect(0, 0, resultCanvas.width, resultCanvas.height); 
+                        resultCtx.drawImage(highlightedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
                     }, 100);
+                    document.getElementById("capture-button").addEventListener("click", async () => {
+                        try {
+                            const track = scannerStream.getTracks()[0];
+                            const imageCapture = new ImageCapture(track);
+                            const photoBlob = await imageCapture.takePhoto();
+                            const photoUrl = URL.createObjectURL(photoBlob);
+                            console.log(photoBlob, photoUrl);
+
+                            // Create a mock result object to pass to handleDocumentScanResult
+                            const mockResult = {
+                                images: [{ imageUrl: photoUrl }]
+                            };
+                            handleDocumentScanResult(mockResult);  // Updated to match expected structure
+                            stopDocumentScanning();
+                        } catch (error) {
+                            console.error("Error capturing image:", error);
+                        }
+                    });
                 };
             })
             .catch(error => {
@@ -223,6 +246,8 @@ function startDocumentScanning() {
         console.error('No video devices found.');
     }
 }
+
+
 
 function stopDocumentScanning() {
     if (scannerStream) {
@@ -256,19 +281,84 @@ function setupBackButtonIntakeEventListener() {
 }
 
 function handleDocumentScanResult(result) {
-    const scannedImages = result.images.map(image => image.imageUrl);
-    console.log('Scanned images:', scannedImages);
+    console.log('Scan result:', result);
 
-    // Display scanned images
-    const imagesContainer = document.getElementById('scanned-images');
-    imagesContainer.innerHTML = ''; // Clear existing images
-    scannedImages.forEach(imageUrl => {
-        const img = document.createElement('img');
-        img.src = imageUrl;
-        img.style.width = '100%';
-        imagesContainer.appendChild(img);
-    });
+    // Check if result and result.images are defined and if result.images is an array
+    if (result && Array.isArray(result.images)) {
+        const scannedImages = result.images.map(image => image.imageUrl);
+        console.log('Scanned images:', scannedImages);
+
+        // Display scanned images for review
+        const imagesContainer = document.getElementById('scanned-images');
+        imagesContainer.innerHTML = ''; // Clear existing images
+        scannedImages.forEach(imageUrl => {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.style.width = '40vw';
+            imagesContainer.appendChild(img);
+        });
+
+        // Show the review section
+        document.getElementById('review-section').style.display = 'block';
+        document.getElementById('scanner-container').style.display = 'none';
+        document.getElementById('back-button-intake-container').style.display = 'none';
+    } else {
+        console.error('No images found in scan result or scan result is invalid.');
+    }
 }
+
+document.getElementById('rescan-button').addEventListener('click', () => {
+    document.getElementById('review-section').style.display = 'none';
+    startDocumentScanning();
+});
+
+document.getElementById('confirm-upload-button').addEventListener('click', async () => {
+    const chipId = document.getElementById('chipID').value;
+    const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
+
+    const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
+        const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ file_name: `document_${index}.jpeg` })
+        });
+        const data = await response.json();
+        if (data.success) {
+            await fetch(data.url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'image/jpeg'
+                },
+                body: await fetch(image).then(res => res.blob())
+            });
+            return data.url.split('?')[0]; // Return the URL without query parameters
+        } else {
+            throw new Error('Failed to generate presigned URL');
+        }
+    }));
+
+    uploadDocumentMetadata(chipId, documentUrls);
+});
+
+async function uploadDocumentMetadata(chipId, documentUrls) {
+    const response = await fetch('https://onebreathpilot.onrender.com/upload_document_metadata', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls })
+    });
+    const data = await response.json();
+    if (data.success) {
+        alert('Document uploaded successfully.');
+        document.getElementById('review-section').style.display = 'none';
+        resetSampleRegistration();
+    } else {
+        alert('Document upload failed.');
+    }
+};
 
 function setupPatientIntakeForm() {
     // Display the patient intake form when appropriate
@@ -458,6 +548,7 @@ function resetSampleRegistration() {
     document.getElementById('manual-add-btn').style.display = 'none';
     document.getElementById('add-button-div').querySelector('.add-new-sample').style.display = 'block';
     Object.values(bodySections).forEach(section => section.style.display = 'grid');
+    Object.values(bodySections)[0].style.display = 'flex';
     AOS.refresh();
 }
 
@@ -690,4 +781,5 @@ function setupSampleEventListeners() {
             changeCamera();
         }
     });
+    
 }

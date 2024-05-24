@@ -227,14 +227,20 @@
             </div>
             
             <div id="scanner-container">
-                <canvas id="result" style="width: 100%;"></canvas>
-                <canvas id="canvas"></canvas>
-                 <video id="video" style="width: 100%;"></video>
-                <button id="change-camera-button" style="margin: 10px;">Change Camera</button>
+                <video id="video"></video><canvas id="canvas"></canvas>
+                <canvas id="result"></canvas>
             </div>
-            
             <div id="back-button-intake-container" style="display: none;">
                 <button id="back-button-intake" class="back-button" style="margin: 10px;">Back</button>
+                <button id="change-camera-button">Change Camera</button>
+                <button id="capture-button">Capture</button>
+            </div>
+
+            <div id="review-section" style="display: none;">
+                <h2>Review Scanned Document</h2>
+                <div id="scanned-images"></div>
+                <button id="rescan-button">Rescan</button>
+                <button id="confirm-upload-button">Confirm Upload</button>
             </div>
 
             <section class="section in-process-section" id="in-process-section" data-aos="slide-up"
