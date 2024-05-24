@@ -51,8 +51,8 @@ COLLECTION_NAME = "collectedsamples"
 DOCUMENTS_SAVE_PATH = '/var/lib/data'
 
 # Google Cloud Storage Configuration
-GCS_BUCKET = 'your-gcs-bucket-name'
-GCS_CREDENTIALS = 'path/to/your/credentials.json'
+GCS_BUCKET = os.getenv("GCS_BUCKET")
+GCS_CREDENTIALS = 'etc/secrets/dashboard-424301-b4f33024df1a.json'
 
 # Initialize GCS client
 storage_client = storage.Client.from_service_account_json(GCS_CREDENTIALS)
