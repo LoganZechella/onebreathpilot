@@ -316,50 +316,61 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
     const chipId = document.getElementById('chipID').value;
     const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
 
-    const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
-        const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
+    try {
+        const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
+            const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ file_name: `document_${index}.jpeg` })
+            });
+            const data = await response.json();
+            if (data.success) {
+                await fetch(data.url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'image/jpeg'
+                    },
+                    body: await fetch(image).then(res => res.blob())
+                });
+                return data.url.split('?')[0]; // Return the URL without query parameters
+            } else {
+                throw new Error('Failed to generate presigned URL');
+            }
+        }));
+
+        uploadDocumentMetadata(chipId, documentUrls);
+    } catch (error) {
+        console.error('Error during document upload:', error);
+        alert('Document upload failed. Please try again.');
+    }
+});
+
+async function uploadDocumentMetadata(chipId, documentUrls) {
+    try {
+        const response = await fetch('https://onebreathpilot.onrender.com/upload_document_metadata', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ file_name: `document_${index}.jpeg` })
+            body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls })
         });
         const data = await response.json();
+        console.log(`uploadDocumentMetadata response: ${data}`);
         if (data.success) {
-            await fetch(data.url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'image/jpeg'
-                },
-                body: await fetch(image).then(res => res.blob())
-            });
-            return data.url.split('?')[0]; // Return the URL without query parameters
+            alert('Document uploaded successfully.');
+            document.getElementById('review-section').style.display = 'none';
+            resetSampleRegistration();
         } else {
-            throw new Error('Failed to generate presigned URL');
+            alert('Document upload failed.');
         }
-    }));
-
-    uploadDocumentMetadata(chipId, documentUrls);
-});
-
-async function uploadDocumentMetadata(chipId, documentUrls) {
-    const response = await fetch('https://onebreathpilot.onrender.com/upload_document_metadata', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls })
-    });
-    const data = await response.json();
-    if (data.success) {
-        alert('Document uploaded successfully.');
-        document.getElementById('review-section').style.display = 'none';
-        resetSampleRegistration();
-    } else {
-        alert('Document upload failed.');
+    } catch (error) {
+        console.error('Error uploading document metadata:', error);
+        alert('Document metadata upload failed. Please try again.');
     }
-};
+}
 
 function setupPatientIntakeForm() {
     // Display the patient intake form when appropriate
