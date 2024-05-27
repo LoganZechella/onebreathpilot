@@ -156,8 +156,7 @@ def upload_document_metadata():
     try:
         chip_id = request.json.get('chip_id')
         document_urls = request.json.get('document_urls')
-        clean_document_urls = document_urls.split('?')[0]
-        if not chip_id or not clean_document_urls:
+        if not chip_id or not document_urls:
             return jsonify({"success": False, "message": "Missing chipID or document URLs in the request."}), 400
 
         sample = collection.find_one({"chip_id": chip_id})
