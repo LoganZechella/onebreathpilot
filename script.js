@@ -222,14 +222,16 @@ function startDocumentScanning() {
                     document.getElementById("capture-button").addEventListener("click", async () => {
                         try {
                             const track = scannerStream.getTracks()[0];
-                            const imageCapture = new ImageCapture(track);
-                            const photoBlob = await imageCapture.takePhoto();
-                            const photoUrl = URL.createObjectURL(photoBlob);
-                            console.log(photoBlob, photoUrl);
+                            console.log(track);
+
+                            // Create an image element to display the captured frame
+                            const image = new Image();
+                            image.src = canvas.toDataURL();
+                            
 
                             // Create a mock result object to pass to handleDocumentScanResult
                             const mockResult = {
-                                images: [{ imageUrl: photoUrl }]
+                                images: [{ imageUrl: image.src }]
                             };
                             handleDocumentScanResult(mockResult);  // Updated to match expected structure
                             stopDocumentScanning();
@@ -355,7 +357,7 @@ async function uploadDocumentMetadata(chipId, documentUrls) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls })
+            body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls[0] })
         });
         const data = await response.json();
         console.log(`uploadDocumentMetadata response: ${data}`);
