@@ -230,10 +230,13 @@
                 <video id="video"></video><canvas id="canvas"></canvas>
                 <canvas id="result"></canvas>
             </div>
+
             <div id="back-button-intake-container" style="display: none;">
                 <button id="back-button-intake" class="back-button" style="margin: 10px;">Back</button>
                 <button id="change-camera-button">Change Camera</button>
+                <input type="file" id="capture-input" accept="image/*" capture="environment" style="display:none;">
                 <button id="capture-button">Capture</button>
+                <img id="captured-image" src="" alt="Captured Image" style="display:none;">
             </div>
 
             <div id="review-section" style="display: none;">
