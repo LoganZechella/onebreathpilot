@@ -173,7 +173,7 @@ def upload_from_memory():
         image_data = base64.b64decode(image_data.split(",")[1])
         image_stream = BytesIO(image_data)
         
-        bucket_name = 'your-bucket-name'
+        bucket_name = bucket
         upload_blob_from_memory(bucket_name, destination_blob_name, image_stream)
 
         return jsonify({'success': True, 'message': 'File uploaded successfully'}), 200
