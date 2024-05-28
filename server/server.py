@@ -153,7 +153,6 @@ def generate_presigned_url():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-
 def upload_blob_from_memory(destination_blob_name, file_stream):
     """Uploads a file to the bucket."""
     blob = bucket.blob(destination_blob_name)
@@ -178,7 +177,6 @@ def upload_from_memory():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/upload_document_metadata', methods=['POST'])
 def upload_document_metadata():
     try:
@@ -196,13 +194,10 @@ def upload_document_metadata():
             {"$set": {"document_urls": document_urls}}
         )
 
-        if update_result.modified_count >= 1:
+        if update_result.modified_count >= 0:
             return jsonify({"success": True, "message": "Document URLs added to the sample successfully."}), 200
         else:
             return jsonify({"success": False, "message": "Failed to add the document URLs to the sample."}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-# if __name__ == '__main__':
-#     app.run(debug=True, host='127.0.0.1', port=8080, use_reloader=False)
