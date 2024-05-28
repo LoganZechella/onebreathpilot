@@ -170,10 +170,10 @@ def upload_from_memory():
         
         
          # Optional: save temporarily if needed
-        temp_filename = f"/tmp/{destination_blob_name.split('/')[3]}"
+        temp_filename = f"/tmp/{destination_blob_name.split('/')[-1]}"
         with open(temp_filename, 'wb') as temp_file:
             temp_file.write(temp_filename)
-        short_blob_name = destination_blob_name.split("/")[3]
+        short_blob_name = destination_blob_name.split("/")[-1]
         upload_blob_from_memory(short_blob_name, temp_filename)
         
         # Delete temporary file
