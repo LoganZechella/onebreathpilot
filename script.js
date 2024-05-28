@@ -222,8 +222,6 @@ function startDocumentScanning() {
     }
 }
 
-
-
 function stopDocumentScanning() {
     if (scannerStream) {
         scannerStream.getTracks().forEach(track => track.stop());
@@ -295,13 +293,15 @@ async function uploadFileToGCS(destinationBlobName, contents) {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            body: JSON.stringify({ 'destination_blob_name': destinationBlobName, 'source_file_name': contents })
+            body: JSON.stringify({
+                'destination_blob_name': destinationBlobName,
+                'source_file_name': contents  // Send base64 image data
+            })
         });
 
         const data = await response.json();
         if (data.success) {
             console.log('File uploaded successfully.');
-            // resetSampleRegistration();
         } else {
             alert('File upload failed: ' + data.message);
         }
@@ -314,7 +314,6 @@ async function uploadFileToGCS(destinationBlobName, contents) {
 document.getElementById('confirm-upload-button').addEventListener('click', async () => {
     const chipId = document.getElementById('chipID').value;
     const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
-    
 
     try {
         const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
@@ -324,15 +323,15 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                body: JSON.stringify({ file_name: `document_${chipId}.jpeg`})
+                body: JSON.stringify({ file_name: `document_${chipId}.jpeg` })
             });
             const data = await response.json();
             if (data.success) {
-                fullUrl = data.url;
-                imageUrl = data.url.split('?')[0];
-                short_blob_name = imageUrl.split('/')[4];
+                const fullUrl = data.url;
+                const imageUrl = data.url.split('?')[0];
+                const short_blob_name = imageUrl.split('/')[4];
                 console.log(short_blob_name);
-                await uploadFileToGCS(short_blob_name, imageUrl).then(() => {
+                await uploadFileToGCS(short_blob_name, image).then(() => {
                     uploadDocumentMetadata(chipId, imageUrl);
                 });
             }
