@@ -73,32 +73,12 @@ function sendSample(sampleData) {
 }
 
 function showOptionButtons() {
-    const optionContainer = document.createElement('div');
-    optionContainer.id = 'option-container';
+    const optionContainer = document.getElementById('option-container');
+    const message = document.getElementById('option-message');
     optionContainer.style.display = 'flex';
-    optionContainer.style.flexDirection = 'column';
-    optionContainer.style.alignItems = 'center';
-    optionContainer.style.justifyContent = 'center';
-    optionContainer.style.marginTop = '20px';
-
-    const message = document.createElement('div');
-    message.id = 'option-message';
-    message.innerText = 'Please choose an option:';
-
-    const digitalFormButton = document.createElement('button');
-    digitalFormButton.id = 'digital-form-button';
-    digitalFormButton.innerText = 'Fill Patient Intake Form';
-    digitalFormButton.style.margin = '10px';
-
-    const scanDocumentButton = document.createElement('button');
-    scanDocumentButton.id = 'scan-document-button';
-    scanDocumentButton.innerText = 'Proceed to Document Scanning';
-    scanDocumentButton.style.margin = '10px';
-
-    const backButton = document.createElement('button');
-    backButton.id = 'back-button';
-    backButton.innerText = 'Back';
-    backButton.style.margin = '10px';
+    message.style.display = 'block';
+    const digitalFormButton = document.getElementById('digital-form-button');
+    const scanDocumentButton = document.getElementById('scan-document-button');
 
     digitalFormButton.addEventListener('click', () => {
         document.getElementById('patient-intake-form-section').style.display = 'block';
@@ -111,23 +91,16 @@ function showOptionButtons() {
         optionContainer.style.display = 'none';
     });
 
-    backButton.addEventListener('click', () => {
+    document.getElementById('back-button-options').addEventListener('click', () => {
         document.getElementById('sample-reg-section').style.display = 'block';
         optionContainer.style.display = 'none';
     });
-
-    optionContainer.appendChild(message);
-    optionContainer.appendChild(digitalFormButton);
-    optionContainer.appendChild(scanDocumentButton);
-    optionContainer.appendChild(backButton);
-
-    document.body.appendChild(optionContainer);
 }
 
 function setupOptionContainerEventListeners() {
     const digitalFormButton = document.getElementById('digital-form-button');
     const scanDocumentButton = document.getElementById('scan-document-button');
-    const backButton = document.getElementById('back-button');
+    const backButton = document.getElementById('back-button-options');
 
     digitalFormButton.addEventListener('click', () => {
         document.getElementById('patient-intake-form-section').style.display = 'block';
@@ -330,20 +303,15 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
             });
             const data = await response.json();
             if (data.success) {
-                await fetch(data.url, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'image/jpeg'
-                    },
-                    body: await fetch(image).then(res => res.blob())
-                });
-                return data.url.split('?')[0]; // Return the URL without query parameters
-            } else {
+                const imageUrl = data.url.split('?')[0];
+                uploadDocumentMetadata(chipId, imageUrl);
+                return imageUrl;   
+            } 
+            else {
                 throw new Error('Failed to generate presigned URL');
             }
         }));
 
-        uploadDocumentMetadata(chipId, documentUrls);
     } catch (error) {
         console.error('Error during document upload:', error);
         alert('Document upload failed. Please try again.');
@@ -358,7 +326,7 @@ async function uploadDocumentMetadata(chipId, documentUrls) {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls[0] })
+            body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls })
         });
         const data = await response.json();
         console.log(`uploadDocumentMetadata response: ${data}`);
@@ -602,9 +570,9 @@ function updateSampleQueues(samples) {
 
 function createSampleCard(sample) {
     const card = document.createElement('div');
-    card.setAttribute('data-aos', 'zoom-in');
-    card.setAttribute('data-aos-duration', '500');
-    card.setAttribute('data-aos-delay', '200');
+    // card.setAttribute('data-aos', 'zoom-in');
+    // card.setAttribute('data-aos-duration', '500');
+    // card.setAttribute('data-aos-delay', '200');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
         <h3>${sample.chip_id}</h3>
@@ -624,7 +592,6 @@ function createSampleCard(sample) {
 
     return card;
 }
-
 
 function initializeCountdown(timestamp, timerId, chipId) {
     const endTime = new Date(timestamp).getTime() + 7200000; // 2 hours from timestamp
@@ -653,7 +620,6 @@ function initializeCountdown(timestamp, timerId, chipId) {
         timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s remaining`;
     }, 1000);
 }
-
 
 function updateStatusToReadyForPickup(chipId) {
     const sampleData = {
