@@ -53,7 +53,7 @@ COLLECTION_NAME = "collectedsamples"
 
 # Google Cloud Storage Configuration
 GCS_BUCKET = os.getenv("GCS_BUCKET")
-GCS_CREDENTIALS = '/etc/secrets/dashboard-424301-b4f33024df1a.json'
+GCS_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 # Initialize GCS client
 storage_client = storage.Client.from_service_account_json(GCS_CREDENTIALS)
@@ -154,10 +154,8 @@ def generate_presigned_url():
         return jsonify({"error": str(e)}), 500
     
 
-def upload_blob_from_memory(bucket_name, destination_blob_name, file_stream):
+def upload_blob_from_memory(destination_blob_name, file_stream):
     """Uploads a file to the bucket."""
-    client = storage.Client()
-    bucket = client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_file(file_stream)
     print(f"File uploaded to {destination_blob_name}.")
@@ -173,8 +171,7 @@ def upload_from_memory():
         image_data = base64.b64decode(image_data.split(",")[1])
         image_stream = BytesIO(image_data)
         
-        bucket_name = bucket
-        upload_blob_from_memory(bucket_name, destination_blob_name, image_stream)
+        upload_blob_from_memory(destination_blob_name, image_stream)
 
         return jsonify({'success': True, 'message': 'File uploaded successfully'}), 200
 
