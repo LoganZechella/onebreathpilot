@@ -168,13 +168,12 @@ def upload_from_memory():
         source_file_name = data.get('source_file_name')
         destination_blob_name = data.get('destination_blob_name')
         
-        
-         # Optional: save temporarily if needed
-        temp_filename = f"/tmp/{destination_blob_name.split('/')[-1]}"
+        # save temporarily if needed
+        temp_filename = "temp_file.jpeg"
         with open(temp_filename, 'wb') as temp_file:
             temp_file.write(temp_filename)
         short_blob_name = destination_blob_name.split("/")[-1]
-        upload_blob_from_memory(short_blob_name, temp_filename)
+        upload_blob_from_memory(short_blob_name, temp_file)
         
         # Delete temporary file
         import os
