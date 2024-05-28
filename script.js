@@ -328,10 +328,11 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
             });
             const data = await response.json();
             if (data.success) {
-                uploadFileToGCS(image, data.url);   
                 const imageUrl = data.url.split('?')[0];
-                uploadDocumentMetadata(chipId, imageUrl);
-                return documentUrls;   
+                await uploadFileToGCS(image, imageUrl).then(() => {
+                    uploadDocumentMetadata(chipId, imageUrl);
+                });
+                return imageUrl;
             } 
             else {
                 throw new Error('Failed to generate presigned URL');
