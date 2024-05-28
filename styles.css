@@ -198,7 +198,11 @@ p {
 }
 
 #back-button-intake,
-#back-button {
+#back-button,
+#back-button-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 1em;
     background-color: #ffffff;
     color: #000000;
@@ -209,7 +213,8 @@ p {
 }
 
 #back-button-intake:hover,
-#back-button:hover {
+#back-button:hover,
+#back-button-options:hover {
     background-color: #f0f0f0;
 }
 
@@ -241,23 +246,41 @@ p {
     align-items: center;
 }
 
-
-
 #option-container {
     display: none;
+    max-width: 50vw;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     margin-top: 20px;
+    padding: 0.5em 1em 0.5em 1em;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    border-radius: 0.7em;
 }
 
 #option-message {
     max-width: 40vw;
     justify-content: center;
+    color: #ffffff;
 }
 
 #digital-form-button, #scan-document-button {
-    margin: 0.5em 1em 0.5em 1em;
+    margin: 1em 1em 1em 1em;
+    padding: 0.5em 1em 0.5em 1em;
+}
+
+#option-container>#back-button {
+    margin: 1em 1em 1em 1em;
+    padding: 0.5em 1em 0.5em 1em;
+}
+
+#capture-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1em 1em 1em 1em;
+    padding: 0.5em 1em 0.5em 1em;
 }
 
 #add-button-div {

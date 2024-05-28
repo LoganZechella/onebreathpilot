@@ -71,14 +71,7 @@
                     </form>
                 </section>
                 
-                <!-- Option Container for digital form or document scanning -->
-                <div id="option-container"
-                    style="display: none; flex-direction: column; align-items: center; justify-content: center; margin-top: 20px;">
-                    <div id="option-message">Please choose an option:</div>
-                    <button id="digital-form-button" style="margin: 10px;">Fill Patient Intake Form</button>
-                    <button id="scan-document-button" style="margin: 10px;">Proceed to Document Scanning</button>
-                    <button id="back-button" style="margin: 10px;">Back</button>
-                </div>
+                
                 
                 
 
@@ -232,11 +225,19 @@
             </div>
 
             <div id="back-button-intake-container" style="display: none;">
-                <button id="back-button-intake" class="back-button" style="margin: 10px;">Back</button>
+                <button id="back-button-intake" class="back-button">Back</button>
                 <button id="change-camera-button">Change Camera</button>
                 <input type="file" id="capture-input" accept="image/*" capture="environment" style="display:none;">
                 <button id="capture-button">Capture</button>
                 <img id="captured-image" src="" alt="Captured Image" style="display:none;">
+            </div>
+
+            <!-- Option Container for digital form or document scanning -->
+            <div id="option-container">
+                <div id="option-message">Please choose an option:</div>
+                <button id="digital-form-button" >Fill Patient Intake Form</button>
+                <button id="scan-document-button">Proceed to Document Scanning</button>
+                <button id="back-button-options">Back</button>
             </div>
 
             <div id="review-section" style="display: none;">
@@ -298,7 +299,7 @@
                 </div>
 
             </section>
-            <section class="section elution-section" id="elution-section" data-aos="slide-up" data-aos-duration="500">
+            <section class="section elution-section" id="elution-section" data-aos="slide-up" data-aos-duration="500" style="display: none">
                 <div class="section-title" id="elution-title">
                     <h3>Elution</h3>
                 </div>
