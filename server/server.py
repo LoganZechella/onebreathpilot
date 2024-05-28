@@ -191,7 +191,7 @@ def upload_document_metadata():
             {"$set": {"document_urls": document_urls}}
         )
 
-        if update_result.modified_count == 1:
+        if update_result.modified_count >= 1:
             return jsonify({"success": True, "message": "Document URLs added to the sample successfully."}), 200
         else:
             return jsonify({"success": False, "message": "Failed to add the document URLs to the sample."}), 500
