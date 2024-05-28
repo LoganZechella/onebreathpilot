@@ -7,6 +7,7 @@ from firebase_admin import credentials, auth
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 from google.cloud import storage
+from io import BytesIO
 
 load_dotenv()
 
@@ -152,10 +153,14 @@ def generate_presigned_url():
         return jsonify({"error": str(e)}), 500
     
 
-def upload_blob_from_memory(contents, destination_blob_name):
+def upload_blob_from_memory(destination_blob_name, source_file_name):
     blob = bucket.blob(destination_blob_name)
-    blob.upload_from_string(contents)
-    print(f"{destination_blob_name} with contents {contents} uploaded to {GCS_BUCKET}.")
+    # blob.upload_from_string(contents)
+    
+    with open(source_file_name, "rb") as image_file:
+        blob.upload_from_file(image_file)
+
+    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
 
 @app.route('/upload_from_memory', methods=['POST'])
 def upload_from_memory():
@@ -163,11 +168,22 @@ def upload_from_memory():
         data = request.json
         contents = data.get('contents')
         destination_blob_name = data.get('destination_blob_name')
-
+        
+        image_data = BytesIO(contents)
+         # Optional: save temporarily if needed
+        temp_filename = destination_blob_name
+        with open(temp_filename, 'wb') as temp_file:
+            temp_file.write(image_data)
+        short_blob_name = destination_blob_name.split("/")[-1]
+        upload_blob_from_memory(short_blob_name, temp_filename)
+        
+        # Delete temporary file
+        import os
+        os.remove(temp_filename)
+        
         if not contents or not destination_blob_name:
             return jsonify({"success": False, "message": "Missing contents or destination_blob_name in the request."}), 400
 
-        upload_blob_from_memory(contents, destination_blob_name)
         return jsonify({"success": True, "message": f"{destination_blob_name} uploaded successfully."}), 200
 
     except Exception as e:

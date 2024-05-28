@@ -177,7 +177,7 @@ function startDocumentScanning() {
             .then((stream) => {
                 scannerStream = stream;
                 video.srcObject = stream;
-                
+
                 video.onloadedmetadata = () => {
                     video.play();
                     // video.style.display = 'none';
@@ -185,11 +185,11 @@ function startDocumentScanning() {
                     scannerInterval = setInterval(() => {
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
-                        resultCanvas.width = video.videoWidth; 
-                        resultCanvas.height = video.videoHeight; 
+                        resultCanvas.width = video.videoWidth;
+                        resultCanvas.height = video.videoHeight;
                         canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
                         const highlightedCanvas = scanner.highlightPaper(canvas);
-                        resultCtx.clearRect(0, 0, resultCanvas.width, resultCanvas.height); 
+                        resultCtx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
                         resultCtx.drawImage(highlightedCanvas, 0, 0, resultCanvas.width, resultCanvas.height);
                     }, 100);
                     document.getElementById("capture-button").addEventListener("click", async () => {
@@ -200,7 +200,7 @@ function startDocumentScanning() {
                             // Create an image element to display the captured frame
                             const image = new Image();
                             image.src = canvas.toDataURL();
-                            
+
 
                             // Create a mock result object to pass to handleDocumentScanResult
                             const mockResult = {
@@ -261,7 +261,6 @@ function handleDocumentScanResult(result) {
     // Check if result and result.images are defined and if result.images is an array
     if (result && Array.isArray(result.images)) {
         const scannedImages = result.images.map(image => image.imageUrl);
-        console.log('Scanned images:', scannedImages);
 
         // Display scanned images for review
         const imagesContainer = document.getElementById('scanned-images');
@@ -302,7 +301,7 @@ async function uploadFileToGCS(contents, destinationBlobName) {
         const data = await response.json();
         if (data.success) {
             console.log('File uploaded successfully.');
-            resetSampleRegistration();
+            // resetSampleRegistration();
         } else {
             alert('File upload failed: ' + data.message);
         }
@@ -329,11 +328,13 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
             const data = await response.json();
             if (data.success) {
                 const imageUrl = data.url.split('?')[0];
-                await uploadFileToGCS(image, imageUrl).then(() => {
+                short_blob_name = imageUrl.split('/')[-1];
+                console.log(short_blob_name);
+                await uploadFileToGCS(image[0].imageUrl, short_blob_name).then(() => {
                     uploadDocumentMetadata(chipId, imageUrl);
                 });
                 return imageUrl;
-            } 
+            }
             else {
                 throw new Error('Failed to generate presigned URL');
             }
@@ -356,7 +357,6 @@ async function uploadDocumentMetadata(chipId, documentUrls) {
             body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls })
         });
         const data = await response.json();
-        console.log(`uploadDocumentMetadata response: ${data}`);
         if (data.success) {
             alert('Document uploaded successfully.');
             document.getElementById('review-section').style.display = 'none';
@@ -789,5 +789,5 @@ function setupSampleEventListeners() {
             changeCamera();
         }
     });
-    
+
 }
