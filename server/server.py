@@ -7,6 +7,8 @@ from firebase_admin import credentials, auth
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 from google.cloud import storage
+from io import BytesIO
+import base64
 
 load_dotenv()
 
@@ -152,37 +154,29 @@ def generate_presigned_url():
         return jsonify({"error": str(e)}), 500
     
 
-def upload_blob_from_memory(destination_blob_name, source_file_name):
+def upload_blob_from_memory(bucket_name, destination_blob_name, file_stream):
+    """Uploads a file to the bucket."""
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
-    # blob.upload_from_string(contents)
-    
-    with open(source_file_name, "rb") as image_file:
-        blob.upload_from_file(image_file)
-
-    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
+    blob.upload_from_file(file_stream)
+    print(f"File uploaded to {destination_blob_name}.")
 
 @app.route('/upload_from_memory', methods=['POST'])
 def upload_from_memory():
     try:
-        data = request.json
-        source_file_name = data.get('source_file_name')
-        destination_blob_name = data.get('destination_blob_name')
-        
-        # save temporarily if needed
-        temp_filename = "temp_file.jpeg"
-        with open(temp_filename, 'wb') as temp_file:
-            temp_file.write(temp_filename)
-        short_blob_name = destination_blob_name.split("/")[-1]
-        upload_blob_from_memory(short_blob_name, temp_file)
-        
-        # Delete temporary file
-        import os
-        os.remove(temp_filename)
-        
-        if not source_file_name or not destination_blob_name:
-            return jsonify({"success": False, "message": "Missing contents or destination_blob_name in the request."}), 400
+        data = request.get_json()
+        destination_blob_name = data['destination_blob_name']
+        image_data = data['source_file_name']
 
-        return jsonify({"success": True, "message": f"{destination_blob_name} uploaded successfully."}), 200
+        # Convert base64 image data to BytesIO
+        image_data = base64.b64decode(image_data.split(",")[1])
+        image_stream = BytesIO(image_data)
+        
+        bucket_name = 'your-bucket-name'
+        upload_blob_from_memory(bucket_name, destination_blob_name, image_stream)
+
+        return jsonify({'success': True, 'message': 'File uploaded successfully'}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
