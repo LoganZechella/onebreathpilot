@@ -7,7 +7,6 @@ from firebase_admin import credentials, auth
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 from google.cloud import storage
-from io import BytesIO
 
 load_dotenv()
 
@@ -166,22 +165,22 @@ def upload_blob_from_memory(destination_blob_name, source_file_name):
 def upload_from_memory():
     try:
         data = request.json
-        contents = data.get('contents')
+        source_file_name = data.get('source_file_name')
         destination_blob_name = data.get('destination_blob_name')
         
-        image_data = BytesIO(contents)
+        
          # Optional: save temporarily if needed
-        temp_filename = "temp_image.jpg"
+        temp_filename = f"/tmp/{destination_blob_name.split('/')[3]}"
         with open(temp_filename, 'wb') as temp_file:
-            temp_file.write(image_data)
-        short_blob_name = destination_blob_name.split("/")[-1]
+            temp_file.write(temp_filename)
+        short_blob_name = destination_blob_name.split("/")[3]
         upload_blob_from_memory(short_blob_name, temp_filename)
         
         # Delete temporary file
         import os
         os.remove(temp_filename)
         
-        if not contents or not destination_blob_name:
+        if not source_file_name or not destination_blob_name:
             return jsonify({"success": False, "message": "Missing contents or destination_blob_name in the request."}), 400
 
         return jsonify({"success": True, "message": f"{destination_blob_name} uploaded successfully."}), 200

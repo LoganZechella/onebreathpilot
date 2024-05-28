@@ -287,7 +287,7 @@ document.getElementById('rescan-button').addEventListener('click', () => {
 });
 
 // Function to upload file contents to GCS
-async function uploadFileToGCS(contents, destinationBlobName) {
+async function uploadFileToGCS(destinationBlobName, contents) {
     try {
         const response = await fetch('https://onebreathpilot.onrender.com/upload_from_memory', {
             method: 'POST',
@@ -295,7 +295,7 @@ async function uploadFileToGCS(contents, destinationBlobName) {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            body: JSON.stringify({ contents, destination_blob_name: destinationBlobName })
+            body: JSON.stringify({ 'destination_blob_name': destinationBlobName, 'source_file_name': contents })
         });
 
         const data = await response.json();
@@ -314,6 +314,7 @@ async function uploadFileToGCS(contents, destinationBlobName) {
 document.getElementById('confirm-upload-button').addEventListener('click', async () => {
     const chipId = document.getElementById('chipID').value;
     const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
+    
 
     try {
         const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
@@ -323,23 +324,19 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                body: JSON.stringify({ file_name: `document_${chipId}.jpeg` })
+                body: JSON.stringify({ file_name: `document_${chipId}.jpeg`})
             });
             const data = await response.json();
             if (data.success) {
-                const imageUrl = data.url.split('?')[0];
-                short_blob_name = imageUrl.split('/')[-1];
+                fullUrl = data.url;
+                imageUrl = data.url.split('?')[0];
+                short_blob_name = imageUrl.split('/')[4];
                 console.log(short_blob_name);
-                await uploadFileToGCS(image[0].imageUrl, short_blob_name).then(() => {
+                await uploadFileToGCS(short_blob_name, imageUrl).then(() => {
                     uploadDocumentMetadata(chipId, imageUrl);
                 });
-                return imageUrl;
-            }
-            else {
-                throw new Error('Failed to generate presigned URL');
             }
         }));
-
     } catch (error) {
         console.error('Error during document upload:', error);
         alert('Document upload failed. Please try again.');
