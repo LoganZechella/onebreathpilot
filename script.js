@@ -287,6 +287,31 @@ document.getElementById('rescan-button').addEventListener('click', () => {
     startDocumentScanning();
 });
 
+// Function to upload file contents to GCS
+async function uploadFileToGCS(contents, destinationBlobName) {
+    try {
+        const response = await fetch('https://onebreathpilot.onrender.com/upload_from_memory', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({ contents, destination_blob_name: destinationBlobName })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            console.log('File uploaded successfully.');
+            resetSampleRegistration();
+        } else {
+            alert('File upload failed: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('File upload failed. Please try again.');
+    }
+}
+
 document.getElementById('confirm-upload-button').addEventListener('click', async () => {
     const chipId = document.getElementById('chipID').value;
     const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
@@ -299,13 +324,14 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                body: JSON.stringify({ file_name: `document_${index}.jpeg` })
+                body: JSON.stringify({ file_name: `document_${chipId}.jpeg` })
             });
             const data = await response.json();
             if (data.success) {
+                uploadFileToGCS(image, data.url);   
                 const imageUrl = data.url.split('?')[0];
                 uploadDocumentMetadata(chipId, imageUrl);
-                return imageUrl;   
+                return documentUrls;   
             } 
             else {
                 throw new Error('Failed to generate presigned URL');

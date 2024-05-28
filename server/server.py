@@ -150,6 +150,31 @@ def generate_presigned_url():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+def upload_blob_from_memory(bucket_name, contents, destination_blob_name):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_string(contents)
+    print(f"{destination_blob_name} with contents {contents} uploaded to {bucket_name}.")
+
+@app.route('/upload_from_memory', methods=['POST'])
+def upload_from_memory():
+    try:
+        data = request.json
+        contents = data.get('contents')
+        destination_blob_name = data.get('destination_blob_name')
+
+        if not contents or not destination_blob_name:
+            return jsonify({"success": False, "message": "Missing contents or destination_blob_name in the request."}), 400
+
+        upload_blob_from_memory(GCS_BUCKET, contents, destination_blob_name)
+        return jsonify({"success": True, "message": f"{destination_blob_name} uploaded successfully."}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/upload_document_metadata', methods=['POST'])
 def upload_document_metadata():
@@ -158,7 +183,7 @@ def upload_document_metadata():
         document_urls = request.json.get('document_urls')
         if not chip_id or not document_urls:
             return jsonify({"success": False, "message": "Missing chipID or document URLs in the request."}), 400
-
+        
         sample = collection.find_one({"chip_id": chip_id})
         if not sample:
             return jsonify({"success": False, "message": "No sample found with the given chipID."}), 404
