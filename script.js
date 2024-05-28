@@ -355,7 +355,8 @@ async function uploadDocumentMetadata(chipId, documentUrls) {
         const response = await fetch('https://onebreathpilot.onrender.com/upload_document_metadata', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({ chip_id: chipId, document_urls: documentUrls[0] })
         });
