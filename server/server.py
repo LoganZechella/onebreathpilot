@@ -171,7 +171,7 @@ def upload_from_memory():
         
         image_data = BytesIO(contents)
          # Optional: save temporarily if needed
-        temp_filename = destination_blob_name
+        temp_filename = "temp_image.jpg"
         with open(temp_filename, 'wb') as temp_file:
             temp_file.write(image_data)
         short_blob_name = destination_blob_name.split("/")[-1]
