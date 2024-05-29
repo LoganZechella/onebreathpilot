@@ -85,6 +85,7 @@ p {
         width: 95%;
         font-size: 14px;
     }
+    
 }
 
 #nav-title-text {
@@ -152,9 +153,9 @@ p {
 }
 
 #scanner-container>video {
-    width: 95vw;
-    height: 75vh;
-    object-fit: cover;
+    /* width: 95vw;
+    height: 75vh; */
+    object-fit: contain;
     /* position: absolute;  */
     top: 0; 
     left: 0; 
@@ -180,18 +181,19 @@ p {
 @media (max-width: 768px) {
     #scanner-container {
         max-width: 100%;
-        max-height: 60vh;
+        /* max-height: 60vh; */
     }
 
     #reader {
         width: 500px;
     }
+
 }
 
 @media (max-width: 480px) {
     #scanner-container {
         max-width: 100%;
-        max-height: 50vh;
+        /* max-height: 50vh; */
     }
 
     #reader {
@@ -204,16 +206,17 @@ p {
     flex-direction: row-reverse;
     align-content: center;
     align-items: center;
+    width: 50vw;
+    justify-content: center;
 }
 
 #change-camera-button {
     display: flex;
     margin: 1em 0.5em 1em 0.5em;
     justify-content: center;
-    padding: 0.5em 1em 1em 1em;
-    width: 75px;
-    height: 65px;
-    border-radius: 10%;
+    padding: 0.5em 1em 0.5em 1em;
+    width: max-content;
+    border-radius: 1em;
     text-align: center;
     background-color: #222;
     color: #ffffff;
@@ -234,14 +237,13 @@ p {
 
 #back-button-intake {
     margin: 0.5em 1em 0.5em 1em;
-    width: 65px;
-    height: 50px;
+    width: 80px;
 }
 
 #back-button-options {
     margin: 2em 0.5em 0.5em 0.5em;
-    max-width: 80%;
-    height: 40px;
+    width: 60%;
+    max-height: 50px;
 }
 
 #back-button-intake:hover,
@@ -282,15 +284,15 @@ p {
     display: none;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     margin-top: 20px;
     background-color: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(10px);
     border-radius: 0.7em;
-    max-width: 90vw;
-    min-width: 70vw;
-    max-height: 80vh;
-    min-height: 60vh;
+    /* max-width: 90vw; */
+    width: 75vw;
+    /* max-height: 65vh; */
+    height: 65vh;
     padding: 0 1em 0 1em;
 }
 
@@ -300,14 +302,21 @@ p {
     display: flex;
     text-align: center;
     max-width: 50vw;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 550;
     text-shadow: 0px 0px 3px #222;
     margin: 0.25em 1em 0.25em 1em;
 }
 
-#digital-form-button, #scan-document-button {
-    margin: 0.5em 1em 0.5em 1em;
+#digital-form-button {
+    margin: 0 1em 0 1em;
+    padding: 1em 0.5em 1em 0.5em;
+    min-width: 95%;
+    height: 65px;
+}
+
+#scan-document-button {
+    margin: 0 1em 0 1em;
     padding: 1em 0.5em 1em 0.5em;
     min-width: 95%;
     height: 65px;
@@ -325,7 +334,7 @@ p {
     margin: 1em 0.5em 1em 0.5em;
     padding: 0.5em 1em 0.5em 1em;
     min-height: 50px;
-    width: 70%;
+    width: 52%;
     height: 75px;
     background-color: rgb(18, 177, 112);
     box-shadow: 0px 0px 3px 3px rgba(18, 177, 112, 62%);
