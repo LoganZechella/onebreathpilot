@@ -488,6 +488,10 @@ function setupQRCodeScanner() {
         document.getElementById('qr-close-btn').style.display = 'block';
         document.getElementById('manual-add-btn').style.display = 'block';
         document.getElementById('reader').style.display = 'block';
+        if (window.window.innerWidth >= 768) {
+            document.getElementById('reader').removeAttribute('style');
+            document.getElementById('reader').setAttribute('style', 'width: 500px;');
+        }
         AOS.refresh();
 
         const html5QrCode = new Html5Qrcode("reader");
