@@ -43,7 +43,7 @@ p {
 
 @media screen and (max-width: 768px) {
     body {
-        background-size: fill;
+        background-size: cover;
         background-repeat: no-repeat;
         background-position: bottom;
     }
@@ -679,34 +679,35 @@ p {
     background-color: light-dark(#ffffff, #000000);
 }
 
+/* Loader Styles */
 .loader {
-    display: none;
-    width: 20px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: #ffffffd1;
-    box-shadow: 0 0 0 0 #ffffff93;
-    animation: l2 2.5s infinite ease-in-out;
     position: relative;
+    width: 100px;
+    height: 100px;
+    display: none;
+    /* Hidden by default */
 }
 
 .loader:before,
 .loader:after {
-    content: "";
+    content: '';
+    border-radius: 50%;
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    box-shadow: 0 0 0 0 #ffffff96;
-    animation: inherit;
-    animation-delay: -0.5s;
+    inset: top 1em right 1em bottom 1em left 1em;
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.815) inset;
 }
 
 .loader:after {
-    animation-delay: -1s;
+    box-shadow: 0 2px 0 #2196f3 inset;
+    animation: rotate 2s linear infinite;
 }
 
-@keyframes l2 {
+@keyframes rotate {
+    0% {
+        transform: rotate(0);
+    }
+
     100% {
-        box-shadow: 0 0 0 40px #0000
+        transform: rotate(360deg);
     }
 }

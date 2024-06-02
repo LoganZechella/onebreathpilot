@@ -383,6 +383,7 @@ function setupPatientIntakeForm() {
 
     document.getElementById('patient-intake-form-close-btn').addEventListener('click', () => {
         document.getElementById('patient-intake-form-section').style.display = 'none';
+        resetSampleRegistration();
     });
 
     setupConditionalFields();
@@ -529,8 +530,7 @@ function showManualEntryForm() {
         'add-button': document.getElementById('add-new-sample'),
         'in-process': document.getElementById('in-process-section'),
         'pickup': document.getElementById('pickup-section'),
-        'shipping': document.getElementById('shipping-section'),
-        'elution': document.getElementById('elution-section')
+        'shipping': document.getElementById('shipping-section')
     };
     Object.values(bodySections).forEach(section => section.style.display = 'none');
 
@@ -562,13 +562,29 @@ function resetSampleRegistration() {
     AOS.refresh();
 }
 
+// Function to fetch samples and update UI
 function fetchSamplesAndUpdateUI() {
-    setTimeout(() => {
-        fetch('https://onebreathpilot.onrender.com/samples')
-            .then(response => response.json())
-            .then(samples => updateSampleQueues(samples))
-            .catch(error => console.error('Error fetching samples:', error));
-    }, 1000);
+    const loader = document.querySelector('.loader');
+    const dashboardContent = document.getElementById('landing-main');
+
+    // Show loader and hide dashboard content
+    loader.style.display = 'block';
+    dashboardContent.style.display = 'none';
+
+    // Fetch data
+    fetch('https://onebreathpilot.onrender.com/samples')
+        .then(response => response.json())
+        .then(samples => {
+            updateSampleQueues(samples);
+
+            // Hide loader and show dashboard content
+            loader.style.display = 'none';
+            dashboardContent.style.display = 'flex';
+        })
+        .catch(error => {
+            console.error('Error fetching samples:', error);
+            // Optionally handle error by showing an error message
+        });
 }
 
 function updateSampleQueues(samples) {
@@ -763,6 +779,7 @@ function setupSampleEventListeners() {
         event.preventDefault();
         updateStatusToReadyForAnalysis(event.target.elements['data-chip-id'].value);
         document.getElementById('pickup-form-modal').style.display = 'none';
+        document.getElementById('pickup-form').reset();
     });
 
     document.getElementById('pickup-close-button').addEventListener('click', function () {
