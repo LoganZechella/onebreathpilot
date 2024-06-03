@@ -271,7 +271,7 @@ function handleDocumentScanResult(result) {
         });
 
         // Show the review section
-        document.getElementById('review-section').style.display = 'block';
+        document.getElementById('review-section').style.display = 'flex';
         document.getElementById('scanner-container').style.display = 'none';
         document.getElementById('back-button-intake-container').style.display = 'none';
     } else {
