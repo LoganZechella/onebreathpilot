@@ -28,7 +28,6 @@
         </ul>
     </nav>
 
-
     <!-- sign-in.html -->
     <div id="sign-in-container" data-aos="fade-up" data-aos-duration="500">
         <img src="assets/images/BREATH DIAGNOSTICS-2.png" alt="Breath Diagnostics Logo"
@@ -39,11 +38,8 @@
         <button id="sign-in-google" type="button">Sign In with Google</button>
     </div>
 
-
-
-
     <div class="blocker">
-        <span class="loader"></span>
+        
         <main class="container" id="add-sample-main">
             <div class="grid">
                 <section id="sample-reg-section">
@@ -71,10 +67,6 @@
                     </form>
                 </section>
                 
-                
-                
-                
-
                 <section id="patient-intake-form-section">
                     <span class="close-button patient-intake-form-close-btn"
                         id="patient-intake-form-close-btn">&times;</span>
@@ -241,10 +233,11 @@
             </div>
 
             <div id="review-section" style="display: none;">
-                <h2>Review Scanned Document</h2>
+                <span class="loader" id="document-upload-loader" style="display: none;"></span>
+                <h2 class="review-non-loader">Review Scanned Document</h2>
                 <div id="scanned-images"></div>
-                <button id="rescan-button">Rescan</button>
-                <button id="confirm-upload-button">Confirm Upload</button>
+                <button class="review-non-loader" id="rescan-button">Rescan</button>
+                <button class="review-non-loader" id="confirm-upload-button">Confirm Upload</button>
             </div>
 
             <section class="section in-process-section" id="in-process-section" data-aos="slide-up"
@@ -252,10 +245,7 @@
                 <div class="section-title" id="in-process-title">
                     <h3>In-Process</h3>
                 </div>
-                
-                <div class="grid">
-                    
-                </div>
+                <div class="grid"></div>
             </section>
 
             <div id="pickup-form-modal" class="modal" data-aos="fade-up" data-aos-duration="500">
@@ -274,40 +264,30 @@
                         <label for="error-codes">Error Codes (Optional):</label>
                         <input type="text" id="error-codes" name="error-codes">
 
-                        <button id="confirm-pickup-button">Confirm
-                            Pickup</button>
+                        <button id="confirm-pickup-button">Confirm Pickup</button>
                     </form>
                 </div>
             </div>
-
-
 
             <section class="section pickup-section" id="pickup-section" >
                 <div class="section-title" id="ready-for-pickup-title">
                     <h3>Ready for Pickup</h3>
                 </div>
-                
-                <div class="grid">
-                    
-                </div>
-
+                <div class="grid"></div>
             </section>
+
             <section class="section shipping-section" id="shipping-section" >
                 <div class="section-title" id="shipping-title">
                     <h3>Ready for Analysis</h3>
                 </div>
-                
-                <div class="grid">
-                    
-                </div>
-
+                <div class="grid"></div>
             </section>
+
             <section class="section elution-section" id="elution-section" style="display: none">
                 <div class="section-title" id="elution-title">
                     <h3>Elution</h3>
                 </div>
                 <div class="grid">
-
                 </div>
 
             </section>

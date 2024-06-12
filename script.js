@@ -160,7 +160,6 @@ function startDocumentScanning() {
     const scanner = new jscanify();
     const canvasCtx = canvas.getContext("2d", { willReadFrequently: true });
     const resultCtx = resultCanvas.getContext("2d", { willReadFrequently: true });
-    let imageCapture;
 
     video.setAttribute('playsinline', '');
 
@@ -315,6 +314,12 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
     const chipId = document.getElementById('chipID').value;
     const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
 
+    const reviewSection = document.querySelectorAll('.review-non-loader');
+    const loader = document.getElementById('document-upload-loader');
+    reviewSection.forEach(section => section.style.display = 'none');
+    loader.style.display = 'inline-block';
+    // loader.style.zIndex = '1';
+
     try {
         const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
             const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
@@ -332,13 +337,20 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
                 const short_blob_name = imageUrl.split('/')[4];
                 console.log(short_blob_name);
                 await uploadFileToGCS(short_blob_name, image).then(() => {
-                    uploadDocumentMetadata(chipId, imageUrl);
+                    uploadDocumentMetadata(chipId, imageUrl)
                 });
+                loader.style.display = 'none';
+                alert('Document uploaded successfully.');
+                stopDocumentScanning();
+                document.getElementById('review-section').style.display = 'none';
+                resetSampleRegistration();
             }
         }));
     } catch (error) {
         console.error('Error during document upload:', error);
         alert('Document upload failed. Please try again.');
+        loader.style.display = 'none';
+        reviewSection.style.display = 'flex';
     }
 });
 
@@ -354,9 +366,7 @@ async function uploadDocumentMetadata(chipId, documentUrls) {
         });
         const data = await response.json();
         if (data.success) {
-            alert('Document uploaded successfully.');
-            document.getElementById('review-section').style.display = 'none';
-            resetSampleRegistration();
+            console.log('Document metadata uploaded successfully.');
         } else {
             alert('Document upload failed.');
         }
@@ -564,26 +574,14 @@ function resetSampleRegistration() {
 
 // Function to fetch samples and update UI
 function fetchSamplesAndUpdateUI() {
-    const loader = document.querySelector('.loader');
-    const dashboardContent = document.getElementById('landing-main');
-
-    // Show loader and hide dashboard content
-    loader.style.display = 'block';
-    dashboardContent.style.display = 'none';
-
     // Fetch data
     fetch('https://onebreathpilot.onrender.com/samples')
         .then(response => response.json())
         .then(samples => {
             updateSampleQueues(samples);
-
-            // Hide loader and show dashboard content
-            loader.style.display = 'none';
-            dashboardContent.style.display = 'flex';
         })
         .catch(error => {
             console.error('Error fetching samples:', error);
-            // Optionally handle error by showing an error message
         });
 }
 
