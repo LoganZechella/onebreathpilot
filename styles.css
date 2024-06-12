@@ -685,33 +685,32 @@ p {
 
 /* Loader Styles */
 .loader {
+    width: 100%;
+    height: 4.8px;
+    display: inline-block;
     position: relative;
-    width: 100px;
-    height: 100px;
-    display: none;
-    /* Hidden by default */
+    background: rgb(255, 255, 255);
+    overflow: hidden;
 }
 
-.loader:before,
-.loader:after {
+.loader::after {
     content: '';
-    border-radius: 50%;
+    box-sizing: border-box;
+    width: 0;
+    height: 4.8px;
+    background: #007bff;
     position: absolute;
-    inset: top 1em right 1em bottom 1em left 1em;
-    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.815) inset;
+    top: 0;
+    left: 0;
+    animation: animFw 10s linear infinite;
 }
 
-.loader:after {
-    box-shadow: 0 2px 0 #2196f3 inset;
-    animation: rotate 2s linear infinite;
-}
-
-@keyframes rotate {
+@keyframes animFw {
     0% {
-        transform: rotate(0);
+        width: 0;
     }
 
     100% {
-        transform: rotate(360deg);
+        width: 100%;
     }
 }
