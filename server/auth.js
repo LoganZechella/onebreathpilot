@@ -7,13 +7,13 @@ import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/fir
 
 // Initialize Firebase App
 const firebaseConfig = {
-    apiKey: "AIzaSyBW0bd6AuFyb3OZmO98DFQX3bgKwwwdxYo",
-    authDomain: "pilotdash-2466b.firebaseapp.com",
-    projectId: "pilotdash-2466b",
-    storageBucket: "pilotdash-2466b.appspot.com",
-    messagingSenderId: "929141041648",
-    appId: "1:929141041648:web:1f27019dda3624dd885535",
-    measurementId: "G-R0EETJKW7B"
+    apiKey: "AIzaSyC8LkfOZniLfcItfzU4vO-vxFw2Jcr15y0",
+    authDomain: "dashboard-424301.firebaseapp.com",
+    projectId: "dashboard-424301",
+    storageBucket: "dashboard-424301.appspot.com",
+    messagingSenderId: "121248577105",
+    appId: "1:121248577105:web:ad670277dad3b9cfd8aa70",
+    measurementId: "G-GSKZV0PKMN"
 };
 const app = initializeApp(firebaseConfig);
 
