@@ -12,16 +12,19 @@
     <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
     <title>OneBreath Sample Dashboard</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <meta name="description"
+        content="OneBreath Pilot Study Dashboard for managing sample registration and patient intake forms.">
+    <meta name="keywords" content="OneBreath, Pilot Study, Sample Registration, Patient Intake">
 </head>
 
 <body>
 
-    <nav class="container-fluid">
-        <div class="nav-header">
+    <nav class="container-fluid" role="navigation" aria-label="Main navigation">
+        <header class="nav-header">
             <ul>
                 <li id="nav-title-text"><strong>OneBreath Pilot Study</strong></li>
             </ul>
-        </div>
+        </header>
         <ul class="nav-links">
             <li><a href="#">Home</a></li>
             <li><a href="#" id="show-sign-in" class="logged-out">Sign In</a></li>
@@ -30,16 +33,18 @@
 
     <!-- sign-in.html -->
     <div id="sign-in-container" data-aos="fade-up" data-aos-duration="500">
-        <img src="assets/images/BREATH DIAGNOSTICS-2.png" alt="Breath Diagnostics Logo"
+        <img src="assets/images/BREATH DIAGNOSTICS-2.png" alt="Logo of Breath Diagnostics"
             style="width: 200px; display: block; margin: 0 auto 20px;">
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
+        <label for="email">Email:</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
         <button id="sign-in">Sign In</button>
         <button id="sign-in-google" type="button">Sign In with Google</button>
     </div>
 
     <div class="blocker">
-        
+
         <main class="container" id="add-sample-main">
             <div class="grid">
                 <section id="sample-reg-section">
@@ -50,13 +55,9 @@
                     </hgroup>
                     <form id="new-sample-form">
                         <label for="chipID">Chip ID: (PXXXXX)</label>
-
                         <input type="text" id="chipID" pattern="P\d{5}" required inputmode="text">
-
                         <label for="patientID">Patient ID: (BDx-XXX)</label>
-
                         <input type="text" id="patientID" pattern="BDx-\d*" required inputmode="text" value="BDx-">
-
                         <label for="location">Location</label>
                         <select id="location" name="location" required>
                             <option value="">Select Location</option>
@@ -66,7 +67,7 @@
                         <button id="confirm-button">Confirm</button>
                     </form>
                 </section>
-                
+
                 <section id="patient-intake-form-section">
                     <span class="close-button patient-intake-form-close-btn"
                         id="patient-intake-form-close-btn">&times;</span>
@@ -210,7 +211,7 @@
             </div>
             <div id="reader" style="width: 300px;" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="2000">
             </div>
-            
+
             <div id="scanner-container">
                 <video id="video"></video><canvas id="canvas"></canvas>
                 <canvas id="result"></canvas>
@@ -227,7 +228,7 @@
             <!-- Option Container for digital form or document scanning -->
             <div id="option-container">
                 <div id="option-message">Please choose an option:</div>
-                <button id="digital-form-button" >Fill Patient Intake Form</button>
+                <button id="digital-form-button">Fill Patient Intake Form</button>
                 <button id="scan-document-button">Proceed to Document Scanning</button>
                 <button id="back-button-options">Back</button>
             </div>
@@ -269,14 +270,14 @@
                 </div>
             </div>
 
-            <section class="section pickup-section" id="pickup-section" >
+            <section class="section pickup-section" id="pickup-section">
                 <div class="section-title" id="ready-for-pickup-title">
                     <h3>Ready for Pickup</h3>
                 </div>
                 <div class="grid"></div>
             </section>
 
-            <section class="section shipping-section" id="shipping-section" >
+            <section class="section shipping-section" id="shipping-section">
                 <div class="section-title" id="shipping-title">
                     <h3>Ready for Analysis</h3>
                 </div>
