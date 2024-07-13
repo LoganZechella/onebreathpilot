@@ -17,7 +17,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Firebase Admin SDK settings
 cred = credentials.Certificate('/etc/secrets/Firebaseadminsdk.json')
-# cred = credentials.Certificate('server/pilotdash-2466b-firebase-adminsdk-26rdi-11a0d7418d.json')
+# cred = credentials.Certificate('server/Firebaseadminsdk.json')
 firebase_admin.initialize_app(cred)
 
 @app.route('/api/auth/signin', methods=['POST'])
