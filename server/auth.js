@@ -33,6 +33,22 @@ async function makeAuthRequest(url, data) {
     }
 }
 
+// Function to handle element animations
+function animateCSS(element, animationName, callback) {
+    const node = document.querySelector(element);
+    node.classList.add('animate__animated', animationName);
+
+    function handleAnimationEnd(event) {
+        event.stopPropagation();
+        node.classList.remove('animate__animated', animationName);
+        if (callback) {
+            callback();
+        }
+    }
+
+    node.addEventListener('animationend', handleAnimationEnd, { once: true });
+}
+
 // Listen for the document to be loaded
 document.addEventListener('DOMContentLoaded', () => {
     if (!auth.currentUser) {
@@ -57,13 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
             await signInWithEmailAndPassword(auth, email, password);
             const idToken = await getIdToken(auth.currentUser);
             const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
-            document.getElementById('sign-in-container').classList.add('animate__animated', 'animate__fadeOut');
-            setTimeout(() => {
+            animateCSS('#sign-in-container', 'animate__fadeOut', () => {
                 document.getElementById('sign-in-container').style.display = 'none';
                 document.getElementById('loading-spinner').style.display = 'none';
-                document.getElementById('landing-main').classList.add('animate__animated', 'animate__fadeIn');
                 document.getElementById('landing-main').style.display = 'flex';
-            }, 2000);  // Delay to allow fade out animation
+                animateCSS('#landing-main', 'animate__fadeIn');
+            });
         } catch (error) {
             console.error('Login failed:', error);
             document.getElementById('loading-spinner').style.display = 'none';
@@ -77,13 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
             const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
-            document.getElementById('sign-in-container').classList.add('animate__animated', 'animate__fadeOut');
-            setTimeout(() => {
+            animateCSS('#sign-in-container', 'animate__fadeOut', () => {
                 document.getElementById('sign-in-container').style.display = 'none';
                 document.getElementById('loading-spinner').style.display = 'none';
-                document.getElementById('landing-main').classList.add('animate__animated', 'animate__fadeIn');
                 document.getElementById('landing-main').style.display = 'flex';
-            }, 2000);  // Delay to allow fade out animation
+                animateCSS('#landing-main', 'animate__fadeIn');
+            });
         } catch (error) {
             console.error('Google sign-in failed:', error);
             document.getElementById('loading-spinner').style.display = 'none';
@@ -94,8 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 onAuthStateChanged(auth, user => {
     if (user) {
-        document.querySelector('.blocker').style.display = 'flex'; // Hide the blocker
-        document.getElementById('sign-in-container').style.display = 'none'; // Hide the sign-in form
+        animateCSS('.blocker', 'animate__fadeIn', () => {
+            document.querySelector('.blocker').style.display = 'flex'; // Hide the blocker
+        });
+        animateCSS('#sign-in-container', 'animate__fadeOut', () => {
+            document.getElementById('sign-in-container').style.display = 'none'; // Hide the sign-in form
+        });
         document.getElementById('show-sign-in').classList.add('logged-in'); // Update the UI to show the user is logged in
         document.getElementById('show-sign-in').textContent = 'Sign Out'; // Change the text to "Sign Out"
     } else {
