@@ -51,7 +51,7 @@ function animateCSS(element, animationName, callback) {
 
 // Listen for the document to be loaded
 document.addEventListener('DOMContentLoaded', () => {
-    if (!auth.currentUser) {
+    if (auth.currentUser) {
         document.querySelector('.blocker').style.display = 'none';
         document.getElementById('sign-in-container').style.display = 'block';
     }
