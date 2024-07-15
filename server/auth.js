@@ -51,9 +51,9 @@ function animateCSS(element, animationName, callback) {
 
 // Listen for the document to be loaded
 document.addEventListener('DOMContentLoaded', () => {
-    if (!auth.currentUser) {
-        document.querySelector('.blocker').style.display = 'none';
-        document.getElementById('sign-in-container').style.display = 'block';
+    if (auth.currentUser) {
+        document.querySelector('.blocker').style.display = 'flex';
+        document.getElementById('sign-in-container').style.display = 'none';
     }
     document.getElementById('show-sign-in').addEventListener('click', (event) => {
         event.preventDefault(); // Prevent the link from following the URL
@@ -72,10 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             const idToken = await getIdToken(auth.currentUser);
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
+            await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
+            document.getElementById('loading-spinner').style.display = 'none';
             animateCSS('#sign-in-container', 'animate__fadeOut', () => {
                 document.getElementById('sign-in-container').style.display = 'none';
-                document.getElementById('loading-spinner').style.display = 'none';
                 document.querySelector('.blocker').style.display = 'flex';
                 animateCSS('.blocker', 'animate__fadeIn');
             });
@@ -91,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
-            const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
+            await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
+            document.getElementById('loading-spinner').style.display = 'none';
             animateCSS('#sign-in-container', 'animate__fadeOut', () => {
                 document.getElementById('sign-in-container').style.display = 'none';
-                document.getElementById('loading-spinner').style.display = 'none';
                 document.querySelector('.blocker').style.display = 'flex';
                 animateCSS('.blocker', 'animate__fadeIn');
             });
@@ -109,9 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
 onAuthStateChanged(auth, user => {
     if (user) {
         document.getElementById('sign-in-container').style.display = 'none';
-        animateCSS('.blocker', 'animate__fadeIn', () => {
-            document.querySelector('.blocker').style.display = 'flex'; // Show the blocker
-        });
+        document.querySelector('.blocker').style.display = 'flex';
+        animateCSS('.blocker', 'animate__fadeIn');
         document.getElementById('show-sign-in').classList.add('logged-in'); // Update the UI to show the user is logged in
         document.getElementById('show-sign-in').textContent = 'Sign Out'; // Change the text to "Sign Out"
     } else {
