@@ -63,10 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('loading-spinner').style.display = 'none';
                 document.getElementById('landing-main').classList.add('animate__animated', 'animate__fadeIn');
                 document.getElementById('landing-main').style.display = 'flex';
-            }, 1000);  // Delay to allow fade out animation
+            }, 2000);  // Delay to allow fade out animation
         } catch (error) {
             console.error('Login failed:', error);
-            alert('Login failed: ' + error.message);
             document.getElementById('loading-spinner').style.display = 'none';
         }
     });
@@ -84,10 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('loading-spinner').style.display = 'none';
                 document.getElementById('landing-main').classList.add('animate__animated', 'animate__fadeIn');
                 document.getElementById('landing-main').style.display = 'flex';
-            }, 1000);  // Delay to allow fade out animation
+            }, 2000);  // Delay to allow fade out animation
         } catch (error) {
             console.error('Google sign-in failed:', error);
-            alert('Google sign-in failed: ' + error.message);
             document.getElementById('loading-spinner').style.display = 'none';
         }
     });
