@@ -76,8 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
             animateCSS('#sign-in-container', 'animate__fadeOut', () => {
                 document.getElementById('sign-in-container').style.display = 'none';
                 document.getElementById('loading-spinner').style.display = 'none';
-                document.getElementById('landing-main').style.display = 'flex';
-                animateCSS('#blocker', 'animate__fadeIn');
+                document.getElementById('.blocker').style.display = 'flex';
+                animateCSS('.blocker', 'animate__fadeIn');
             });
         } catch (error) {
             console.error('Login failed:', error);
