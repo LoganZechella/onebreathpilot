@@ -3,4 +3,4 @@
 
 [[edge_functions]]
   function = "authFrontend.mjs"
-  path = "/authFrontend"
+  path = "/netlify/edge-functions/authFrontend.mjs"

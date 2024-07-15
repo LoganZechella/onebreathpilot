@@ -3,8 +3,6 @@ import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getIdToken } f
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
-
-
 // Initialize Firebase App
 const firebaseConfig = {
     apiKey: "AIzaSyC8LkfOZniLfcItfzU4vO-vxFw2Jcr15y0",
@@ -25,12 +23,12 @@ async function makeAuthRequest(url, data) {
     try {
         const response = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
             body: JSON.stringify(data)
         });
         return response.json();
     } catch (error) {
-        // console.error('Error with auth request:', error);
+        console.error('Error with auth request:', error);
         throw error;
     }
 }
@@ -54,27 +52,43 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sign-in').addEventListener('click', async () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        document.getElementById('loading-spinner').style.display = 'block';  // Show spinner
         try {
             await signInWithEmailAndPassword(auth, email, password);
             const idToken = await getIdToken(auth.currentUser);
             const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
-            // console.log('Login successful:', data);
+            document.getElementById('sign-in-container').classList.add('animate__animated', 'animate__fadeOut');
+            setTimeout(() => {
+                document.getElementById('sign-in-container').style.display = 'none';
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('landing-main').classList.add('animate__animated', 'animate__fadeIn');
+                document.getElementById('landing-main').style.display = 'flex';
+            }, 1000);  // Delay to allow fade out animation
         } catch (error) {
-            // console.error('Login failed:', error);
-            // alert('Login failed: ' + error.message);
+            console.error('Login failed:', error);
+            alert('Login failed: ' + error.message);
+            document.getElementById('loading-spinner').style.display = 'none';
         }
     });
 
     document.getElementById('sign-in-google').addEventListener('click', async () => {
         const googleProvider = new GoogleAuthProvider();
+        document.getElementById('loading-spinner').style.display = 'block';  // Show spinner
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
             const data = await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
-            // console.log('Google sign-in successful:', data);
+            document.getElementById('sign-in-container').classList.add('animate__animated', 'animate__fadeOut');
+            setTimeout(() => {
+                document.getElementById('sign-in-container').style.display = 'none';
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('landing-main').classList.add('animate__animated', 'animate__fadeIn');
+                document.getElementById('landing-main').style.display = 'flex';
+            }, 1000);  // Delay to allow fade out animation
         } catch (error) {
-            // console.error('Google sign-in failed:', error);
-            // alert('Google sign-in failed: ' + error.message);
+            console.error('Google sign-in failed:', error);
+            alert('Google sign-in failed: ' + error.message);
+            document.getElementById('loading-spinner').style.display = 'none';
         }
     });
 
