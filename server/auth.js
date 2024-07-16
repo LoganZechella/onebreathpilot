@@ -1,5 +1,4 @@
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getIdToken } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
-// Import statements for Firebase v9+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
@@ -18,51 +17,40 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
 
-// Helper function to make API requests to Netlify function
-async function makeAuthRequest(url, data) {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify(data)
-        });
-        return response.json();
-    } catch (error) {
-        console.error('Error with auth request:', error);
-        throw error;
-    }
-}
-
-// Function to handle element animations
-function animateCSS(element, animationName, callback) {
-    const node = document.querySelector(element);
-    node.classList.add('animate__animated', animationName);
-
-    function handleAnimationEnd(event) {
-        event.stopPropagation();
-        node.classList.remove('animate__animated', animationName);
-        if (callback) {
-            callback();
-        }
-    }
-
-    node.addEventListener('animationend', handleAnimationEnd, { once: true });
-}
-
-// Listen for the document to be loaded
-document.addEventListener('DOMContentLoaded', () => {
-    if (auth.currentUser) {
+function updateUIForAuth(user) {
+    if (user) {
         document.querySelector('.blocker').style.display = 'flex';
         document.getElementById('sign-in-container').style.display = 'none';
+        document.getElementById('show-sign-in').textContent = 'Sign Out';
+        document.getElementById('show-sign-in').classList.add('logged-in');
+    } else {
+        document.querySelector('.blocker').style.display = 'none';
+        document.getElementById('sign-in-container').style.display = 'block';
+        document.getElementById('show-sign-in').textContent = 'Sign In';
+        document.getElementById('show-sign-in').classList.remove('logged-in');
     }
+}
+
+// Listen for authentication state to change
+onAuthStateChanged(auth, user => {
+    updateUIForAuth(user);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Check initial state of user authentication
+    updateUIForAuth(auth.currentUser);
+
     document.getElementById('show-sign-in').addEventListener('click', (event) => {
         event.preventDefault(); // Prevent the link from following the URL
-        if (document.getElementById('show-sign-in').classList.contains('logged-in')) {
-            auth.signOut();
-            window.location.reload();
+        if (auth.currentUser) {
+            auth.signOut().then(() => {
+                window.location.reload();
+            }).catch((error) => {
+                console.error('Sign out error:', error);
+            });
         } else {
             document.getElementById('sign-in-container').style.display = 'block';
-        };
+        }
     });
 
     document.getElementById('sign-in').addEventListener('click', async () => {
@@ -75,9 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
             document.getElementById('loading-spinner').style.display = 'none';
             animateCSS('#sign-in-container', 'animate__fadeOut', () => {
-                document.getElementById('sign-in-container').style.display = 'none';
-                document.querySelector('.blocker').style.display = 'flex';
-                animateCSS('.blocker', 'animate__fadeIn');
+                updateUIForAuth(auth.currentUser);
             });
         } catch (error) {
             console.error('Login failed:', error);
@@ -94,30 +80,40 @@ document.addEventListener('DOMContentLoaded', () => {
             await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
             document.getElementById('loading-spinner').style.display = 'none';
             animateCSS('#sign-in-container', 'animate__fadeOut', () => {
-                document.getElementById('sign-in-container').style.display = 'none';
-                document.querySelector('.blocker').style.display = 'flex';
-                animateCSS('.blocker', 'animate__fadeIn');
+                updateUIForAuth(auth.currentUser);
             });
         } catch (error) {
             console.error('Google sign-in failed:', error);
             document.getElementById('loading-spinner').style.display = 'none';
         }
     });
-
 });
 
-onAuthStateChanged(auth, user => {
-    if (user) {
-        document.getElementById('sign-in-container').style.display = 'none';
-        document.querySelector('.blocker').style.display = 'flex';
-        animateCSS('.blocker', 'animate__fadeIn');
-        document.getElementById('show-sign-in').classList.add('logged-in'); // Update the UI to show the user is logged in
-        document.getElementById('show-sign-in').textContent = 'Sign Out'; // Change the text to "Sign Out"
-    } else {
-        animateCSS('.blocker', 'animate__fadeOut', () => {
-            document.querySelector('.blocker').style.display = 'none'; // Hide the blocker
+async function makeAuthRequest(url, data) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+            body: JSON.stringify(data)
         });
-        document.getElementById('show-sign-in').classList.remove('logged-in'); // Update the UI to show the user is logged out
-        document.getElementById('show-sign-in').textContent = 'Sign In'; // Change the text to "Sign In"
+        return response.json();
+    } catch (error) {
+        console.error('Error with auth request:', error);
+        throw error;
     }
-});
+}
+
+function animateCSS(element, animationName, callback) {
+    const node = document.querySelector(element);
+    node.classList.add('animate__animated', animationName);
+
+    function handleAnimationEnd(event) {
+        event.stopPropagation();
+        node.classList.remove('animate__animated', animationName);
+        if (callback) {
+            callback();
+        }
+    }
+
+    node.addEventListener('animationend', handleAnimationEnd, { once: true });
+}
