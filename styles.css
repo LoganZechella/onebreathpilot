@@ -676,20 +676,14 @@ p {
 }
 
 #email,
-#password {
-    color: light-dark(#000000, #ffffff);
-    font-size: 14px;
-    font-weight: 300;
-    font-style: italic;
-}
-
+#password,
 #email::placeholder,
 #password::placeholder {
+    color: light-dark(#000000, #d2d2d2);
+    font-size: 14px;
     font-weight: 400;
-    font-style: normal;
-    background-color: light-dark(#ffffff, #000000);
+    font-style: italic;
 }
-
 
 /* Loader Styles */
 .loader {
