@@ -18,21 +18,21 @@ function setupAutofillStyling() {
     const inputs = document.querySelectorAll('#email, #password');
 
     inputs.forEach(input => {
-        input.addEventListener('animationstart', (event) => {
+        input.addEventListener('input', (event) => {
             if (event.animationName === 'onAutoFillStart') {
-                styleAutofilledInput(input);
+            styleAutofilledInput(input);
             }
         });
-        input.addEventListener('animationend', (event) => {
-            if (event.animationName === 'onAutoFillCancel') {
-                resetAutofilledInputStyle(input);
-            }
-        });
+        // input.addEventListener('animationend', (event) => {
+        //     if (event.animationName === 'onAutoFillCancel') {
+        //         resetAutofilledInputStyle(input);
+        //     }
+        // });
     });
 }
 
 function styleAutofilledInput(input) {
-    input = input + '::placeholder';
+    pseudo = `${input.id}::-webkit-autofill`;
     input.style.backgroundColor = 'light-dark(#ffffff, #000000)';
     input.style.color = 'light-dark(#000000, #ffffff)';
 }
