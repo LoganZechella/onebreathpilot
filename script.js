@@ -32,6 +32,7 @@ function setupAutofillStyling() {
 }
 
 function styleAutofilledInput(input) {
+    input = input + '::placeholder';
     input.style.backgroundColor = 'light-dark(#ffffff, #000000)';
     input.style.color = 'light-dark(#000000, #ffffff)';
 }
