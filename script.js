@@ -32,8 +32,8 @@ function setupAutofillStyling() {
 }
 
 function styleAutofilledInput(input) {
-    input.style.backgroundColor = 'var(--autofill-bg-color, light-dark(#ffffff, #000000))';
-    input.style.color = 'var(--autofill-text-color, light-dark(#000000, #ffffff))';
+    input.style.backgroundColor = 'light-dark(#ffffff, #000000)';
+    input.style.color = 'light-dark(#000000, #ffffff)';
 }
 
 function resetAutofilledInputStyle(input) {
