@@ -8,9 +8,38 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPatientIntakeEventListeners();
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
-    enumerateVideoDevices()
+    enumerateVideoDevices();
+
+    // Detect and style autofilled inputs
+    setupAutofillStyling();
 });
 
+function setupAutofillStyling() {
+    const inputs = document.querySelectorAll('#email, #password');
+
+    inputs.forEach(input => {
+        input.addEventListener('animationstart', (event) => {
+            if (event.animationName === 'onAutoFillStart') {
+                styleAutofilledInput(input);
+            }
+        });
+        input.addEventListener('animationend', (event) => {
+            if (event.animationName === 'onAutoFillCancel') {
+                resetAutofilledInputStyle(input);
+            }
+        });
+    });
+}
+
+function styleAutofilledInput(input) {
+    input.style.backgroundColor = 'var(--autofill-bg-color, light-dark(#ffffff, #000000))';
+    input.style.color = 'var(--autofill-text-color, light-dark(#000000, #ffffff))';
+}
+
+function resetAutofilledInputStyle(input) {
+    input.style.backgroundColor = '';
+    input.style.color = '';
+}
 function initApp() {
     const queryParams = window.location.search;
     if (queryParams) {
