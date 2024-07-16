@@ -1,10 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Old+Standard+TT:ital@1&display=swap');
+@import url(https://fonts.googleapis.com/css?family=Figtree:300,regular,500,600,700,800,900,300italic,italic,500italic,600italic,700italic,800italic,900italic);
 
 :root {
-    --primaryFont: "Figtree", sans-serif;
+    --primaryFont: "Figtree", "helvetica", "arial", sans-serif;
     --backgroundColor: #19191a;
-    --primaryColor: #6246ea;
     --hTexts: #2b2c34;
     --pTexts: #2b2c34;
 }
@@ -658,6 +656,12 @@ p {
     border-radius: 4px;
 }
 
+#sign-in-container label[for="email"],
+#sign-in-container label[for="password"] {
+    color: #000000;
+    font-size: 16px;
+}
+
 #sign-in-container button {
     background-color: #007bff;
     color: white;
@@ -671,16 +675,26 @@ p {
     background-color: #0056b3;
 }
 
+#email[type="email"]::auto-fill,
+#password[type="password"]::auto-fill {
+    background-color: light-dark(#ffffff, #000000);
+    color: light-dark(#000000, #ffffff);
+}
+
 #email,
 #password,
 #email::placeholder,
 #password::placeholder {
-    color: light-dark(#000000, #ffffff);
+    color: light-dark(#000000, #d2d2d2);
+    font-size: 14px;
+    font-weight: 300;
+    font-style: italic;
 }
 
-#email:auto-fill,
-#password:auto-fill {
+#email::auto-fill,
+#password::auto-fill {
     background-color: light-dark(#ffffff, #000000);
+    color: light-dark(#000000, #000000);
 }
 
 /* Loader Styles */
@@ -720,8 +734,8 @@ p {
     border: 8px solid rgba(0, 0, 0, 0.1);
     border-left: 8px solid #007bff;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
     animation: spin 1s linear infinite;
     display: none;
     margin: 20px auto;
@@ -729,10 +743,10 @@ p {
 
 @keyframes spin {
     0% {
-        transform: rotate(0deg);
+        transform: rotate(0deg) scale(1, 1);
     }
 
     100% {
-        transform: rotate(360deg);
+        transform: rotate(360deg) scale(2, 2);
     }
 }
