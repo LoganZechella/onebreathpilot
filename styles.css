@@ -750,3 +750,25 @@ p {
         transform: rotate(360deg) scale(2, 2);
     }
 }
+
+@keyframes onAutoFillStart {
+    from {}
+
+    to {}
+}
+
+@keyframes onAutoFillCancel {
+    from {}
+
+    to {}
+}
+
+input:-webkit-autofill {
+    animation-name: onAutoFillStart;
+    animation-fill-mode: both;
+}
+
+input:not(:-webkit-autofill) {
+    animation-name: onAutoFillCancel;
+    animation-fill-mode: both;
+}
