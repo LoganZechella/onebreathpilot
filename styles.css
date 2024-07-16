@@ -691,8 +691,20 @@ p {
     font-style: italic;
 }
 
-#email::auto-fill,
-#password::auto-fill {
+#email:-webkit-autofill,
+#password:-webkit-autofill {
+    animation-name: onAutoFillStart;
+    animation-fill-mode: both;
+}
+
+input:not(:-webkit-autofill),
+input:not(:-webkit-autofill) {
+    animation-name: onAutoFillCancel;
+    animation-fill-mode: both;
+}
+
+#email:auto-fill,
+#password:auto-fill {
     background-color: light-dark(#ffffff, #000000);
     color: light-dark(#000000, #000000);
 }
@@ -763,12 +775,3 @@ p {
     to {}
 }
 
-input:-webkit-autofill {
-    animation-name: onAutoFillStart;
-    animation-fill-mode: both;
-}
-
-input:not(:-webkit-autofill) {
-    animation-name: onAutoFillCancel;
-    animation-fill-mode: both;
-}
