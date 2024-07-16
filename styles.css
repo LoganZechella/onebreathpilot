@@ -690,23 +690,6 @@ p {
     background-color: light-dark(#ffffff, #000000);
 }
 
-input:-webkit-autofill,
-input:-webkit-autofill {
-    animation-name: onAutoFillStart;
-    animation-fill-mode: both;
-}
-
-input:not(:-webkit-autofill),
-input:not(:-webkit-autofill) {
-    animation-name: onAutoFillCancel;
-    animation-fill-mode: both;
-}
-
-input:-internal-autofill,
-input:-internal-autofill-selected {
-    color: light-dark(#000000, #ffffff);
-    background-color: light-dark(#ffffff, #000000);
-}
 
 /* Loader Styles */
 .loader {
@@ -762,15 +745,4 @@ input:-internal-autofill-selected {
     }
 }
 
-@keyframes onAutoFillStart {
-    from {}
-
-    to {}
-}
-
-@keyframes onAutoFillCancel {
-    from {}
-
-    to {}
-}
 
