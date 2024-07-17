@@ -18,9 +18,9 @@ function initApp() {
     setTimeout(() => {
         document.body.style.backgroundImage = 'url(\'./assets/images/loadingblur.png\')';
         document.body.style.backgroundColor = 'none';
-        splashScreen.classList.add('animate__animated', 'animate__fadeOut');
+        splashScreen.classList.add('animate__animated', 'animate__fadeOut', 'animate__slow');
+        signIn.classList.add('animate__animated', 'animate__fadeIn', 'animate__slow');
         splashScreen.style.display = 'none';
-        signIn.classList.add('animate__animated', 'animate__fadeIn');
         checkAuthState();
         // signIn.style.display = 'block';
     }, 2500);
