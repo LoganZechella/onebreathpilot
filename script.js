@@ -23,7 +23,7 @@ function initApp() {
         splashScreen.style.display = 'none';
         checkAuthState();
         // signIn.style.display = 'block';
-    }, 2500);
+    }, 2000);
 
     const queryParams = window.location.search;
     if (queryParams) {
@@ -43,6 +43,7 @@ function checkAuthState() {
     if (user) {
         document.getElementById('sign-in-container').style.display = 'none';
         document.getElementById('landing-main').style.display = 'flex';
+        document.getElementById('blocker').style.display = 'flex';
         const nav = document.querySelector('container-fluid');
         nav.style.display = 'flex';
     } else {
