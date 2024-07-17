@@ -9,39 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
     enumerateVideoDevices();
-
-    // Detect and style autofilled inputs
-    setupAutofillStyling();
 });
 
-function setupAutofillStyling() {
-    const inputs = document.querySelectorAll('#email, #password');
-
-    inputs.forEach(input => {
-        input.addEventListener('input', (event) => {
-            if (event.animationName === 'onAutoFillStart') {
-            styleAutofilledInput(input);
-            }
-        });
-        // input.addEventListener('animationend', (event) => {
-        //     if (event.animationName === 'onAutoFillCancel') {
-        //         resetAutofilledInputStyle(input);
-        //     }
-        // });
-    });
-}
-
-function styleAutofilledInput(input) {
-    pseudo = `${input.id}::-webkit-autofill`;
-    input.style.backgroundColor = 'light-dark(#ffffff, #000000)';
-    input.style.color = 'light-dark(#000000, #ffffff)';
-}
-
-function resetAutofilledInputStyle(input) {
-    input.style.backgroundColor = '';
-    input.style.color = '';
-}
 function initApp() {
+    const signIn = document.getElementById('sign-in-container');
+    const splashScreen = document.getElementById('splash-screen');
+
+    setTimeout(() => {
+        document.body.style.backgroundImage = 'url(\'./assets/images/loadingblur.png\')';
+        document.body.style.backgroundColor = 'none';
+        splashScreen.classList.add('animate__animated', 'animate__fadeOut');
+        splashScreen.style.display = 'none';
+        signIn.classList.add('animate__animated', 'animate__fadeIn');
+        checkAuthState();
+        // signIn.style.display = 'block';
+    }, 2500);
+
     const queryParams = window.location.search;
     if (queryParams) {
         document.getElementById('landing-main').style.display = 'none';
@@ -55,9 +38,18 @@ function initApp() {
     }
 }
 
-function getQueryStringParams(param) {
-    const searchParams = new URLSearchParams(window.location.search);
-    return searchParams.get(param);
+function checkAuthState() {
+    const user = window.user;
+    if (user) {
+        document.getElementById('sign-in-container').style.display = 'none';
+        document.getElementById('landing-main').style.display = 'flex';
+        const nav = document.querySelector('container-fluid');
+        nav.style.display = 'flex';
+    } else {
+        document.getElementById('sign-in-container').style.display = 'block';
+        document.getElementById('sign-in-container').removeAttribute('hidden');
+        document.getElementById('landing-main').style.display = 'none';
+    }
 }
 
 function setupSampleConfirmation() {

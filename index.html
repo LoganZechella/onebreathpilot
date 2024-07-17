@@ -14,11 +14,14 @@
     <title>OneBreath Sample Dashboard</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <meta name="description"
-        content="OneBreath Pilot Study Dashboard for managing sample registration and patient intake forms.">
+        content="OneBreath Pilot Study Dashboard for managing samples in the OneBreath pilot study by Breath Diagnostics staff. FOR INTERNAL USE ONLY.">
     <meta name="keywords" content="OneBreath, Pilot Study, Sample Registration, Patient Intake">
 </head>
 
 <body>
+    <div id="splash-screen" class="animate__animated animate__fadeIn">
+        <img src="./assets/images/BREATH DIAGNOSTICS-2.png" alt="Splash Logo" class="splash-logo">
+    </div>
 
     <nav class="container-fluid" role="navigation" aria-label="Main navigation">
         <header class="nav-header">
@@ -33,7 +36,7 @@
     </nav>
 
     <!-- sign-in.html -->
-    <div id="sign-in-container" data-aos="fade-up" data-aos-duration="500">
+    <div id="sign-in-container" data-aos="fade-up" data-aos-duration="500" hidden>
         <img src="assets/images/BREATH DIAGNOSTICS-2.png" alt="Logo of Breath Diagnostics"
             style="width: 200px; display: block; margin: 0 auto 20px;">
         <div id="loading-spinner" class="spinner"></div>
