@@ -18,27 +18,30 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 function updateUIForAuth(user) {
+    const signInContainer = document.getElementById('sign-in-container');
+    const landingMain = document.getElementById('landing-main');
+    const signInButton = document.getElementById('show-sign-in');
+    const blocker = document.getElementById('blocker');
+
     if (user) {
-        document.querySelector('.blocker').style.display = 'flex';
-        document.getElementById('sign-in-container').style.display = 'none';
-        document.getElementById('show-sign-in').textContent = 'Sign Out';
-        document.getElementById('show-sign-in').classList.add('logged-in');
+        signInContainer.style.display = 'none';
+        blocker.style.display = 'flex';
+        signInButton.textContent = 'Sign Out';
     } else {
-        document.querySelector('.blocker').style.display = 'none';
-        document.getElementById('sign-in-container').style.display = 'block';
-        document.getElementById('show-sign-in').textContent = 'Sign In';
-        document.getElementById('show-sign-in').classList.remove('logged-in');
+        signInContainer.style.display = 'block';
+        landingMain.style.display = 'block';
+        signInButton.textContent = 'Sign In';
     }
 }
 
 // Listen for authentication state to change
 onAuthStateChanged(auth, user => {
     updateUIForAuth(user);
+    window.user = user; // Expose user to global scope
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Check initial state of user authentication
-    updateUIForAuth(auth.currentUser);
+    window.auth = auth; // Expose auth to global scope
 
     document.getElementById('show-sign-in').addEventListener('click', (event) => {
         event.preventDefault(); // Prevent the link from following the URL
@@ -62,9 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const idToken = await getIdToken(auth.currentUser);
             await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
             document.getElementById('loading-spinner').style.display = 'none';
-            animateCSS('#sign-in-container', 'animate__fadeOut', () => {
-                updateUIForAuth(auth.currentUser);
-            });
         } catch (error) {
             console.error('Login failed:', error);
             document.getElementById('loading-spinner').style.display = 'none';
@@ -79,9 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const idToken = await result.user.getIdToken();
             await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
             document.getElementById('loading-spinner').style.display = 'none';
-            animateCSS('#sign-in-container', 'animate__fadeOut', () => {
-                updateUIForAuth(auth.currentUser);
-            });
         } catch (error) {
             console.error('Google sign-in failed:', error);
             document.getElementById('loading-spinner').style.display = 'none';
@@ -101,19 +98,4 @@ async function makeAuthRequest(url, data) {
         console.error('Error with auth request:', error);
         throw error;
     }
-}
-
-function animateCSS(element, animationName, callback) {
-    const node = document.querySelector(element);
-    node.classList.add('animate__animated', animationName);
-
-    function handleAnimationEnd(event) {
-        event.stopPropagation();
-        node.classList.remove('animate__animated', animationName);
-        if (callback) {
-            callback();
-        }
-    }
-
-    node.addEventListener('animationend', handleAnimationEnd, { once: true });
 }
