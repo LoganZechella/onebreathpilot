@@ -1,6 +1,1 @@
-[build]
-  edge_functions = "/netlify/edge-functions"
 
-[[edge_functions]]
-  function = "authFrontend.mjs"
-  path = "/netlify/edge-functions/authFrontend.mjs"
