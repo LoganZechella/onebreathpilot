@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    AOS.init(); // Initialize AOS for scroll animations
-
     initApp();
     setupSampleConfirmation();
     setupPatientIntakeForm();
@@ -20,94 +18,139 @@ function initApp() {
     setTimeout(() => {
         document.body.style.backgroundImage = 'url(\'./assets/images/loadingblur.png\')';
         document.body.style.backgroundColor = 'none';
-        splashScreen.classList.add('animate__fadeOut');
-        setTimeout(() => {
-            splashScreen.style.display = 'none';
-        }, 1000); // Matches animate.css fadeOut duration
-    }, 3000); // Time for the splash screen to display
+        splashScreen.classList.add('animate__animated', 'animate__fadeOut', 'animate__slow');
+        signIn.classList.add('animate__animated', 'animate__fadeIn', 'animate__slow');
+        splashScreen.style.display = 'none';
+        checkAuthState();
+        // signIn.style.display = 'block';
+    }, 2000);
+
+    const queryParams = window.location.search;
+    if (queryParams) {
+        document.getElementById('landing-main').style.display = 'none';
+        const chipID = getQueryStringParams('chipID');
+        if (chipID) {
+            document.getElementById('chipID').value = chipID;
+        }
+    } else {
+        document.getElementById('landing-main').style.display = 'flex';
+        document.getElementById('add-sample-main').style.display = 'none';
+    }
+}
+
+function checkAuthState() {
+    const user = window.user;
+    if (user) {
+        document.getElementById('sign-in-container').style.display = 'none';
+        document.getElementById('landing-main').style.display = 'flex';
+        document.querySelector('.blocker').style.display = 'flex';
+        const nav = document.querySelector('.container-fluid');
+        nav.style.display = 'flex';
+    } else {
+        document.getElementById('sign-in-container').style.display = 'block';
+        document.getElementById('sign-in-container').removeAttribute('hidden');
+        document.getElementById('landing-main').style.display = 'none';
+    }
 }
 
 function setupSampleConfirmation() {
     const confirmButton = document.getElementById('confirm-button');
-    confirmButton.addEventListener('click', () => {
-        const sampleRegSection = document.getElementById('sample-reg-section');
-        sampleRegSection.classList.add('animate__animated', 'animate__fadeOut');
-        setTimeout(() => {
-            sampleRegSection.style.display = 'none';
-        }, 1000); // Matches animate.css fadeOut duration
+    confirmButton.addEventListener('click', async function (event) {
+        event.preventDefault();
+        const sample = collectSampleFormData();
+        if (sample) {
+            sample.timestamp = new Date().toISOString();
+            sample.status = 'In Process';
+            sendSample(sample);
+            document.getElementById('sample-reg-section').style.display = 'none';
+            showOptionButtons();
+        }
     });
 }
 
-function setupPatientIntakeForm() {
-    const confirmButton = document.getElementById('patient-intake-form-confirm-button');
-    confirmButton.addEventListener('click', () => {
-        const intakeFormSection = document.getElementById('patient-intake-form-section');
-        intakeFormSection.classList.add('animate__animated', 'animate__fadeOut');
-        setTimeout(() => {
-            intakeFormSection.style.display = 'none';
-        }, 1000); // Matches animate.css fadeOut duration
-    });
+function collectSampleFormData() {
+    let chip_id = document.getElementById('chipID').value;
+    let patient_id = document.getElementById('patientID').value;
+    let location = document.getElementById('location').value;
+
+    if (!chip_id || !patient_id || !location) {
+        alert('Please fill in all required fields.');
+        return null;
+    }
+    return { chip_id, patient_id, location };
 }
 
-function setupQRCodeScanner() {
-    // Existing QR Code scanner setup
+function sendSample(sampleData) {
+    fetch('https://onebreathpilot.onrender.com/update_sample', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sampleData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            alert('Sample update successful.');
+        })
+        .catch(error => {
+            alert('Sample update failed.');
+        });
 }
 
-function fetchSamplesAndUpdateUI() {
-    // Existing function to fetch samples and update the UI
-}
+function showOptionButtons() {
+    const optionContainer = document.getElementById('option-container');
+    const message = document.getElementById('option-message');
+    optionContainer.style.display = 'flex';
+    message.style.display = 'block';
+    const digitalFormButton = document.getElementById('digital-form-button');
+    const scanDocumentButton = document.getElementById('scan-document-button');
 
-function setupSampleEventListeners() {
-    document.getElementById('add-new-sample').addEventListener('click', () => {
-        const sampleRegSection = document.getElementById('sample-reg-section');
-        sampleRegSection.style.display = 'block';
-        sampleRegSection.classList.remove('animate__fadeOut');
-        sampleRegSection.classList.add('animate__animated', 'animate__slideInUp');
+    digitalFormButton.addEventListener('click', () => {
+        document.getElementById('patient-intake-form-section').style.display = 'block';
+        optionContainer.style.display = 'none';
+        document.getElementById('back-button-intake').style.display = 'block';
     });
 
-    document.getElementById('sample-reg-close-btn').addEventListener('click', () => {
-        const sampleRegSection = document.getElementById('sample-reg-section');
-        sampleRegSection.classList.add('animate__fadeOut');
-        setTimeout(() => {
-            sampleRegSection.style.display = 'none';
-        }, 1000); // Matches animate.css fadeOut duration
-    });
-}
-
-function setupPatientIntakeEventListeners() {
-    document.getElementById('digital-form-button').addEventListener('click', () => {
-        const intakeFormSection = document.getElementById('patient-intake-form-section');
-        intakeFormSection.style.display = 'block';
-        intakeFormSection.classList.remove('animate__fadeOut');
-        intakeFormSection.classList.add('animate__animated', 'animate__slideInUp');
+    scanDocumentButton.addEventListener('click', () => {
+        startDocumentScanning();
+        optionContainer.style.display = 'none';
     });
 
-    document.getElementById('patient-intake-form-close-btn').addEventListener('click', () => {
-        const intakeFormSection = document.getElementById('patient-intake-form-section');
-        intakeFormSection.classList.add('animate__fadeOut');
-        setTimeout(() => {
-            intakeFormSection.style.display = 'none';
-        }, 1000); // Matches animate.css fadeOut duration
+    document.getElementById('back-button-options').addEventListener('click', () => {
+        document.getElementById('sample-reg-section').style.display = 'block';
+        optionContainer.style.display = 'none';
     });
 }
 
 function setupOptionContainerEventListeners() {
-    document.getElementById('back-button-options').addEventListener('click', () => {
-        const optionContainer = document.getElementById('option-container');
-        optionContainer.classList.add('animate__fadeOut');
-        setTimeout(() => {
-            optionContainer.style.display = 'none';
-        }, 1000); // Matches animate.css fadeOut duration
+    const digitalFormButton = document.getElementById('digital-form-button');
+    const scanDocumentButton = document.getElementById('scan-document-button');
+    const backButton = document.getElementById('back-button-options');
+
+    digitalFormButton.addEventListener('click', () => {
+        document.getElementById('patient-intake-form-section').style.display = 'block';
+        document.getElementById('option-container').style.display = 'none';
+        document.getElementById('back-button-intake').style.display = 'block';
+    });
+
+    scanDocumentButton.addEventListener('click', () => {
+        startDocumentScanning();
+        document.getElementById('option-container').style.display = 'none';
+    });
+
+    backButton.addEventListener('click', () => {
+        document.getElementById('sample-reg-section').style.display = 'block';
+        document.getElementById('option-container').style.display = 'none';
     });
 }
 
 function setupBackButtonIntakeEventListener() {
-    document.getElementById('back-button-intake').addEventListener('click', () => {
-        const intakeFormSection = document.getElementById('patient-intake-form-section');
-        intakeFormSection.classList.add('animate__fadeOut');
-        setTimeout(() => {
-            intakeFormSection.style.display = 'none';
-        }, 1000); // Matches animate.css fadeOut duration
+    const backButtonIntake = document.getElementById('back-button-intake');
+    backButtonIntake.addEventListener('click', () => {
+        stopDocumentScanning();
+        document.getElementById('patient-intake-form-section').style.display = 'none';
+        document.getElementById('option-container').style.display = 'flex';
+        document.getElementById('back-button-intake-container').style.display = 'none';
+        setupOptionContainerEventListeners(); // Re-setup event listeners
+        setupBackButtonIntakeEventListener(); // Re-setup event listener
     });
 }
 
