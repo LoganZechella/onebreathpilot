@@ -25,13 +25,20 @@ function updateUIForAuth(user) {
     const blocker = document.querySelector('.blocker');
 
     if (user) {
-        signInContainer.style.display = 'none';
-        landingMain.style.display = 'flex';
-        blocker.style.display = 'flex';
-        signInButton.textContent = 'Sign Out';
+        signInContainer.classList.add('animate__fadeOut');
+        setTimeout(() => {
+            signInContainer.style.display = 'none';
+            landingMain.style.display = 'flex';
+            blocker.style.display = 'flex';
+            signInButton.textContent = 'Sign Out';
+            landingMain.classList.add('animate__animated', 'animate__fadeIn');
+            blocker.classList.add('animate__animated', 'animate__fadeIn');
+        }, 1000); // Matches animate.css fadeOut duration
     } else {
         signInContainer.style.display = 'block';
-        landingMain.style.display = 'block';
+        signInContainer.classList.add('animate__animated', 'animate__fadeIn');
+        landingMain.style.display = 'none';
+        blocker.style.display = 'none';
         signInButton.textContent = 'Sign In';
     }
 }
@@ -55,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else {
             document.getElementById('sign-in-container').style.display = 'block';
+            document.getElementById('sign-in-container').classList.add('animate__animated', 'animate__fadeIn');
         }
     });
 
@@ -68,9 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const authRequest = await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' }).then(() => {
                 if (authRequest.success) {
                     document.getElementById('loading-spinner').style.display = 'none';
-                    document.getElementById('sign-in-container').style.display = 'none';
-                    document.getElementById('landing-main').style.display = 'flex';
-                    document.querySelector('.blocker').style.display = 'flex';
+                    document.getElementById('sign-in-container').classList.add('animate__fadeOut');
+                    setTimeout(() => {
+                        document.getElementById('sign-in-container').style.display = 'none';
+                        document.getElementById('landing-main').style.display = 'flex';
+                        document.querySelector('.blocker').style.display = 'flex';
+                        document.getElementById('landing-main').classList.add('animate__animated', 'animate__fadeIn');
+                        document.querySelector('.blocker').classList.add('animate__animated', 'animate__fadeIn');
+                    }, 1000); // Matches animate.css fadeOut duration
                 } else {
                     alert('Error with auth request:', authRequest.error);
                     document.getElementById('loading-spinner').style.display = 'none';
@@ -90,6 +103,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const idToken = await result.user.getIdToken();
             await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'googleSignIn' });
             document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('sign-in-container').classList.add('animate__fadeOut');
+            setTimeout(() => {
+                document.getElementById('sign-in-container').style.display = 'none';
+                document.getElementById('landing-main').style.display = 'flex';
+                document.querySelector('.blocker').style.display = 'flex';
+                document.getElementById('landing-main').classList.add('animate__animated', 'animate__fadeIn');
+                document.querySelector('.blocker').classList.add('animate__animated', 'animate__fadeIn');
+            }, 1000); // Matches animate.css fadeOut duration
         } catch (error) {
             console.error('Google sign-in failed:', error);
             document.getElementById('loading-spinner').style.display = 'none';
