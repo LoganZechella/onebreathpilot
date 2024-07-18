@@ -26,7 +26,8 @@ function updateUIForAuth(user) {
 
     if (user) {
         signInContainer.style.display = 'none';
-        // blocker.style.display = 'flex';
+        landingMain.style.display = 'flex';
+        blocker.style.display = 'flex';
         signInButton.textContent = 'Sign Out';
     } else {
         signInContainer.style.display = 'block';
@@ -64,8 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             const idToken = await getIdToken(auth.currentUser);
-            await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'emailSignIn' });
-            document.getElementById('loading-spinner').style.display = 'none';
+            const authRequest = await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' }).then(() => {
+                if (authRequest.success) {
+                    document.getElementById('loading-spinner').style.display = 'none';
+                    document.getElementById('sign-in-container').style.display = 'none';
+                    document.getElementById('landing-main').style.display = 'flex';
+                    document.getElementById('blocker').style.display = 'flex';
+                } else {
+                    alert('Error with auth request:', authRequest.error);
+                    document.getElementById('loading-spinner').style.display = 'none';
+                }
+            });
         } catch (error) {
             console.error('Login failed:', error);
             document.getElementById('loading-spinner').style.display = 'none';
@@ -78,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
-            await makeAuthRequest('https://onebreathpilot.netlify.app/authFrontend', { idToken, type: 'googleSignIn' });
+            await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'googleSignIn' });
             document.getElementById('loading-spinner').style.display = 'none';
         } catch (error) {
             console.error('Google sign-in failed:', error);
