@@ -44,7 +44,7 @@ function checkAuthState() {
         document.getElementById('sign-in-container').style.display = 'none';
         document.getElementById('landing-main').style.display = 'flex';
         document.querySelector('.blocker').style.display = 'flex';
-        const nav = document.querySelector('container-fluid');
+        const nav = document.querySelector('.container-fluid');
         nav.style.display = 'flex';
     } else {
         document.getElementById('sign-in-container').style.display = 'block';
