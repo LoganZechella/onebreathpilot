@@ -22,12 +22,12 @@ function updateUIForAuth(user) {
     const signInContainer = document.getElementById('sign-in-container');
     const landingMain = document.getElementById('landing-main');
     const signInButton = document.getElementById('show-sign-in');
-    const blocker = document.getElementById('blocker');
+    const blocker = document.querySelector('.blocker');
 
     if (user) {
         signInContainer.style.display = 'none';
         landingMain.style.display = 'flex';
-        // blocker.style.display = 'flex';
+        blocker.style.display = 'flex';
         signInButton.textContent = 'Sign Out';
     } else {
         signInContainer.style.display = 'block';
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('loading-spinner').style.display = 'none';
                     document.getElementById('sign-in-container').style.display = 'none';
                     document.getElementById('landing-main').style.display = 'flex';
-                    document.getElementById('blocker').style.display = 'flex';
+                    document.querySelector('.blocker').style.display = 'flex';
                 } else {
                     alert('Error with auth request:', authRequest.error);
                     document.getElementById('loading-spinner').style.display = 'none';
