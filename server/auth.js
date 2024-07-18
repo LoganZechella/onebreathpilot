@@ -26,7 +26,7 @@ function updateUIForAuth(user) {
 
     if (user) {
         signInContainer.style.display = 'none';
-        blocker.style.display = 'flex';
+        // blocker.style.display = 'flex';
         signInButton.textContent = 'Sign Out';
     } else {
         signInContainer.style.display = 'block';
