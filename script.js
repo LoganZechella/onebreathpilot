@@ -41,10 +41,8 @@ function initApp() {
 function checkAuthState() {
     const user = window.user;
     if (user) {
-        document.getElementById('sign-in-container').classList.add('animate__animated', 'animate__fadeOut', 'animate__slow');
         document.getElementById('sign-in-container').style.display = 'none';
         document.getElementById('landing-main').style.display = 'flex';
-        document.querySelector('.blocker').classList.add('animate__animated', 'animate__fadeIn', 'animate__slow');
         document.querySelector('.blocker').style.display = 'flex';
         const nav = document.querySelector('.container-fluid');
         nav.style.display = 'flex';
