@@ -26,11 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupBackButtonIntakeEventListener();
     enumerateVideoDevices();
 
-    // Adding animations
-    animateCSS('#splash-screen', 'fadeOut').then(() => {
-        document.getElementById('splash-screen').style.display = 'none';
-    });
-    animateCSS('#sign-in-container', 'fadeIn');
+
 });
 
 function showElementWithAnimation(elementId, animation) {
@@ -51,8 +47,10 @@ function initApp() {
     const splashScreen = document.getElementById('splash-screen');
 
     setTimeout(() => {
-        hideElementWithAnimation('splash-screen', 'fadeOut');
-        showElementWithAnimation('sign-in-container', 'fadeIn');
+        animateCSS('#splash-screen', 'fadeOut').then(() => {
+            document.getElementById('splash-screen').style.display = 'none';
+        });
+        animateCSS('#sign-in-container', 'fadeIn');
         // splashScreen.classList.add('animate__animated', 'animate__fadeOut', 'animate__slow');
         // signIn.classList.add('animate__animated', 'animate__fadeIn', 'animate__slow');
         // splashScreen.style.display = 'none';
@@ -71,7 +69,8 @@ function initApp() {
             document.getElementById('landing-main').style.display = 'none';
             document.getElementById('sign-in-container').removeAttribute('hidden');
         }
-        // signIn.style.display = 'block';
+        hideElementWithAnimation('splash-screen', 'fadeOut');
+        showElementWithAnimation('sign-in-container', 'fadeIn');
     }, 1500);
 
     const queryParams = window.location.search;
