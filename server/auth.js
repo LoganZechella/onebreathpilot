@@ -90,20 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sign-in').addEventListener('click', async () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        // document.getElementById('loading-spinner').style.display = 'block';
         showElementWithAnimation('loading-spinner', 'fadeIn');
+        document.getElementById('loading-spinner').style.display = 'block';
         try {
             await signInWithEmailAndPassword(auth, email, password);
             const idToken = await getIdToken(auth.currentUser);
             const authRequest = await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' }).then(() => {
                 if (authRequest.success) {
-                    // hideElementWithAnimation('loading-spinner', 'fadeOut').then(() => {
-                    //     showElementWithAnimation('landing-main', 'fadeIn');
-                    //     document.querySelector('.blocker').style.display = 'flex';
-                    //     const nav = document.querySelector('.container-fluid');
-                    //     nav.style.display = 'flex';
-                    // });
-                    return success;
+                    hideElementWithAnimation('loading-spinner', 'fadeOut').then(() => {
+                        showElementWithAnimation('landing-main', 'fadeIn');
+                        document.querySelector('.blocker').style.display = 'flex';
+                        const nav = document.querySelector('.container-fluid');
+                        nav.style.display = 'flex';
+                    });
                 } else {
                     alert('Error with auth request:', authRequest.error);
                     // hideElementWithAnimation('loading-spinner', 'fadeOut');
