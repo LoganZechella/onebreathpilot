@@ -18,6 +18,22 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
 
+const animateCSS = (element, animation, prefix = 'animate__') =>
+    new Promise((resolve, reject) => {
+        const animationName = `${prefix}${animation}`;
+        const node = document.querySelector(element);
+
+        node.classList.add(`${prefix}animated`, animationName);
+
+        function handleAnimationEnd(event) {
+            event.stopPropagation();
+            node.classList.remove(`${prefix}animated`, animationName);
+            resolve('Animation ended');
+        }
+
+        node.addEventListener('animationend', handleAnimationEnd, { once: true });
+    });
+
 function updateUIForAuth(user) {
     const signInContainer = document.getElementById('sign-in-container');
     const landingMain = document.getElementById('landing-main');
@@ -25,15 +41,28 @@ function updateUIForAuth(user) {
     const blocker = document.querySelector('.blocker');
 
     if (user) {
-        signInContainer.style.display = 'none';
-        landingMain.style.display = 'flex';
+        hideElementWithAnimation('sign-in-container', 'fadeOut');
+        showElementWithAnimation('landing-main', 'fadeIn');
         blocker.style.display = 'flex';
         signInButton.textContent = 'Sign Out';
     } else {
-        signInContainer.style.display = 'block';
-        landingMain.style.display = 'block';
+        showElementWithAnimation('sign-in-container', 'fadeIn');
+        hideElementWithAnimation('landing-main', 'fadeOut');
         signInButton.textContent = 'Sign In';
     }
+}
+
+function showElementWithAnimation(elementId, animation) {
+    const element = document.getElementById(elementId);
+    element.style.display = 'block';
+    animateCSS(`#${elementId}`, animation);
+}
+
+function hideElementWithAnimation(elementId, animation) {
+    const element = document.getElementById(elementId);
+    animateCSS(`#${elementId}`, animation).then(() => {
+        element.style.display = 'none';
+    });
 }
 
 // Listen for authentication state to change
@@ -54,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Sign out error:', error);
             });
         } else {
-            document.getElementById('sign-in-container').style.display = 'block';
+            showElementWithAnimation('sign-in-container', 'fadeIn');
         }
     });
 
@@ -67,23 +96,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const idToken = await getIdToken(auth.currentUser);
             const authRequest = await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' }).then(() => {
                 if (authRequest.success) {
-                    document.getElementById('loading-spinner').classList.add('animate__animated', "animate__fadeOut");
-                    document.getElementById('loading-spinner').style.display = 'none';
-                    document.getElementById('loading-spinner').classList.remove('animate__animated', "animate__fadeOut");
-                    document.getElementById('sign-in-container').classList.add('animate__animated', "animate__bounceOut");
-                    document.getElementById('sign-in-container').style.display = 'none';
-                    document.getElementById('landing-main').style.display = 'flex';
-                    document.querySelector('.blocker').style.display = 'flex';
-                    const nav = document.querySelector('.container-fluid');
-                    nav.style.display = 'flex';
+                    hideElementWithAnimation('loading-spinner', 'fadeOut').then(() => {
+                        showElementWithAnimation('landing-main', 'fadeIn');
+                        document.querySelector('.blocker').style.display = 'flex';
+                        const nav = document.querySelector('.container-fluid');
+                        nav.style.display = 'flex';
+                    });
                 } else {
                     alert('Error with auth request:', authRequest.error);
-                    document.getElementById('loading-spinner').style.display = 'none';
+                    hideElementWithAnimation('loading-spinner', 'fadeOut');
                 }
             });
         } catch (error) {
             console.error('Login failed:', error);
-            document.getElementById('loading-spinner').style.display = 'none';
+            hideElementWithAnimation('loading-spinner', 'fadeOut');
         }
     });
 
@@ -94,10 +120,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await signInWithPopup(auth, googleProvider);
             const idToken = await result.user.getIdToken();
             await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'googleSignIn' });
-            document.getElementById('loading-spinner').style.display = 'none';
+            hideElementWithAnimation('loading-spinner', 'fadeOut');
         } catch (error) {
             console.error('Google sign-in failed:', error);
-            document.getElementById('loading-spinner').style.display = 'none';
+            hideElementWithAnimation('loading-spinner', 'fadeOut');
         }
     });
 });
