@@ -41,14 +41,14 @@ function updateUIForAuth(user) {
     const blocker = document.querySelector('.blocker');
 
     if (user) {
-        // hideElementWithAnimation('sign-in-container', 'fadeOut');
-        // showElementWithAnimation('landing-main', 'fadeIn');
-        // blocker.style.display = 'flex';
+        hideElementWithAnimation('sign-in-container', 'fadeOut');
+        showElementWithAnimation('landing-main', 'fadeIn');
+        blocker.style.display = 'flex';
         signInButton.textContent = 'Sign Out';
     } else {
         showElementWithAnimation('sign-in-container', 'fadeIn');
         hideElementWithAnimation('landing-main', 'fadeOut');
-        // signInButton.textContent = 'Sign In';
+        signInButton.textContent = 'Sign In';
     }
 }
 
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 } else {
                     alert('Error with auth request:', authRequest.error);
-                    // hideElementWithAnimation('loading-spinner', 'fadeOut');
+                    hideElementWithAnimation('loading-spinner', 'fadeOut');
                 }
             });
         } catch (error) {
