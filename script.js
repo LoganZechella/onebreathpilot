@@ -25,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
     enumerateVideoDevices();
-
-
 });
 
 function showElementWithAnimation(elementId, animation) {
