@@ -19,7 +19,7 @@ body {
     background-repeat: repeat;
     min-height: 100vh;
     transition: background 0.3s ease-in-out;
-    animation: gradient-animation 45s cubic-bezier(0.39, 0.575, 0.565, 1) infinite alternate-reverse;
+    animation: pulseZoom 15s ease-in infinite alternate;
     /* Smooth background transition */
 }
 
@@ -758,6 +758,24 @@ p {
     to {
         opacity: 1;
     }
+}
+
+@keyframes pulseZoom {
+    0% {
+        background-position: 35% 60%;
+        backdrop-filter: saturate(100%) hue-rotate(0deg);
+    }
+
+    50% {
+        background-position: 40% 70%;
+        backdrop-filter: saturate(150%) hue-rotate(90deg);
+    }
+
+    100% {
+        background-position: 55% 40%;
+        backdrop-filter: saturate(100%) hue-rotate(180deg);
+    }
+
 }
 
 @keyframes gradient-animation {
