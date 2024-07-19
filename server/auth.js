@@ -98,7 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const authRequest = await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' }).then(() => {
                 if (authRequest.success) {
                     hideElementWithAnimation('loading-spinner', 'fadeOut').then(() => {
+                        hideElementWithAnimation('sign-in-container', 'fadeOut');
                         showElementWithAnimation('landing-main', 'fadeIn');
+                        showElementWithAnimation('blocker', 'fadeIn');
+                        showElementWithAnimation('container-fluid', 'fadeIn');
+                        document.getElementById('landing-main').style.display = 'flex';
                         document.querySelector('.blocker').style.display = 'flex';
                         const nav = document.querySelector('.container-fluid');
                         nav.style.display = 'flex';
