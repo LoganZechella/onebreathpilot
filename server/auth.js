@@ -41,13 +41,13 @@ function updateUIForAuth(user) {
     const blocker = document.querySelector('.blocker');
 
     if (user) {
-        hideElementWithAnimation('sign-in-container', 'fadeOut');
-        showElementWithAnimation('landing-main', 'fadeIn');
+        // hideElementWithAnimation('sign-in-container', 'fadeOut');
+        // showElementWithAnimation('landing-main', 'fadeIn');
         blocker.style.display = 'flex';
         signInButton.textContent = 'Sign Out';
     } else {
-        showElementWithAnimation('sign-in-container', 'fadeIn');
-        hideElementWithAnimation('landing-main', 'fadeOut');
+        // showElementWithAnimation('sign-in-container', 'fadeIn');
+        // hideElementWithAnimation('landing-main', 'fadeOut');
         signInButton.textContent = 'Sign In';
     }
 }
