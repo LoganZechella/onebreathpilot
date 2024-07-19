@@ -67,7 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const idToken = await getIdToken(auth.currentUser);
             const authRequest = await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' }).then(() => {
                 if (authRequest.success) {
+                    document.getElementById('loading-spinner').classList.add('animate__animated', "animate__fadeOut");
                     document.getElementById('loading-spinner').style.display = 'none';
+                    document.getElementById('loading-spinner').classList.remove('animate__animated', "animate__fadeOut");
+                    document.getElementById('sign-in-container').classList.add('animate__animated', "animate__bounceOut");
                     document.getElementById('sign-in-container').style.display = 'none';
                     document.getElementById('landing-main').style.display = 'flex';
                     document.querySelector('.blocker').style.display = 'flex';
