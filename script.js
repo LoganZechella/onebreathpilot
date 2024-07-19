@@ -773,7 +773,7 @@ function showPickupForm(chipId) {
     form.elements['data-chip-id'].value = chipId;
     document.getElementById('pickup-form-modal').style.display = 'block';
     document.getElementById('pickup-form-modal').style.marginTop = '5em';
-    document.getElementById('pickup-form-modal').scrollIntoView({ behavior: 'smooth' });
+    // document.getElementById('pickup-form-modal').scrollIntoView({ behavior: 'auto' });
 }
 
 function completeSample(chipId) {
