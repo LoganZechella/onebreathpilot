@@ -741,7 +741,7 @@ p {
     }
 
     100% {
-        transform: rotate(360deg) scale(2, 2);
+        transform: rotate(360deg) scale(1.5, 1.5);
     }
 }
 

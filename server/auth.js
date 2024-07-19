@@ -71,6 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('sign-in-container').style.display = 'none';
                     document.getElementById('landing-main').style.display = 'flex';
                     document.querySelector('.blocker').style.display = 'flex';
+                    const nav = document.querySelector('.container-fluid');
+                    nav.style.display = 'flex';
                 } else {
                     alert('Error with auth request:', authRequest.error);
                     document.getElementById('loading-spinner').style.display = 'none';
