@@ -28,11 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Adding animations
     animateCSS('#splash-screen', 'fadeOut').then(() => {
-        setTimeout(() => {    
-            document.getElementById('splash-screen').style.display = 'none';
-        }, 1000);
+        document.getElementById('splash-screen').style.display = 'none';
     });
-    animateCSS('#sign-in-container', 'zoomIn');
+    animateCSS('#sign-in-container', 'fadeIn');
 });
 
 function showElementWithAnimation(elementId, animation) {
