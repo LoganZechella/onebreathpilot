@@ -51,9 +51,8 @@ function initApp() {
     const splashScreen = document.getElementById('splash-screen');
 
     setTimeout(() => {
-        document.body.style.backgroundImage = 'url(\'./assets/images/loadingblur.png\')';
-        // document.body.style.backgroundColor = 'none';
-        
+        hideElementWithAnimation('splash-screen', 'fadeOut');
+        showElementWithAnimation('sign-in-container', 'fadeIn');
         // splashScreen.classList.add('animate__animated', 'animate__fadeOut', 'animate__slow');
         // signIn.classList.add('animate__animated', 'animate__fadeIn', 'animate__slow');
         // splashScreen.style.display = 'none';

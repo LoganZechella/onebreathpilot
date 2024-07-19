@@ -9,6 +9,7 @@
 
 body {
     background: var(--backgroundColor);
+    background-image: url('./assets/images/loadingblur.png');
     font-family: var(--primaryFont);
     background-size: cover;
     backdrop-filter: blur(10px);
