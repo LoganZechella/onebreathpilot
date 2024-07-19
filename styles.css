@@ -767,5 +767,5 @@ p {
 #sign-in-container,
 #option-container,
 #patient-intake-form-section {
-    transition: all 0.3s ease-in-out;
+    transition: all 1s ease-in-out;
 }

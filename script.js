@@ -840,13 +840,13 @@ function setupSampleEventListeners() {
 
     document.getElementById('pickup-close-button').addEventListener('click', function () {
         hideElementWithAnimation('pickup-form-modal', 'zoomOut');
-        document.getElementById('pickup-form-modal').style.display = 'none';
+        // document.getElementById('pickup-form-modal').style.display = 'none';
     });
 
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('pickup-button')) {
             showElementWithAnimation(event.target.id, 'zoomIn');
-            showPickupForm(event.target.id);
+            // showPickupForm(event.target.id);
         }
         if (event.target.classList.contains('finish-button')) {
             completeSample(event.target.id);
