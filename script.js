@@ -23,7 +23,7 @@ function initApp() {
         splashScreen.style.display = 'none';
         checkAuthState();
         // signIn.style.display = 'block';
-    }, 2000);
+    }, 1500);
 
     const queryParams = window.location.search;
     if (queryParams) {
