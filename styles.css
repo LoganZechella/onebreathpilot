@@ -367,6 +367,10 @@ p {
     background-color: #2196f3;
 }
 
+#add-sample-main {
+    display: none;
+}
+
 #add-sample-main>.grid {
     grid-template-columns: 1fr;
 }
