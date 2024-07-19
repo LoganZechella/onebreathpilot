@@ -57,6 +57,16 @@ function initApp() {
         // signIn.classList.add('animate__animated', 'animate__fadeIn', 'animate__slow');
         // splashScreen.style.display = 'none';
         checkAuthState();
+        if (checkAuthState() === true) {
+            hideElementWithAnimation('sign-in-container', 'fadeOut');
+            showElementWithAnimation('landing-main', 'fadeIn');
+            showElementWithAnimation('blocker', 'fadeIn');
+            showElementWithAnimation('container-fluid', 'fadeIn');
+        } else {
+            showElementWithAnimation('sign-in-container', 'fadeIn');
+            document.getElementById('landing-main').style.display = 'none';
+            document.getElementById('sign-in-container').removeAttribute('hidden');
+        }
         // signIn.style.display = 'block';
     }, 1500);
 
@@ -76,15 +86,17 @@ function initApp() {
 function checkAuthState() {
     const user = window.user;
     if (user) {
-        document.getElementById('sign-in-container').style.display = 'none';
-        document.getElementById('landing-main').style.display = 'flex';
-        document.querySelector('.blocker').style.display = 'flex';
-        const nav = document.querySelector('.container-fluid');
-        nav.style.display = 'flex';
+        // document.getElementById('sign-in-container').style.display = 'none';
+        // document.getElementById('landing-main').style.display = 'flex';
+        // document.querySelector('.blocker').style.display = 'flex';
+        // const nav = document.querySelector('.container-fluid');
+        // nav.style.display = 'flex';
+        return true;
     } else {
-        document.getElementById('sign-in-container').style.display = 'block';
-        document.getElementById('sign-in-container').removeAttribute('hidden');
-        document.getElementById('landing-main').style.display = 'none';
+        // document.getElementById('sign-in-container').style.display = 'block';
+        // document.getElementById('sign-in-container').removeAttribute('hidden');
+        // document.getElementById('landing-main').style.display = 'none';
+        return false;
     }
 }
 
