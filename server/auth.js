@@ -90,21 +90,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sign-in').addEventListener('click', async () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        document.getElementById('loading-spinner').style.display = 'block';  // Show spinner
+        // document.getElementById('loading-spinner').style.display = 'block';
+        showElementWithAnimation('loading-spinner', 'fadeIn');
         try {
             await signInWithEmailAndPassword(auth, email, password);
             const idToken = await getIdToken(auth.currentUser);
             const authRequest = await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' }).then(() => {
                 if (authRequest.success) {
-                    hideElementWithAnimation('loading-spinner', 'fadeOut').then(() => {
-                        showElementWithAnimation('landing-main', 'fadeIn');
-                        document.querySelector('.blocker').style.display = 'flex';
-                        const nav = document.querySelector('.container-fluid');
-                        nav.style.display = 'flex';
-                    });
+                    // hideElementWithAnimation('loading-spinner', 'fadeOut').then(() => {
+                    //     showElementWithAnimation('landing-main', 'fadeIn');
+                    //     document.querySelector('.blocker').style.display = 'flex';
+                    //     const nav = document.querySelector('.container-fluid');
+                    //     nav.style.display = 'flex';
+                    // });
+                    return success;
                 } else {
                     alert('Error with auth request:', authRequest.error);
-                    hideElementWithAnimation('loading-spinner', 'fadeOut');
+                    // hideElementWithAnimation('loading-spinner', 'fadeOut');
                 }
             });
         } catch (error) {
