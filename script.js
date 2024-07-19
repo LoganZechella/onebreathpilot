@@ -62,6 +62,10 @@ function initApp() {
             showElementWithAnimation('landing-main', 'fadeIn');
             showElementWithAnimation('blocker', 'fadeIn');
             showElementWithAnimation('container-fluid', 'fadeIn');
+            document.getElementById('landing-main').style.display = 'flex';
+            document.querySelector('.blocker').style.display = 'flex';
+            const nav = document.querySelector('.container-fluid');
+            nav.style.display = 'flex';
         } else {
             showElementWithAnimation('sign-in-container', 'fadeIn');
             document.getElementById('landing-main').style.display = 'none';
