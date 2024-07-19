@@ -1,3 +1,19 @@
+const animateCSS = (element, animation, prefix = 'animate__') =>
+    new Promise((resolve, reject) => {
+        const animationName = `${prefix}${animation}`;
+        const node = document.querySelector(element);
+
+        node.classList.add(`${prefix}animated`, animationName);
+
+        function handleAnimationEnd(event) {
+            event.stopPropagation();
+            node.classList.remove(`${prefix}animated`, animationName);
+            resolve('Animation ended');
+        }
+
+        node.addEventListener('animationend', handleAnimationEnd, { once: true });
+    });
+
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
     setupSampleConfirmation();
@@ -9,7 +25,26 @@ document.addEventListener('DOMContentLoaded', () => {
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
     enumerateVideoDevices();
+
+    // Adding animations
+    animateCSS('#splash-screen', 'fadeOut').then(() => {
+        document.getElementById('splash-screen').style.display = 'none';
+    });
+    animateCSS('#sign-in-container', 'fadeIn');
 });
+
+function showElementWithAnimation(elementId, animation) {
+    const element = document.getElementById(elementId);
+    element.style.display = 'block';
+    animateCSS(`#${elementId}`, animation);
+}
+
+function hideElementWithAnimation(elementId, animation) {
+    const element = document.getElementById(elementId);
+    animateCSS(`#${elementId}`, animation).then(() => {
+        element.style.display = 'none';
+    });
+}
 
 function initApp() {
     const signIn = document.getElementById('sign-in-container');

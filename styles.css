@@ -744,7 +744,6 @@ p {
         transform: rotate(360deg) scale(1.5, 1.5);
     }
 }
-
 /* Custom animations */
 @keyframes customFadeIn {
     from {
@@ -758,4 +757,15 @@ p {
 
 .custom-fade-in {
     animation: customFadeIn 1s ease-in-out;
+}
+
+.fade-out {
+    animation: fadeOut 1s ease-in-out;
+}
+
+/* Additional styles for new animations */
+#sign-in-container,
+#option-container,
+#patient-intake-form-section {
+    transition: all 0.3s ease-in-out;
 }
