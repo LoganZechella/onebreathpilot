@@ -14,68 +14,19 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
 
-const animateCSS = (element, animation, prefix = 'animate__') =>
-    new Promise((resolve, reject) => {
-        const animationName = `${prefix}${animation}`;
-        const node = document.querySelector(element);
-
-        node.classList.add(`${prefix}animated`, animationName);
-
-        function handleAnimationEnd(event) {
-            event.stopPropagation();
-            node.classList.remove(`${prefix}animated`, animationName);
-            resolve('Animation ended');
-        }
-
-        node.addEventListener('animationend', handleAnimationEnd, { once: true });
-    });
-
-function updateUIForAuth(user) {
-    const signInContainer = document.getElementById('sign-in-container');
-    const landingMain = document.getElementById('landing-main');
-    const signInButton = document.getElementById('show-sign-in');
-    const blocker = document.querySelector('.blocker');
-
-    if (user) {
-        hideElementWithAnimation('sign-in-container', 'fadeOut');
-        showElementWithAnimation('landing-main', 'fadeIn');
-        blocker.style.display = 'flex';
-        signInButton.textContent = 'Sign Out';
-    } else {
-        showElementWithAnimation('sign-in-container', 'fadeIn');
-        hideElementWithAnimation('landing-main', 'fadeOut');
-        signInButton.textContent = 'Sign In';
-    }
+function handleAuthStateChange(user) {
+    window.user = user;
+    const event = new CustomEvent('authStateChanged', { detail: { user } });
+    window.dispatchEvent(event);
 }
 
-function showElementWithAnimation(elementId, animation) {
-    const element = document.getElementById(elementId);
-    element.style.display = 'block';
-    animateCSS(`#${elementId}`, animation);
-}
-
-function hideElementWithAnimation(elementId, animation) {
-    const element = document.getElementById(elementId);
-    animateCSS(`#${elementId}`, animation).then(() => {
-        element.style.display = 'none';
-    });
-}
-
-// Listen for authentication state to change
-onAuthStateChanged(auth, user => {
-    updateUIForAuth(user);
-    window.user = user; // Expose user to global scope
-});
+onAuthStateChanged(auth, handleAuthStateChange);
 
 document.addEventListener('DOMContentLoaded', () => {
-    window.auth = auth; // Expose auth to global scope
-
     document.getElementById('show-sign-in').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent the link from following the URL
+        event.preventDefault();
         if (auth.currentUser) {
             auth.signOut().then(() => {
                 window.location.reload();
@@ -83,66 +34,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Sign out error:', error);
             });
         } else {
-            showElementWithAnimation('sign-in-container', 'fadeIn');
+            const event = new Event('showSignIn');
+            window.dispatchEvent(event);
         }
     });
 
     document.getElementById('sign-in').addEventListener('click', async () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        showElementWithAnimation('loading-spinner', 'fadeIn');
-        document.getElementById('loading-spinner').style.display = 'block';
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            const idToken = await getIdToken(auth.currentUser);
-            const authRequest = await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' }).then(() => {
-                if (authRequest.success) {
-                    hideElementWithAnimation('loading-spinner', 'fadeOut').then(() => {
-                        hideElementWithAnimation('sign-in-container', 'fadeOut');
-                        showElementWithAnimation('landing-main', 'fadeIn');
-                        showElementWithAnimation('blocker', 'fadeIn');
-                        showElementWithAnimation('container-fluid', 'fadeIn');
-                        document.getElementById('landing-main').style.display = 'flex';
-                        document.querySelector('.blocker').style.display = 'flex';
-                        const nav = document.querySelector('.container-fluid');
-                        nav.style.display = 'flex';
-                    });
-                } else {
-                    alert('Error with auth request:', authRequest.error);
-                    hideElementWithAnimation('loading-spinner', 'fadeOut');
-                }
-            });
         } catch (error) {
             console.error('Login failed:', error);
-            hideElementWithAnimation('loading-spinner', 'fadeOut');
         }
     });
 
     document.getElementById('sign-in-google').addEventListener('click', async () => {
         const googleProvider = new GoogleAuthProvider();
-        document.getElementById('loading-spinner').style.display = 'block';  // Show spinner
         try {
-            const result = await signInWithPopup(auth, googleProvider);
-            const idToken = await result.user.getIdToken();
-            await makeAuthRequest('https://onebreathpilot.netlify.app/api/auth/signin', { idToken, type: 'googleSignIn' });
-            hideElementWithAnimation('loading-spinner', 'fadeOut');
+            await signInWithPopup(auth, googleProvider);
         } catch (error) {
             console.error('Google sign-in failed:', error);
-            hideElementWithAnimation('loading-spinner', 'fadeOut');
         }
     });
 });
-
-async function makeAuthRequest(url, data) {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify(data)
-        });
-        return response.json();
-    } catch (error) {
-        console.error('Error with auth request:', error);
-        throw error;
-    }
-}

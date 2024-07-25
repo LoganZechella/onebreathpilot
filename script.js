@@ -40,6 +40,55 @@ function hideElementWithAnimation(elementId, animation) {
     });
 }
 
+function updateUIBasedOnAuth(user) {
+    const signInContainer = document.getElementById('sign-in-container');
+    const landingMain = document.getElementById('landing-main');
+    const blocker = document.querySelector('.blocker');
+    const signInButton = document.getElementById('show-sign-in');
+
+    if (user) {
+        hideElementWithAnimation('sign-in-container', 'fadeOut');
+        showElementWithAnimation('landing-main', 'fadeIn');
+        blocker.style.display = 'flex';
+        signInButton.textContent = 'Sign Out';
+    } else {
+        showElementWithAnimation('sign-in-container', 'fadeIn');
+        hideElementWithAnimation('landing-main', 'fadeOut');
+        blocker.style.display = 'none';
+        signInButton.textContent = 'Sign In';
+    }
+}
+
+window.addEventListener('authStateChanged', (event) => {
+    const user = event.detail.user;
+    updateUIBasedOnAuth(user);
+});
+
+window.addEventListener('showSignIn', () => {
+    showElementWithAnimation('sign-in-container', 'fadeIn');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.user) {
+        updateUIBasedOnAuth(window.user);
+    } else {
+        updateUIBasedOnAuth(null);
+    }
+});
+
+function showElementWithAnimation(elementId, animation) {
+    const element = document.getElementById(elementId);
+    element.style.display = 'block';
+    animateCSS(`#${elementId}`, animation);
+}
+
+function hideElementWithAnimation(elementId, animation) {
+    const element = document.getElementById(elementId);
+    animateCSS(`#${elementId}`, animation).then(() => {
+        element.style.display = 'none';
+    });
+}
+
 function initApp() {
     const signIn = document.getElementById('sign-in-container');
     const splashScreen = document.getElementById('splash-screen');
