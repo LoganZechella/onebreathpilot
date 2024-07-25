@@ -16,6 +16,11 @@ const animateCSS = (element, animation, prefix = 'animate__') =>
 
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
+    if (window.user) {
+        updateUIBasedOnAuth(window.user);
+    } else {
+        updateUIBasedOnAuth(null);
+    }
     setupSampleConfirmation();
     setupPatientIntakeForm();
     setupQRCodeScanner();
@@ -71,13 +76,8 @@ window.addEventListener('showSignIn', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.user) {
-        updateUIBasedOnAuth(window.user);
-    } else {
-        updateUIBasedOnAuth(null);
-    }
+    
 });
-
 
 function showElementWithAnimation(elementId, animation) {
     const element = document.getElementById(elementId);
