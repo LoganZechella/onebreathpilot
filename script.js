@@ -48,7 +48,9 @@ function updateUIBasedOnAuth(user) {
 
     if (user) {
         hideElementWithAnimation('sign-in-container', 'fadeOut');
-        showElementWithAnimation('landing-main', 'fadeIn');
+        showElementWithAnimation('landing-main', 'fadeIn').then(() => {
+            landingMain.style.display = 'flex';
+        });
         blocker.style.display = 'flex';
         signInButton.textContent = 'Sign Out';
     } else {
@@ -76,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
 function showElementWithAnimation(elementId, animation) {
     const element = document.getElementById(elementId);
     element.style.display = 'block';
@@ -98,9 +101,6 @@ function initApp() {
             document.getElementById('splash-screen').style.display = 'none';
         });
         animateCSS('#sign-in-container', 'fadeIn');
-        // splashScreen.classList.add('animate__animated', 'animate__fadeOut', 'animate__slow');
-        // signIn.classList.add('animate__animated', 'animate__fadeIn', 'animate__slow');
-        // splashScreen.style.display = 'none';
         checkAuthState();
         if (checkAuthState() === true) {
             hideElementWithAnimation('sign-in-container', 'fadeOut');
