@@ -19,7 +19,7 @@ body {
     background-repeat: repeat;
     min-height: 100vh;
     transition: background 0.3s ease-in-out;
-    animation: pulseZoom 15s ease-in infinite alternate;
+    /* animation: pulseZoom 15s ease-in infinite alternate; */
     /* Smooth background transition */
 }
 
