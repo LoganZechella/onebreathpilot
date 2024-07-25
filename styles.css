@@ -12,8 +12,8 @@ body {
     background-image: url('./assets/images/loadingblur.png');
     /* background: linear-gradient(1308deg, #014969, #0F92BB, #00E8C6, #0F92BB, #014969); */
     font-family: var(--primaryFont);
-    /* background-size: contain; */
-    /* background-size: 240% 240%; */
+    background-size: contain;
+    background-size: 240% 240%;
     backdrop-filter: blur(100px);
     background-position: center;
     background-repeat: repeat;
