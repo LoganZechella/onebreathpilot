@@ -18,7 +18,7 @@ function handleAuthStateChange(user) {
     if (user) {
         getIdToken(user).then(idToken => {
             // Make a request to your backend with the ID token
-            makeAuthRequest('https://your-backend-endpoint.com/api/auth/verify', { idToken })
+            makeAuthRequest('https://onebreath.netlify.app/api/auth/signin', { idToken })
                 .then(response => {
                     if (response.success) {
                         window.user = user;
