@@ -13,9 +13,8 @@ const firebaseConfig = {
     measurementId: "G-GSKZV0PKMN"
 };
 
-const auth = getAuth(app);
 const app = initializeApp(firebaseConfig);
-
+const auth = getAuth(app);
 
 function handleAuthStateChange(user) {
     window.user = user;
@@ -48,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Login failed:', error);
         }
-        window.location.reload();
     });
 
     document.getElementById('sign-in-google').addEventListener('click', async () => {
