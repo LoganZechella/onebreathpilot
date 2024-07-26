@@ -463,7 +463,7 @@ p {
 }
 
 #landing-main {
-    display: none;
+    /* display: none; */
     flex-direction: column;
     align-items: center;
     flex-wrap: wrap;
