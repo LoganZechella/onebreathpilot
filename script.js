@@ -15,12 +15,12 @@ const animateCSS = (element, animation, prefix = 'animate__') =>
     });
 
 document.addEventListener('DOMContentLoaded', () => {
-    initApp();
     if (window.user) {
         updateUIBasedOnAuth(window.user);
     } else {
         updateUIBasedOnAuth(null);
     }
+    initApp();
     setupSampleConfirmation();
     setupPatientIntakeForm();
     setupQRCodeScanner();
