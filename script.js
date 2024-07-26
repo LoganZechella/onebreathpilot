@@ -15,11 +15,6 @@ const animateCSS = (element, animation, prefix = 'animate__') =>
     });
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.user) {
-        updateUIBasedOnAuth(window.user);
-    } else {
-        updateUIBasedOnAuth(null);
-    }
     initApp();
     setupSampleConfirmation();
     setupPatientIntakeForm();
@@ -30,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
     enumerateVideoDevices();
+    
+    if (window.user) {
+        updateUIBasedOnAuth(window.user);
+    } else {
+        updateUIBasedOnAuth(null);
+    }
 });
 
 function showElementWithAnimation(elementId, animation) {
