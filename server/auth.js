@@ -1,5 +1,6 @@
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getIdToken, getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getIdToken } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Initialize Firebase App
 const firebaseConfig = {
@@ -8,34 +9,17 @@ const firebaseConfig = {
     projectId: "dashboard-424301",
     storageBucket: "dashboard-424301.appspot.com",
     messagingSenderId: "121248577105",
-    appId: "1:121248577105:web:ad670277dad3b9cfd8aa70"
+    appId: "1:121248577105:web:ad670277dad3b9cfd8aa70",
+    measurementId: "G-GSKZV0PKMN"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 function handleAuthStateChange(user) {
-    if (user) {
-        getIdToken(user).then(idToken => {
-            // Make a request to your backend with the ID token
-            makeAuthRequest('https://onebreath.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' })
-                .then(response => {
-                    if (response.success) {
-                        window.user = user;
-                        const event = new CustomEvent('authStateChanged', { detail: { user } });
-                        window.dispatchEvent(event);
-                    } else {
-                        console.error('Authentication failed:', response.error);
-                    }
-                });
-        }).catch(error => {
-            console.error('Error getting ID token:', error);
-        });
-    } else {
-        window.user = null;
-        const event = new CustomEvent('authStateChanged', { detail: { user: null } });
-        window.dispatchEvent(event);
-    }
+    window.user = user;
+    const event = new CustomEvent('authStateChanged', { detail: { user } });
+    window.dispatchEvent(event);
 }
 
 onAuthStateChanged(auth, handleAuthStateChange);
@@ -60,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
         try {
             await signInWithEmailAndPassword(auth, email, password);
+            window.location.reload();
         } catch (error) {
             console.error('Login failed:', error);
         }
@@ -74,18 +59,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-async function makeAuthRequest(url, data) {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 
-            'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            body: JSON.stringify(data)
-        });
-        return response.json();
-    } catch (error) {
-        console.error('Error with auth request:', error);
-        throw error;
-    }
-}
