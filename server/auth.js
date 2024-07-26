@@ -9,8 +9,7 @@ const firebaseConfig = {
     projectId: "dashboard-424301",
     storageBucket: "dashboard-424301.appspot.com",
     messagingSenderId: "121248577105",
-    appId: "1:121248577105:web:ad670277dad3b9cfd8aa70",
-    measurementId: "G-GSKZV0PKMN"
+    appId: "1:121248577105:web:ad670277dad3b9cfd8aa70"
 };
 
 const app = initializeApp(firebaseConfig);
