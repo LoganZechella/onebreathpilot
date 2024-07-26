@@ -77,7 +77,7 @@ window.addEventListener('showSignIn', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+
 });
 
 function showElementWithAnimation(elementId, animation) {
