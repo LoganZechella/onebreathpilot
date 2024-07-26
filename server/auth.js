@@ -17,14 +17,18 @@ const auth = getAuth(app);
 function handleAuthStateChange(user) {
     if (user) {
         getIdToken(user).then(idToken => {
-            if (success) {
-                window.user = user;
-                const event = new CustomEvent('authStateChanged', { detail: { user } });
-                window.dispatchEvent(event);
-            } else {
-                console.error('Authentication failed:', response.error);
-            }
-        }).catch((error) => {
+            // Make a request to your backend with the ID token
+            makeAuthRequest('https://onebreath.netlify.app/api/auth/signin', { idToken, type: 'emailSignIn' })
+                .then(response => {
+                    if (response.success) {
+                        window.user = user;
+                        const event = new CustomEvent('authStateChanged', { detail: { user } });
+                        window.dispatchEvent(event);
+                    } else {
+                        console.error('Authentication failed:', response.error);
+                    }
+                });
+        }).catch(error => {
             console.error('Error getting ID token:', error);
         });
     } else {
@@ -76,10 +80,8 @@ async function makeAuthRequest(url, data) {
         const response = await fetch(url, {
             method: 'POST',
             headers: { 
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({ 'idToken': data })
+            'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            body: JSON.stringify(data)
         });
         return response.json();
     } catch (error) {
