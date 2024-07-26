@@ -13,8 +13,9 @@ const firebaseConfig = {
     measurementId: "G-GSKZV0PKMN"
 };
 
-const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+
 
 function handleAuthStateChange(user) {
     window.user = user;
