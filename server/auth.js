@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            window.location.reload();
         } catch (error) {
             console.error('Login failed:', error);
         }
+        window.location.reload();
     });
 
     document.getElementById('sign-in-google').addEventListener('click', async () => {
