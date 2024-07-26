@@ -18,7 +18,7 @@ function handleAuthStateChange(user) {
     if (user) {
         getIdToken(user).then(idToken => {
             // Make a request to your backend with the ID token
-            makeAuthRequest('https://onebreath.netlify.app/api/auth/signin', {'idToken': idToken})
+            makeAuthRequest('https://onebreath.netlify.app/api/auth/signin', idToken)
                 .then(response => {
                     if (response.success) {
                         window.user = user;
@@ -83,7 +83,7 @@ async function makeAuthRequest(url, data) {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ 'idToken': data })
         });
         return response.json();
     } catch (error) {
