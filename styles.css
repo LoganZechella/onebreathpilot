@@ -749,6 +749,7 @@ p {
         transform: rotate(360deg) scale(1.5, 1.5);
     }
 }
+
 /* Custom animations */
 @keyframes customFadeIn {
     from {
