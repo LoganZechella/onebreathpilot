@@ -1,6 +1,5 @@
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getIdToken } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getIdToken, getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Initialize Firebase App
 const firebaseConfig = {
@@ -16,9 +15,27 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 function handleAuthStateChange(user) {
-    window.user = user;
-    const event = new CustomEvent('authStateChanged', { detail: { user } });
-    window.dispatchEvent(event);
+    if (user) {
+        getIdToken(user).then(idToken => {
+            // Make a request to your backend with the ID token
+            makeAuthRequest('https://your-backend-endpoint.com/api/auth/verify', { idToken })
+                .then(response => {
+                    if (response.success) {
+                        window.user = user;
+                        const event = new CustomEvent('authStateChanged', { detail: { user } });
+                        window.dispatchEvent(event);
+                    } else {
+                        console.error('Authentication failed:', response.error);
+                    }
+                });
+        }).catch(error => {
+            console.error('Error getting ID token:', error);
+        });
+    } else {
+        window.user = null;
+        const event = new CustomEvent('authStateChanged', { detail: { user: null } });
+        window.dispatchEvent(event);
+    }
 }
 
 onAuthStateChanged(auth, handleAuthStateChange);
@@ -57,3 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+async function makeAuthRequest(url, data) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        return response.json();
+    } catch (error) {
+        console.error('Error with auth request:', error);
+        throw error;
+    }
+}
