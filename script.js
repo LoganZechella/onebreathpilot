@@ -57,6 +57,7 @@ function updateUIBasedOnAuth(user) {
         showElementWithAnimation('blocker', 'fadeIn');
         showElementWithAnimation('container-fluid', 'fadeIn');
         document.getElementById('landing-main').style.display = 'flex';
+        document.getElementById('container-fluid').style.display = 'flex';
         blocker.style.display = 'flex';
         signInButton.textContent = 'Sign Out';
     } else {
