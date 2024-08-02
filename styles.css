@@ -9,7 +9,8 @@
 
 body {
     /* background: var(--backgroundColor); */
-    background-image: url('./assets/images/loadingblur.png');
+    /* background-image: url('./assets/images/loadingblur.png'); */
+    background-color: #2b2c34;
     /* background: linear-gradient(1308deg, #014969, #0F92BB, #00E8C6, #0F92BB, #014969); */
     font-family: var(--primaryFont);
     background-size: contain;
