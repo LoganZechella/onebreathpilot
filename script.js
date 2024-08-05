@@ -56,6 +56,7 @@ function updateUIBasedOnAuth(user) {
         hideElementWithAnimation('sign-in-container', 'fadeOut');
         if (window.location.search.includes('chipID') === true) {
             document.getElementById('landing-main').style.display = 'none';
+            signInButton.textContent = 'Sign Out';
             showElementWithAnimation('add-sample-main', 'fadeIn');
             document.getElementById('add-sample-main').style.display = 'flex';
         } else {
