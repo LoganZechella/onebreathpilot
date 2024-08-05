@@ -53,7 +53,7 @@ function updateUIBasedOnAuth(user) {
 
     if (user) {
         hideElementWithAnimation('sign-in-container', 'fadeOut');
-        if (window.location.search.includes('chipID')) {
+        if (window.location.search.includes('chipID') === true) {
             document.getElementById('landing-main').style.display = 'none';
             showElementWithAnimation('add-sample-main', 'fadeIn');
             document.getElementById('add-sample-main').style.display = 'flex';
@@ -100,10 +100,10 @@ function initApp() {
         checkAuthState();
         if (checkAuthState() === true) {
             hideElementWithAnimation('sign-in-container', 'fadeOut');
-            showElementWithAnimation('landing-main', 'fadeIn');
+            // showElementWithAnimation('landing-main', 'fadeIn');
             showElementWithAnimation('blocker', 'fadeIn');
             showElementWithAnimation('container-fluid', 'fadeIn');
-            document.getElementById('landing-main').style.display = 'flex';
+            // document.getElementById('landing-main').style.display = 'flex';
             document.querySelector('.blocker').style.display = 'flex';
             const nav = document.querySelector('.container-fluid');
             nav.style.display = 'flex';
