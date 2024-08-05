@@ -114,6 +114,7 @@ function initApp() {
     const queryParams = window.location.search;
     if (queryParams) {
         document.getElementById('landing-main').style.display = 'none';
+        document.getElementById('add-sample-main').style.display = 'flex';
         const chipID = getQueryStringParams('chipID');
         if (chipID) {
             document.getElementById('chipID').value = chipID;
@@ -127,16 +128,8 @@ function initApp() {
 function checkAuthState() {
     const user = window.user;
     if (user) {
-        // document.getElementById('sign-in-container').style.display = 'none';
-        // document.getElementById('landing-main').style.display = 'flex';
-        // document.querySelector('.blocker').style.display = 'flex';
-        // const nav = document.querySelector('.container-fluid');
-        // nav.style.display = 'flex';
         return true;
     } else {
-        // document.getElementById('sign-in-container').style.display = 'block';
-        // document.getElementById('sign-in-container').removeAttribute('hidden');
-        // document.getElementById('landing-main').style.display = 'none';
         return false;
     }
 }
@@ -290,8 +283,6 @@ function startDocumentScanning() {
 
                 video.onloadedmetadata = () => {
                     video.play();
-                    // video.style.display = 'none';
-                    // canvas.style.display = 'none';
                     scannerInterval = setInterval(() => {
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
@@ -429,7 +420,6 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
     const loader = document.getElementById('document-upload-loader');
     reviewSection.forEach(section => section.style.display = 'none');
     loader.style.display = 'inline-block';
-    // loader.style.zIndex = '1';
 
     try {
         const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
@@ -722,9 +712,6 @@ function updateSampleQueues(samples) {
 
 function createSampleCard(sample) {
     const card = document.createElement('div');
-    // card.setAttribute('data-aos', 'zoom-in');
-    // card.setAttribute('data-aos-duration', '500');
-    // card.setAttribute('data-aos-delay', '200');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
         <h3>${sample.chip_id}</h3>
@@ -826,7 +813,6 @@ function showPickupForm(chipId) {
     form.elements['data-chip-id'].value = chipId;
     document.getElementById('pickup-form-modal').style.display = 'block';
     document.getElementById('pickup-form-modal').style.marginTop = '5em';
-    // document.getElementById('pickup-form-modal').scrollIntoView({ behavior: 'auto' });
 }
 
 function completeSample(chipId) {
