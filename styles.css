@@ -49,6 +49,7 @@ body {
 
 .container-fluid {
     display: none;
+    background-color: #00000080;
 }
 
 h1,
