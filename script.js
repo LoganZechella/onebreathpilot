@@ -1,4 +1,3 @@
-const { send } = require("express/lib/response");
 
 const animateCSS = (element, animation, prefix = 'animate__') =>
     new Promise((resolve, reject) => {
