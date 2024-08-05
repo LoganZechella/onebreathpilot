@@ -16,6 +16,11 @@ const animateCSS = (element, animation, prefix = 'animate__') =>
 
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
+    if (window.user) {
+        updateUIBasedOnAuth(window.user);
+    } else {
+        updateUIBasedOnAuth(null);
+    }
     setupSampleConfirmation();
     setupPatientIntakeForm();
     setupQRCodeScanner();
@@ -25,12 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
     enumerateVideoDevices();
-    
-    if (window.user) {
-        updateUIBasedOnAuth(window.user);
-    } else {
-        updateUIBasedOnAuth(null);
-    }
 });
 
 function showElementWithAnimation(elementId, animation) {
@@ -54,9 +53,15 @@ function updateUIBasedOnAuth(user) {
 
     if (user) {
         hideElementWithAnimation('sign-in-container', 'fadeOut');
-        showElementWithAnimation('landing-main', 'fadeIn');
-        blocker.style.display = 'flex';
-        signInButton.textContent = 'Sign Out';
+        if (window.location.search.includes('chipID')) {
+            document.getElementById('landing-main').style.display = 'none';
+            showElementWithAnimation('add-sample-main', 'fadeIn');
+            document.getElementById('add-sample-main').style.display = 'flex';
+        } else {
+            showElementWithAnimation('landing-main', 'fadeIn');
+            blocker.style.display = 'flex';
+            signInButton.textContent = 'Sign Out';
+        }
     } else {
         showElementWithAnimation('sign-in-container', 'fadeIn');
         // hideElementWithAnimation('landing-main', 'fadeOut');
