@@ -1,3 +1,5 @@
+const { send } = require("express/lib/response");
+
 const animateCSS = (element, animation, prefix = 'animate__') =>
     new Promise((resolve, reject) => {
         const animationName = `${prefix}${animation}`;
@@ -148,8 +150,12 @@ function setupSampleConfirmation() {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
             sendSample(sample);
-            document.getElementById('sample-reg-section').style.display = 'none';
-            showOptionButtons();
+            if (sendSample(sample) === true) {
+                document.getElementById('sample-reg-section').style.display = 'none';
+                showOptionButtons();
+            } else {
+                window.location.reload();
+            }
         }
     });
 }
@@ -175,9 +181,11 @@ function sendSample(sampleData) {
         .then(response => response.json())
         .then(data => {
             alert('Sample update successful.');
+            return true;
         })
         .catch(error => {
-            alert('Sample update failed.');
+            alert('Sample submission failed. Please try again.');
+            return false;
         });
 }
 
@@ -344,19 +352,6 @@ function changeCamera() {
     stopDocumentScanning();
     currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
     startDocumentScanning();
-}
-
-// Back button for patient intake form section
-function setupBackButtonIntakeEventListener() {
-    const backButtonIntake = document.getElementById('back-button-intake');
-    backButtonIntake.addEventListener('click', () => {
-        stopDocumentScanning();
-        document.getElementById('patient-intake-form-section').style.display = 'none';
-        document.getElementById('option-container').style.display = 'flex';
-        document.getElementById('back-button-intake-container').style.display = 'none';
-        setupOptionContainerEventListeners(); // Re-setup event listeners
-        setupBackButtonIntakeEventListener(); // Re-setup event listener
-    });
 }
 
 function handleDocumentScanResult(result) {
