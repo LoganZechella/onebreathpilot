@@ -149,13 +149,14 @@ function setupSampleConfirmation() {
         if (sample) {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
-            sendSample(sample);
-            if (sendSample(sample) === true) {
-                document.getElementById('sample-reg-section').style.display = 'none';
-                showOptionButtons();
-            } else {
-                window.location.reload();
-            }
+            await sendSample(sample).then(() => {
+                if (sendSample(sample) === true) {
+                    document.getElementById('sample-reg-section').style.display = 'none';
+                    showOptionButtons();
+                } else {
+                    window.location.reload();
+                }
+            });
         }
     });
 }
@@ -172,7 +173,7 @@ function collectSampleFormData() {
     return { chip_id, patient_id, location };
 }
 
-function sendSample(sampleData) {
+async function sendSample(sampleData) {
     fetch('https://onebreathpilot.onrender.com/update_sample', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -184,7 +185,7 @@ function sendSample(sampleData) {
             return true;
         })
         .catch(error => {
-            alert('Sample submission failed. Please try again.');
+            alert(`Sample submission failed: ${error}.  Please try again.`);
             return false;
         });
 }
