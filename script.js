@@ -115,7 +115,7 @@ function initApp() {
     if (queryParams) {
         document.getElementById('landing-main').style.display = 'none';
         document.getElementById('add-sample-main').style.display = 'flex';
-        const chipID = getQueryStringParams('chipID');
+        const chipID = queryParams.split('=')[1];
         if (chipID) {
             document.getElementById('chipID').value = chipID;
         }
