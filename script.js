@@ -150,12 +150,11 @@ function setupSampleConfirmation() {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
             await sendSample(sample).then(() => {
-                if (sendSample(sample) === true) {
-                    document.getElementById('sample-reg-section').style.display = 'none';
-                    showOptionButtons();
-                } else {
-                    window.location.reload();
-                }
+                document.getElementById('sample-reg-section').style.display = 'none';
+                showOptionButtons();
+            }).catch(error => {
+                console.error('Failed to submit sample:', error);
+                alert('Failed to submit sample.');
             });
         }
     });
