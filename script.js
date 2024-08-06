@@ -150,11 +150,11 @@ function setupSampleConfirmation() {
         if (sample) {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
-            document.getElementById('loading-dashes').style.display = 'block';
-            showElementWithAnimation('loading-dashes', 'zoomInBig');
+            // document.getElementById('loading-dashes').style.display = 'block';
+            // showElementWithAnimation('loading-dashes', 'zoomInBig');
             await sendSample(sample).then(() => {
                 setTimeout(() => {
-                    hideElementWithAnimation('loading-dashes', 'zoomOutBig');
+                    // hideElementWithAnimation('loading-dashes', 'zoomOutBig');
                     hideElementWithAnimation('sample-reg-section', 'fadeOut');
                     document.getElementById('sample-reg-section').style.display = 'none';
                     showOptionButtons();
@@ -187,7 +187,7 @@ async function sendSample(sampleData) {
     })
         .then(response => response.json())
         .then(data => {
-            alert('Sample update successful.');
+            // alert('Sample update successful.');
             return true;
         })
         .catch(error => {
@@ -199,6 +199,7 @@ async function sendSample(sampleData) {
 function showOptionButtons() {
     const optionContainer = document.getElementById('option-container');
     const message = document.getElementById('option-message');
+    showElementWithAnimation('option-container', 'fadeIn');
     optionContainer.style.display = 'flex';
     message.style.display = 'block';
     const digitalFormButton = document.getElementById('digital-form-button');
