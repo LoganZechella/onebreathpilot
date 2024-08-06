@@ -151,12 +151,14 @@ function setupSampleConfirmation() {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
             document.getElementById('loading-dashes').style.display = 'block';
+            showElementWithAnimation('loading-dashes', 'zoomInBig');
             await sendSample(sample).then(() => {
-                hideElementWithAnimation('loading-dashes', 'zoomOutBig');
-                document.getElementById('loading-dashes').setAttribute('style', 'display: none;');
-                hideElementWithAnimation('sample-reg-section', 'fadeOut');
-                document.getElementById('sample-reg-section').style.display = 'none';
-                showOptionButtons();
+                setTimeout(() => {
+                    hideElementWithAnimation('loading-dashes', 'zoomOutBig');
+                    hideElementWithAnimation('sample-reg-section', 'fadeOut');
+                    document.getElementById('sample-reg-section').style.display = 'none';
+                    showOptionButtons();
+                }, 1000);
             }).catch(error => {
                 console.error('Failed to submit sample:', error);
                 alert('Failed to submit sample.');
