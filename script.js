@@ -150,9 +150,11 @@ function setupSampleConfirmation() {
         if (sample) {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
+            document.getElementById('loading-dashes').removeAttribute('style');
             showElementWithAnimation('#loading-dashes', 'zoomInBig');
             await sendSample(sample).then(() => {
                 hideElementWithAnimation('#loading-dashes', 'zoomOutBig');
+                document.getElementById('loading-dashes').setAttribute('style', 'display: none;');
                 hideElementWithAnimation('#sample-reg-section', 'fadeOut');
                 document.getElementById('sample-reg-section').style.display = 'none';
                 showOptionButtons();
