@@ -152,9 +152,9 @@ function setupSampleConfirmation() {
             sample.status = 'In Process';
             document.getElementById('loading-dashes').style.display = 'block';
             await sendSample(sample).then(() => {
-                hideElementWithAnimation('#loading-dashes', 'zoomOutBig');
+                hideElementWithAnimation('loading-dashes', 'zoomOutBig');
                 document.getElementById('loading-dashes').setAttribute('style', 'display: none;');
-                hideElementWithAnimation('#sample-reg-section', 'fadeOut');
+                hideElementWithAnimation('sample-reg-section', 'fadeOut');
                 document.getElementById('sample-reg-section').style.display = 'none';
                 showOptionButtons();
             }).catch(error => {
