@@ -155,7 +155,9 @@ function setupSampleConfirmation() {
             await sendSample(sample).then(() => {
                 setTimeout(() => {
                     // hideElementWithAnimation('loading-dashes', 'zoomOutBig');
-                    hideElementWithAnimation('sample-reg-section', 'fadeOut');
+                    animateCSS('#sample-reg-section', 'pulse').then(() => {
+                        hideElementWithAnimation('sample-reg-section', 'fadeOut');
+                    });
                     document.getElementById('sample-reg-section').style.display = 'none';
                     showOptionButtons();
                 }, 1000);
