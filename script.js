@@ -61,6 +61,7 @@ function updateUIBasedOnAuth(user) {
             document.getElementById('add-sample-main').style.display = 'flex';
         } else {
             showElementWithAnimation('landing-main', 'fadeIn');
+            document.getElementById('landing-main').style.display = 'flex';
             blocker.style.display = 'flex';
             signInButton.textContent = 'Sign Out';
         }
@@ -667,7 +668,7 @@ function resetSampleRegistration() {
     document.getElementById('patient-intake-form-section').style.display = 'none';
     document.getElementById('qr-close-btn').style.display = 'none';
     document.getElementById('manual-add-btn').style.display = 'none';
-    document.getElementById('add-button-div').querySelector('.add-new-sample').style.display = 'block';
+    document.getElementById('add-button-div').querySelector('.add-new-sample').style.display = 'flex';
     Object.values(bodySections).forEach(section => section.style.display = 'grid');
     Object.values(bodySections)[0].style.display = 'flex';
     AOS.refresh();
