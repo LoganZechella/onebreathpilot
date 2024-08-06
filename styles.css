@@ -144,6 +144,12 @@ p {
     width: 25px;
 }
 
+#loading-dashes {
+    display: none;
+    width: 250px;
+    height: 250px;
+}
+
 #add-new-sample,
 #qr-close-btn,
 #manual-add-btn {
