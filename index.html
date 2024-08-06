@@ -32,7 +32,7 @@
             </ul>
         </header>
         <ul class="nav-links">
-            <li><a href="#">Home</a></li>
+            <li><a href="/index.html">Home</a></li>
             <li><a href="#" id="show-sign-in" class="logged-out">Sign In</a></li>
         </ul>
     </nav>
@@ -47,7 +47,7 @@
         <label for="password">Password:</label>
         <input type="password" id="password" placeholder="Required" required>
         <button id="sign-in">Sign In</button>
-        <button id="sign-in-google" type="button">Sign In with Google</button>
+        <button id="sign-in-google" type="button" disabled>Sign In with Google</button>
     </div>
 
     <div class="blocker animate__animated animate__fadeIn animate__slow" id="blocker">
@@ -60,6 +60,10 @@
                         <h2>Sample Registration</h2>
                         <h3>Enter the details for the new sample below:</h3>
                     </hgroup>
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon src="https://cdn.lordicon.com/ktsahwvc.json" id="loading-dashes" trigger="loop" delay="200" state="loop-transparency"
+                        colors="primary:#000000">
+                    </lord-icon>
                     <form id="new-sample-form">
                         <label for="chipID">Chip ID: (PXXXXX)</label>
                         <input type="text" id="chipID" pattern="P\d{5}" required inputmode="text">
