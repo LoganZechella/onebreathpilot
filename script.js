@@ -150,7 +150,7 @@ function setupSampleConfirmation() {
         if (sample) {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
-            document.getElementById('loading-dashes').removeAttribute('style');
+            document.getElementById('loading-dashes').style.display = 'block';
             showElementWithAnimation('#loading-dashes', 'zoomInBig');
             await sendSample(sample).then(() => {
                 hideElementWithAnimation('#loading-dashes', 'zoomOutBig');
