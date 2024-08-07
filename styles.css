@@ -526,6 +526,7 @@ p {
 }
 
 .card {
+    position: relative;
     background-color: #f2f4f6b0;
     backdrop-filter: blur(20px);
     border-radius: 25px;
@@ -588,38 +589,25 @@ p {
 }
 
 .edit-button {
-    position: fixed;
-    bottom: 0.5em;
-    left: 1em;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    right: 10px;
 }
 
 .evacuation-complete-button {
-    position: fixed;
-    bottom: 0.5em;
-    right: 1em;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    left: 10px;
 }
 
 .edit-button,
 .evacuation-complete-button {
-    margin-top: 10px;
-    font-size: 12px;
+    position: absolute;
+    bottom: 10px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
     background-color: #007bff;
     color: white;
-    border: none;
-    padding: 0.5em 1em 0.5em 1em;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease-in-out;
-    max-width: 30%;
-    max-height: 50px;
 }
 
 .edit-button:hover,

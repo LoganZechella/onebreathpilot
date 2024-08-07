@@ -728,19 +728,18 @@ function createSampleCard(sample) {
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
         <h3>${sample.chip_id}</h3>
-        <p>Status: In Process</p>
-        <p>Location: ${sample.location}</p>
+        <p>Status: <strong>${sample.status}</strong></p>
+        <p>Location: <strong>${sample.location}</strong></p>
         <div class="timer" id="timer-${sample.chip_id}"></div>
         <button class="edit-button">Edit</button>
-        <button class="evacuation-complete-button">Evacuation Complete?</button>
+        ${sample.status === 'In Process' ? '<button class="evacuation-complete-button">Evacuation Complete?</button>' : ''}
     `;
-    appendButtonsBasedOnStatus(card, sample);
 
-    // Ensure the card is appended before initializing any countdown or accessing any child
-    document.getElementById('in-process-section').querySelector('.grid').appendChild(card);
+    // Attach event listeners for edit and evacuation buttons if they exist
+    card.querySelector('.edit-button').addEventListener('click', handleEditButtonClick);
 
-    // Check and initialize countdown after the card is in the DOM
-    if (sample.status === 'In Process' && sample.timestamp) {
+    if (sample.status === 'In Process') {
+        card.querySelector('.evacuation-complete-button').addEventListener('click', handleEvacuationCompleteButtonClick);
         initializeCountdown(sample.timestamp, `timer-${sample.chip_id}`, sample.chip_id);
     }
 
