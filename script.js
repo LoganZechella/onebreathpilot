@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPatientIntakeEventListeners();
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
+    setupNewButtonsEventListeners();
     enumerateVideoDevices();
 });
 
@@ -726,10 +727,12 @@ function createSampleCard(sample) {
     const card = document.createElement('div');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
-        <h3>${sample.chip_id}</h3>
-        <p>Status:<br/> <strong>${sample.status}</strong></p>
-        <p>Location:<br/> <strong>${sample.location}</strong></p>
-        <div class="timer" id="timer-${sample.chip_id}"></div>
+        <h3>Sample ID</h3>
+        <p>Status: In Process</p>
+        <p>Location: Sample Location</p>
+        <div class="timer">Time Remaining: 1h 30m</div>
+        <button class="edit-button">Edit</button>
+        <button class="evacuation-complete-button">Evacuation Complete?</button>
     `;
     appendButtonsBasedOnStatus(card, sample);
 
@@ -742,6 +745,51 @@ function createSampleCard(sample) {
     }
 
     return card;
+}
+
+function setupNewButtonsEventListeners() {
+    document.querySelectorAll('.edit-button').forEach(button => {
+        button.addEventListener('click', handleEditButtonClick);
+    });
+
+    document.querySelectorAll('.evacuation-complete-button').forEach(button => {
+        button.addEventListener('click', handleEvacuationCompleteButtonClick);
+    });
+}
+
+function handleEditButtonClick(event) {
+    const card = event.target.closest('.card');
+    const chipID = card.querySelector('h3').innerText;
+    const existingMenu = card.querySelector('.edit-options-menu');
+
+    // Remove existing menu if it's already open
+    if (existingMenu) {
+        existingMenu.remove();
+        return;
+    }
+
+    // Create a new div for the options menu
+    const optionsMenu = document.createElement('div');
+    optionsMenu.classList.add('edit-options-menu');
+    optionsMenu.innerHTML = `
+        <button class="update-button">Update</button>
+        <button class="attach-document-button">Attach Document</button>
+        <button class="cancel-sample-button">Cancel Sample</button>
+    `;
+
+    // Append the menu to the card
+    card.appendChild(optionsMenu);
+
+    // Event listeners for the new buttons (placeholders for now)
+    optionsMenu.querySelector('.update-button').addEventListener('click', () => alert(`Update clicked for ${chipID}`));
+    optionsMenu.querySelector('.attach-document-button').addEventListener('click', () => alert(`Attach Document clicked for ${chipID}`));
+    optionsMenu.querySelector('.cancel-sample-button').addEventListener('click', () => alert(`Cancel Sample clicked for ${chipID}`));
+}
+
+function handleEvacuationCompleteButtonClick(event) {
+    const chipID = event.target.closest('.card').querySelector('h3').innerText;
+    
+    // Implement the functionality to mark the sample as evacuated
 }
 
 function initializeCountdown(timestamp, timerId, chipId) {
