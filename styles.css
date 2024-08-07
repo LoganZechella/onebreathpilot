@@ -549,20 +549,20 @@ p {
 
 /* General Card Styling for All Devices */
 .card {
+    max-width: 100%;
     position: relative;
     background-color: #f2f4f6b0;
     backdrop-filter: blur(20px);
     border-radius: 25px;
     text-align: center;
     padding: 1em;
-    width: 100%;
     margin: 0.5em 0;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
     border: #000000b6 0.9px solid;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
+    justify-content: center;
+    align-items:flex-start;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
@@ -578,7 +578,7 @@ p {
     font-size: 1rem;
     line-height: 1.3rem;
     color: #535353;
-    /* margin: 0.5em 0; */
+    
 }
 
 .card button:hover {
@@ -596,12 +596,44 @@ p {
     text-decoration: underline;
 }
 
+.card .card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card .edit-menu {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+    width: 100%;
+}
+
+.card .edit-menu button {
+    margin: 0.5em 0;
+    padding: 0.5em;
+    width: 80%;
+}
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: flex;
+}
+
+.timer {
+    margin: 0em 0 1em 0;
+}
+
 .edit-button,
 .evacuation-complete-button {
     position: absolute;
     bottom: 10px;
     padding: 0.25em 0.5em 0.25em 0.5em;
-    margin: 0.5em 0.25em 0.25em 0.25em;
+    margin: 2em 0.25em 0.25em 0.25em;
     font-size: 10px;
     border-radius: 5px;
     border: 1px solid #000;
@@ -609,19 +641,20 @@ p {
     transition: background-color 0.3s ease-in-out;
     background-color: transparent;
     color: #000;
-    max-width: fit-content
+    max-width: fit-content;
 }
 
 .edit-button {
-    right: 10px;
+    right: 1em;
 }
 
 .evacuation-complete-button {
     left: 10px;
-    height: 30px;
-    width: 30px;
+    height: 20px;
+    width: 20px;
     padding: 0 0 0 0;
     border: none;
+    background-color: #21de4d;
 }
 
 .edit-button:hover,
@@ -660,13 +693,14 @@ p {
 
 .pickup-button {
     display: flex;
-    margin: -1em 0 2.5em 0;
+    align-self: center;
+    margin: -1em 0 2em 0;
     align-items: center;
     justify-content: center;
     padding: 0.25em 0.5em 0.25em 0.5em;
     font-size: 12px;
     background-color: #28a745;
-    width: 100px;
+    max-width: 85%;
     height: 25px;
 }
 
