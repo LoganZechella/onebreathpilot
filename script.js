@@ -735,15 +735,32 @@ function createSampleCard(sample) {
         ${sample.status === 'In Process' ? '<button class="evacuation-complete-button">Evacuation Complete?</button>' : ''}
     `;
 
-    // Attach event listeners for edit and evacuation buttons if they exist
-    card.querySelector('.edit-button').addEventListener('click', handleEditButtonClick);
+    // Append card to the respective status section (ensuring it's in the DOM)
+    switch (sample.status) {
+        case 'In Process':
+            document.getElementById('in-process-section').querySelector('.grid').appendChild(card);
+            break;
+        case 'Ready for Pickup':
+            document.getElementById('pickup-section').querySelector('.grid').appendChild(card);
+            break;
+        case 'Picked up. Ready for Analysis':
+            document.getElementById('shipping-section').querySelector('.grid').appendChild(card);
+            break;
+    }
 
-    if (sample.status === 'In Process') {
-        const timerElement = card.querySelector(`#timer-${sample.chip_id}`);
-        if (timerElement) {
+    // Ensure the timer element exists and is correctly referenced
+    const timerElementId = `timer-${sample.chip_id}`;
+    const timerElement = document.getElementById(timerElementId);
+    if (timerElement) {
+        // Attach event listeners for edit and evacuation buttons if they exist
+        card.querySelector('.edit-button').addEventListener('click', handleEditButtonClick);
+
+        if (sample.status === 'In Process') {
             card.querySelector('.evacuation-complete-button').addEventListener('click', handleEvacuationCompleteButtonClick);
-            initializeCountdown(sample.timestamp, `timer-${sample.chip_id}`, sample.chip_id);
+            initializeCountdown(sample.timestamp, timerElementId, sample.chip_id);
         }
+    } else {
+        console.error(`Timer element with ID ${timerElementId} not found. Skipping countdown.`);
     }
 
     return card;
