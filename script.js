@@ -727,10 +727,9 @@ function createSampleCard(sample) {
     const card = document.createElement('div');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
-        <h3>${sample.chip_id}</h3>
-        <p>Status: <strong>${sample.status}</strong></p>
-        <p>Location: <strong>${sample.location}</strong></p>
+        <h3>${sample.chip_id}: </h3><p><strong>${sample.status}</strong></p><br>
         <div class="timer" id="timer-${sample.chip_id}"></div>
+        <p>Location: ${sample.location}</p><br>
         <button class="edit-button">Edit</button>
         ${sample.status === 'In Process' ? '<button class="evacuation-complete-button">Evacuation Complete?</button>' : ''}
     `;
@@ -853,6 +852,7 @@ function updateStatusToReadyForPickup(chipId) {
         .then(response => response.json())
         .then(data => {
             fetchSamplesAndUpdateUI();
+            appendButtonsBasedOnStatus(document.querySelector(`.${chipId}`), chipId);
         })
         .catch(error => {
             console.error('Error updating sample status:', error);

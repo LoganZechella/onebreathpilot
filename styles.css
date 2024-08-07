@@ -540,8 +540,8 @@ p {
     border: #000000b6 0.9px solid;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
@@ -560,19 +560,6 @@ p {
     margin: 0.1em 0 0.1em 0;
 }
 
-.card button>:not(.edit-button), .card button>:not(.evacuation-complete-button) {
-    font-weight: bold;
-    border-radius: 25px;
-    color: #00214d;
-    border: 0;
-    /* min-width: 100px; */
-    margin: 10px 0;
-    outline: none;
-    background-color: #00ebc7;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-}
-
 .card button:hover {
     box-shadow: 20px 20px 20px rgba(0, 0, 0, 0.1), -10px -10px 10px rgba(255, 255, 255, 0.3);
     transform: translateY(-3px);
@@ -589,19 +576,19 @@ p {
 }
 
 .edit-button {
-    right: 10px;
+    right: 1em;
 }
 
 .evacuation-complete-button {
-    left: 10px;
+    left: 1em;
 }
 
 .edit-button,
 .evacuation-complete-button {
     position: absolute;
-    bottom: 10px;
-    padding: 5px 10px;
-    font-size: 0.9em;
+    bottom: 0.5em;
+    padding: 0.5em 1em;
+    font-size: 12px;
     border-radius: 5px;
     border: none;
     cursor: pointer;
