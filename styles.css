@@ -101,8 +101,13 @@ p {
     }
 }
 
-#nav-title-text, #container-fluid>ul>li:nth-child(1)>a, #container-fluid>ul>li:nth-child(2)>a  {
+#nav-title-text  {
     color: #87bfec;
+    text-shadow: #000 1px 2px 5px;
+}
+
+.nav-links>li>a {
+    color: aliceblue;
     text-shadow: #000 1px 2px 5px;
 }
 
