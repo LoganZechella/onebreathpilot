@@ -101,8 +101,9 @@ p {
     }
 }
 
-#nav-title-text {
-    color: var(--primary);
+#nav-title-text, #container-fluid>ul>li:nth-child(1)>a, #container-fluid>ul>li:nth-child(2)>a  {
+    color: #87bfec;
+    text-shadow: #000 1px 2px 5px;
 }
 
 #new-sample-form {
