@@ -727,11 +727,11 @@ function createSampleCard(sample) {
     const card = document.createElement('div');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
-        <h3>${sample.chip_id}: </h3><p><strong>${sample.status}</strong></p><br>
+        <h3>${sample.chip_id}: </h3><p><strong>${sample.status}</strong></p>
         <div class="timer" id="timer-${sample.chip_id}"></div>
         <p>Location: ${sample.location}</p><br>
         <button class="edit-button">Edit</button>
-        ${sample.status === 'In Process' ? '<button class="evacuation-complete-button">Evacuation Complete?</button>' : ''}
+        ${sample.status === 'In Process' ? '<button class="evacuation-complete-button" style="background-color: none"><img src="assets/images/icons8-check-ios-17-filled-32.png"></button>' : ''}
     `;
 
     // Append card to the respective status section (ensuring it's in the DOM)
@@ -741,6 +741,7 @@ function createSampleCard(sample) {
             break;
         case 'Ready for Pickup':
             document.getElementById('pickup-section').querySelector('.grid').appendChild(card);
+            appendButtonsBasedOnStatus(document.querySelector(`.${sample.chip_id}`), sample);
             break;
         case 'Picked up. Ready for Analysis':
             document.getElementById('shipping-section').querySelector('.grid').appendChild(card);
@@ -852,7 +853,6 @@ function updateStatusToReadyForPickup(chipId) {
         .then(response => response.json())
         .then(data => {
             fetchSamplesAndUpdateUI();
-            appendButtonsBasedOnStatus(document.querySelector(`.${chipId}`), sampleData);
         })
         .catch(error => {
             console.error('Error updating sample status:', error);
@@ -891,6 +891,7 @@ function clearElements(elements) {
 function showPickupForm(chipId) {
     const form = document.getElementById('pickup-form');
     form.elements['data-chip-id'].value = chipId;
+    showElementWithAnimation('pickup-form-modal', 'bounceIn');
     document.getElementById('pickup-form-modal').style.display = 'block';
     document.getElementById('pickup-form-modal').style.marginTop = '5em';
 }
@@ -964,7 +965,7 @@ function setupSampleEventListeners() {
 
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('pickup-button')) {
-            showElementWithAnimation(event.target.id, 'zoomIn');
+            showElementWithAnimation(event.target.id, 'pulse');
             showPickupForm(event.target.id);
         }
         if (event.target.classList.contains('finish-button')) {
