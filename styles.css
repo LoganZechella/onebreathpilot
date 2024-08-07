@@ -63,8 +63,8 @@ p {
     transition: color 0.3s ease-in-out;
 }
 
+/* Mobile Specific Styles */
 @media screen and (max-width: 768px) {
-
     .section {
         border-radius: 10px;
         padding: 1rem;
@@ -73,15 +73,6 @@ p {
         color: black;
         max-height: fit-content;
         grid-template-columns: 1fr;
-    }
-
-    #landing-main {
-        /* display: flex; */
-        flex-direction: column;
-        align-items: center;
-        flex-wrap: wrap;
-        align-content: stretch;
-        justify-content: center;
     }
 
     .modal {
@@ -96,14 +87,39 @@ p {
 
     .card {
         max-width: 100%;
-        margin: 0.5em 0;
-        padding: 0.5em;
+        margin: 1em 0;
+        padding: 1em;
     }
 
-    .edit-button, .evacuation-complete-button {
+    .edit-button,
+    .evacuation-complete-button {
         max-width: 45%;
         font-size: 0.8em;
         padding: 5px;
+    }
+}
+
+/* Styles for Smaller Mobile Screens */
+@media screen and (max-width: 480px) {
+    .card {
+        padding: 0.5em;
+        margin: 1em 0;
+    }
+
+    .card h3 {
+        font-size: 1em;
+    }
+
+    .card p {
+        font-size: 0.9em;
+        margin: 0.2em 0;
+    }
+
+    .edit-button,
+    .evacuation-complete-button {
+        max-width: 40%;
+        font-size: 0.7em;
+        padding: 3px;
     }
 }
 
@@ -531,17 +547,16 @@ p {
     background-color: #0056b3;
 }
 
+/* General Card Styling for All Devices */
 .card {
     position: relative;
     background-color: #f2f4f6b0;
     backdrop-filter: blur(20px);
     border-radius: 25px;
     text-align: center;
-    padding: 0.5em 0.5em 1em 0.5em;
-    min-width: 100px;
-    max-width: 250px;
+    padding: 1em;
     width: 100%;
-    margin: 0.25em 0.25em 0.5em 0.25em;
+    margin: 0.5em 0;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
     border: #000000b6 0.9px solid;
     display: flex;
@@ -563,7 +578,7 @@ p {
     font-size: 1rem;
     line-height: 1.3rem;
     color: #535353;
-    margin: 0.1em 0 0.1em 0;
+    margin: 0.5em 0;
 }
 
 .card button:hover {
@@ -581,14 +596,6 @@ p {
     text-decoration: underline;
 }
 
-.edit-button {
-    right: 1em;
-}
-
-.evacuation-complete-button {
-    left: 1em;
-}
-
 .edit-button,
 .evacuation-complete-button {
     position: absolute;
@@ -601,7 +608,15 @@ p {
     transition: background-color 0.3s ease-in-out;
     background-color: #007bff;
     color: white;
-    max-width: 40%;
+    max-width: 45%;
+}
+
+.edit-button {
+    right: 10px;
+}
+
+.evacuation-complete-button {
+    left: 10px;
 }
 
 .edit-button:hover,
