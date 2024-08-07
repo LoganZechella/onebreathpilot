@@ -727,10 +727,10 @@ function createSampleCard(sample) {
     const card = document.createElement('div');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
-        <h3>Sample ID</h3>
+        <h3>${sample.chip_id}</h3>
         <p>Status: In Process</p>
-        <p>Location: Sample Location</p>
-        <div class="timer">Time Remaining: 1h 30m</div>
+        <p>Location: ${sample.location}</p>
+        <div class="timer" id="timer-${sample.chip_id}"></div>
         <button class="edit-button">Edit</button>
         <button class="evacuation-complete-button">Evacuation Complete?</button>
     `;
