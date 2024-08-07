@@ -739,8 +739,11 @@ function createSampleCard(sample) {
     card.querySelector('.edit-button').addEventListener('click', handleEditButtonClick);
 
     if (sample.status === 'In Process') {
-        card.querySelector('.evacuation-complete-button').addEventListener('click', handleEvacuationCompleteButtonClick);
-        initializeCountdown(sample.timestamp, `timer-${sample.chip_id}`, sample.chip_id);
+        const timerElement = card.querySelector(`#timer-${sample.chip_id}`);
+        if (timerElement) {
+            card.querySelector('.evacuation-complete-button').addEventListener('click', handleEvacuationCompleteButtonClick);
+            initializeCountdown(sample.timestamp, `timer-${sample.chip_id}`, sample.chip_id);
+        }
     }
 
     return card;
