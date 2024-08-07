@@ -590,6 +590,8 @@ p {
 .edit-button,
 .evacuation-complete-button {
     margin-top: 10px;
+    display: flex;
+    font-size: 12px;
     background-color: #007bff;
     color: white;
     border: none;
