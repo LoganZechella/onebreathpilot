@@ -26,11 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPatientIntakeForm();
     setupQRCodeScanner();
     fetchSamplesAndUpdateUI();
+    setupNewButtonsEventListeners();
     setupSampleEventListeners();
     setupPatientIntakeEventListeners();
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
-    setupNewButtonsEventListeners();
     enumerateVideoDevices();
 });
 
@@ -852,7 +852,7 @@ function updateStatusToReadyForPickup(chipId) {
         .then(response => response.json())
         .then(data => {
             fetchSamplesAndUpdateUI();
-            appendButtonsBasedOnStatus(document.querySelector(`.${chipId}`), chipId);
+            appendButtonsBasedOnStatus(document.querySelector(`.${chipId}`), sampleData);
         })
         .catch(error => {
             console.error('Error updating sample status:', error);
@@ -873,6 +873,7 @@ function updateStatusToReadyForAnalysis(chipId) {
         .then(response => response.json())
         .then(data => {
             fetchSamplesAndUpdateUI();
+            appendButtonsBasedOnStatus(document.querySelector(`.${chipId}`), sampleData);
         })
         .catch(error => {
             console.error('Error updating sample status:', error);
