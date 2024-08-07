@@ -561,7 +561,7 @@ p {
     border: #000000b6 0.9px solid;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
@@ -578,7 +578,7 @@ p {
     font-size: 1rem;
     line-height: 1.3rem;
     color: #535353;
-    margin: 0.5em 0;
+    /* margin: 0.5em 0; */
 }
 
 .card button:hover {
@@ -600,15 +600,16 @@ p {
 .evacuation-complete-button {
     position: absolute;
     bottom: 10px;
-    padding: 5px 10px;
-    font-size: 0.9em;
+    padding: 0.25em 0.5em 0.25em 0.5em;
+    margin: 0.5em 0.25em 0.25em 0.25em;
+    font-size: 10px;
     border-radius: 5px;
-    border: none;
+    border: 1px solid #000;
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
-    background-color: #007bff;
-    color: white;
-    max-width: 45%;
+    background-color: transparent;
+    color: #000;
+    max-width: fit-content
 }
 
 .edit-button {
@@ -617,6 +618,10 @@ p {
 
 .evacuation-complete-button {
     left: 10px;
+    height: 30px;
+    width: 30px;
+    padding: 0 0 0 0;
+    border: none;
 }
 
 .edit-button:hover,
@@ -653,9 +658,16 @@ p {
     background-color: #0056b3;
 }
 
-.ready-for-pickup-button {
-    max-width: 50%;
-    margin-left: 25%;
+.pickup-button {
+    display: flex;
+    margin: -1em 0 2.5em 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25em 0.5em 0.25em 0.5em;
+    font-size: 12px;
+    background-color: #28a745;
+    width: 100px;
+    height: 25px;
 }
 
 .modal {
