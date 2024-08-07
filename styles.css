@@ -559,12 +559,12 @@ p {
     margin: 0.1em 0 0.1em 0;
 }
 
-.card button {
+.card button>:not(.edit-button), .card button>:not(.evacuation-complete-button) {
     font-weight: bold;
     border-radius: 25px;
     color: #00214d;
     border: 0;
-    min-width: 100px;
+    /* min-width: 100px; */
     margin: 10px 0;
     outline: none;
     background-color: #00ebc7;
@@ -587,15 +587,34 @@ p {
     text-decoration: underline;
 }
 
+.edit-button {
+    position: fixed;
+    bottom: 0.5em;
+    left: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.evacuation-complete-button {
+    position: fixed;
+    bottom: 0.5em;
+    right: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
 .edit-button,
 .evacuation-complete-button {
     margin-top: 10px;
-    display: flex;
     font-size: 12px;
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 0.5em 1em 0.5em 1em;
     cursor: pointer;
     border-radius: 5px;
     transition: background-color 0.3s ease-in-out;
