@@ -101,14 +101,13 @@ p {
     }
 }
 
-#nav-title-text  {
+#nav-title-text>strong  {
     color: #87bfec;
-    text-shadow: #000 1px 2px 5px;
+    text-shadow: #000000bb 1px 2px 5px;
 }
 
 .nav-links>li>a {
     color: aliceblue;
-    text-shadow: #000 1px 2px 5px;
 }
 
 #new-sample-form {
