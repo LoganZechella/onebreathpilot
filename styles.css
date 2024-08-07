@@ -587,6 +587,52 @@ p {
     text-decoration: underline;
 }
 
+.edit-button,
+.evacuation-complete-button {
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.edit-button:hover,
+.evacuation-complete-button:hover {
+    background-color: #0056b3;
+}
+
+.edit-options-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    padding: 10px;
+}
+
+.edit-options-menu button {
+    margin: 5px 0;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.edit-options-menu button:hover {
+    background-color: #0056b3;
+}
+
 .ready-for-pickup-button {
     max-width: 50%;
     margin-left: 25%;
