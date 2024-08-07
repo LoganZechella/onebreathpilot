@@ -242,8 +242,9 @@ function setupOptionContainerEventListeners() {
     });
 
     backButton.addEventListener('click', () => {
-        document.getElementById('sample-reg-section').style.display = 'block';
-        document.getElementById('option-container').style.display = 'none';
+        // document.getElementById('sample-reg-section').style.display = 'block';
+        // optionContainer.style.display = 'none';
+        window.location.href = '/index.html';
     });
 }
 
