@@ -63,8 +63,14 @@ p {
     transition: color 0.3s ease-in-out;
 }
 
+
+/* Styles for Smaller Mobile Screens */
 /* Mobile Specific Styles */
 @media screen and (max-width: 768px) {
+    .card {
+        width: 95%;
+    }
+    
     .section {
         border-radius: 10px;
         padding: 1rem;
@@ -84,42 +90,33 @@ p {
         width: 95vw;
         margin: 2% auto;
     }
-
-    .card {
-        max-width: 100%;
-        margin: 1em 0;
-        padding: 1em;
-    }
-
-    .edit-button,
-    .evacuation-complete-button {
-        max-width: 45%;
-        font-size: 0.8em;
-        padding: 5px;
-    }
 }
 
-/* Styles for Smaller Mobile Screens */
 @media screen and (max-width: 480px) {
     .card {
         padding: 0.5em;
-        margin: 1em 0;
+        max-height: 120px;
     }
 
-    .card h3 {
+    .chip-id {
         font-size: 1em;
     }
 
-    .card p {
-        font-size: 0.9em;
-        margin: 0.2em 0;
+    .location {
+        font-size: 0.8em;
     }
 
-    .edit-button,
-    .evacuation-complete-button {
-        max-width: 40%;
-        font-size: 0.7em;
-        padding: 3px;
+    .status {
+        font-size: 0.9em;
+    }
+
+    .timer {
+        font-size: 0.8em;
+    }
+
+    .card-buttons button {
+        font-size: 0.8em;
+        padding: 0.3em 0.5em;
     }
 }
 
@@ -473,7 +470,7 @@ p {
 .grid {
     display: grid;
     grid-area: content;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     gap: 20px;
     width: 100%;
     justify-items: center;
@@ -549,21 +546,97 @@ p {
 
 /* General Card Styling for All Devices */
 .card {
-    max-width: 100%;
     position: relative;
-    background-color: #f2f4f6b0;
-    backdrop-filter: blur(20px);
-    border-radius: 25px;
-    text-align: center;
+    background-color: #f2f4f6;
+    border-radius: 10px;
+    text-align: left;
     padding: 1em;
-    margin: 0.5em 0;
-    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
-    border: #000000b6 0.9px solid;
+    width: 90%;
+    max-height: 200px;
+    margin: 0.5em auto;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items:flex-start;
+    justify-content: space-between;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5em;
+}
+
+.chip-id-location {
+    display: flex;
+    flex-direction: column;
+}
+
+.chip-id {
+    font-size: 1.2em;
+    color: #333;
+    font-weight: bold;
+    margin: 0;
+}
+
+.location {
+    font-size: 0.9em;
+    color: #777;
+    margin: 0.2em 0;
+}
+
+.status-timer {
+    text-align: right;
+}
+
+.status {
+    font-size: 1em;
+    color: #555;
+    margin: 0;
+}
+
+.timer {
+    font-size: 0.9em;
+    color: #999;
+    margin-top: 0.2em;
+}
+
+.card-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 0.5em 0 -1em 0;
+    min-width: 50%;
+}
+
+.card-buttons button {
+    padding: 0.5em;
+    font-size: 12px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.pickup-button {
+    background-color: #28a745;
+    width: 150px;
+    color: white;
+    flex: 1;
+    margin-right: 0.5em;
+}
+
+.edit-button {
+    background-color: transparent;
+    color: #000;
+    width: 40%;
+    text-decoration: underline;
+}
+
+.pickup-button:hover,
+.edit-button:hover {
+    opacity: 0.8;
 }
 
 .card h3 {
@@ -591,10 +664,6 @@ p {
     box-shadow: inset -1px -1px 3px rgba(0, 0, 0, 0.2), -20px -20px 20px rgba(255, 255, 255, 0.7);
 }
 
-#card-text-id {
-    font-weight: bolder;
-    text-decoration: underline;
-}
 
 .card .card-content {
     display: flex;
@@ -624,11 +693,7 @@ p {
     display: flex;
 }
 
-.timer {
-    margin: 0em 0 1em 0;
-}
-
-.edit-button,
+/* .edit-button,
 .evacuation-complete-button {
     position: absolute;
     bottom: 10px;
@@ -642,11 +707,8 @@ p {
     background-color: transparent;
     color: #000;
     max-width: fit-content;
-}
+} */
 
-.edit-button {
-    right: 1em;
-}
 
 .evacuation-complete-button {
     left: 10px;
@@ -689,19 +751,6 @@ p {
 
 .edit-options-menu button:hover {
     background-color: #0056b3;
-}
-
-.pickup-button {
-    display: flex;
-    align-self: center;
-    margin: -1em 0 2em 0;
-    align-items: center;
-    justify-content: center;
-    padding: 0.25em 0.5em 0.25em 0.5em;
-    font-size: 12px;
-    background-color: #28a745;
-    max-width: 85%;
-    height: 25px;
 }
 
 .modal {

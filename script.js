@@ -222,7 +222,7 @@ function showOptionButtons() {
     document.getElementById('back-button-options').addEventListener('click', () => {
         // document.getElementById('sample-reg-section').style.display = 'block';
         // optionContainer.style.display = 'none';
-        window.location.href = '/index.html';
+        window.location.reload();
     });
 }
 
@@ -716,6 +716,7 @@ function updateSampleQueues(samples) {
         }
     });
 
+
     for (const element of [inProcessElement, pickupElement, shippingElement, analysisElement]) {
         element.style.display = 'grid';
     }
@@ -727,11 +728,22 @@ function createSampleCard(sample) {
     const card = document.createElement('div');
     card.className = `card ${sample.chip_id}`;
     card.innerHTML = `
-        <h3>${sample.chip_id}: </h3><p><strong>${sample.status}</strong></p>
-        <div class="timer" id="timer-${sample.chip_id}"></div>
-        <p>Location: ${sample.location}</p><br>
-        <button class="edit-button">Edit</button>
-        ${sample.status === 'In Process' ? '<button class="evacuation-complete-button" style="background-color: none"><img src="assets/images/icons8-check-ios-17-filled-32.png"></button>' : ''}
+        <div class="card-content">
+            <div class="card-header">
+                <div class="chip-id-location">
+                    <h3 class="chip-id">${sample.chip_id}</h3>
+                    <p class="location">Location: ${sample.location}</p>
+                </div>
+                <div class="status-timer">
+                    <p class="status"><strong>${sample.status}</strong></p>
+                    <div class="timer" id="timer-${sample.chip_id}"></div>
+                </div>
+            </div>
+            <div class="card-buttons">
+                ${sample.status === 'Ready for Pickup' ? '<button class="pickup-button">Pickup Chip</button>' : ''}
+                ${sample.status === 'Picked up. Ready for Analysis' ? '<button class="complete-button">Complete</button>' : '<button class="edit-button">Edit</button>'}
+            </div>
+        </div>
     `;
 
     // Append card to the respective status section (ensuring it's in the DOM)
@@ -741,7 +753,6 @@ function createSampleCard(sample) {
             break;
         case 'Ready for Pickup':
             document.getElementById('pickup-section').querySelector('.grid').appendChild(card);
-            appendButtonsBasedOnStatus(document.querySelector(`.${sample.chip_id}`), sample);
             break;
         case 'Picked up. Ready for Analysis':
             document.getElementById('shipping-section').querySelector('.grid').appendChild(card);
@@ -753,14 +764,22 @@ function createSampleCard(sample) {
     const timerElement = document.getElementById(timerElementId);
     if (timerElement) {
         // Attach event listeners for edit and evacuation buttons if they exist
-        card.querySelector('.edit-button').addEventListener('click', handleEditButtonClick);
-
         if (sample.status === 'In Process') {
-            card.querySelector('.evacuation-complete-button').addEventListener('click', handleEvacuationCompleteButtonClick);
             initializeCountdown(sample.timestamp, timerElementId, sample.chip_id);
         }
     } else {
         console.error(`Timer element with ID ${timerElementId} not found. Skipping countdown.`);
+    }
+
+    // Attach event listeners for buttons
+    if (sample.status !== 'Picked up. Ready for Analysis') {
+        card.querySelector('.edit-button').addEventListener('click', handleEditButtonClick);
+    } else {
+        card.querySelector('.complete-button').addEventListener('click', () => completeSample(sample.chip_id));
+    }
+
+    if (sample.status === 'Ready for Pickup') {
+        card.querySelector('.pickup-button').addEventListener('click', handlePickupButtonClick);
     }
 
     return card;
@@ -778,31 +797,30 @@ function setupNewButtonsEventListeners() {
 
 function handleEditButtonClick(event) {
     const card = event.target.closest('.card');
-    const chipID = card.querySelector('h3').innerText;
-    const existingMenu = card.querySelector('.edit-options-menu');
+    toggleEditMenu(card, true);
+}
 
-    // Remove existing menu if it's already open
-    if (existingMenu) {
-        existingMenu.remove();
-        return;
+function handlePickupButtonClick(event) {
+    formId = event.target.closest('.card').querySelector('.chip-id').innerText;
+    document.getElementById('pickup-form').elements['confirm-pickup-button'].classList.add(formId);
+    const chipID = event.target.closest('.card').querySelector('.chip-id').innerText;
+    showElementWithAnimation('pickup-form', 'pulse');
+    showPickupForm(formId);
+}
+
+function toggleEditMenu(card, show) {
+    const cardContent = card.querySelector('.card-content');
+    const editMenu = card.querySelector('.edit-menu');
+
+    if (show) {
+        cardContent.classList.add('hidden');
+        editMenu.classList.remove('hidden');
+        editMenu.classList.add('visible');
+    } else {
+        cardContent.classList.remove('hidden');
+        editMenu.classList.remove('visible');
+        editMenu.classList.add('hidden');
     }
-
-    // Create a new div for the options menu
-    const optionsMenu = document.createElement('div');
-    optionsMenu.classList.add('edit-options-menu');
-    optionsMenu.innerHTML = `
-        <button class="update-button">Update</button>
-        <button class="attach-document-button">Attach Document</button>
-        <button class="cancel-sample-button">Cancel Sample</button>
-    `;
-
-    // Append the menu to the card
-    card.appendChild(optionsMenu);
-
-    // Event listeners for the new buttons (placeholders for now)
-    optionsMenu.querySelector('.update-button').addEventListener('click', () => alert(`Update clicked for ${chipID}`));
-    optionsMenu.querySelector('.attach-document-button').addEventListener('click', () => alert(`Attach Document clicked for ${chipID}`));
-    optionsMenu.querySelector('.cancel-sample-button').addEventListener('click', () => alert(`Cancel Sample clicked for ${chipID}`));
 }
 
 function handleEvacuationCompleteButtonClick(event) {
@@ -873,11 +891,11 @@ function updateStatusToReadyForAnalysis(chipId) {
         .then(response => response.json())
         .then(data => {
             fetchSamplesAndUpdateUI();
-            appendButtonsBasedOnStatus(document.querySelector(`.${chipId}`), sampleData);
         })
         .catch(error => {
             console.error('Error updating sample status:', error);
         });
+    
 }
 
 function clearElements(elements) {
@@ -910,6 +928,7 @@ function completeSample(chipId) {
         .then(response => response.json())
         .then(data => {
             fetchSamplesAndUpdateUI();
+            alert('Sample completed successfully.');
         })
         .catch(error => {
             console.error('Error updating sample status:', error);
@@ -953,7 +972,8 @@ function updateTimerDisplay(timerElement, distance) {
 function setupSampleEventListeners() {
     document.getElementById('pickup-form').addEventListener('submit', function (event) {
         event.preventDefault();
-        updateStatusToReadyForAnalysis(event.target.elements['data-chip-id'].value);
+        const chipId = event.target.elements['confirm-pickup-button'].classList[0];
+        updateStatusToReadyForAnalysis(chipId);
         document.getElementById('pickup-form-modal').style.display = 'none';
         document.getElementById('pickup-form').reset();
     });
@@ -965,11 +985,11 @@ function setupSampleEventListeners() {
 
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('pickup-button')) {
-            showElementWithAnimation(event.target.id, 'pulse');
-            showPickupForm(event.target.id);
+            handlePickupButtonClick(event);
         }
         if (event.target.classList.contains('finish-button')) {
             completeSample(event.target.id);
+            
         }
         if (event.target.classList.contains('sample-reg-close-btn')) {
             resetSampleRegistration();
