@@ -604,8 +604,9 @@ p {
 
 .card-buttons {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
+    flex-direction: row-reverse;
     margin: 0.5em 0 -1em 0;
     min-width: 50%;
 }
@@ -616,7 +617,15 @@ p {
     border-radius: 5px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+    /* transition: background-color 0.3s ease-in-out; */
+}
+
+.finish-early-button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    opacity: 60%;
+    background-color: transparent;
 }
 
 .pickup-button {
@@ -630,15 +639,23 @@ p {
 .edit-button {
     background-color: transparent;
     color: #000;
-    width: 40%;
+    width: min-content;
     text-decoration: underline;
 }
 
-.pickup-button:hover,
-.edit-button:hover {
+.pickup-button:hover {
     opacity: 0.8;
 }
 
+.edit-button:hover {
+    transition: ease-in-out 0.3s;
+    border: #000 1px solid;
+}
+
+.finish-early-button:hover {
+    animation: pulseZoom 1s ease-in-out infinite;
+    transition: ease-in-out 0.3s;
+}
 .card h3 {
     font-size: 1.2em;
     line-height: 1em;
@@ -655,7 +672,7 @@ p {
 }
 
 .card button:hover {
-    box-shadow: 20px 20px 20px rgba(0, 0, 0, 0.1), -10px -10px 10px rgba(255, 255, 255, 0.3);
+    /* box-shadow: 20px 20px 20px rgba(0, 0, 0, 0.1), -10px -10px 10px rgba(255, 255, 255, 0.3); */
     transform: translateY(-3px);
 }
 
@@ -708,21 +725,6 @@ p {
     color: #000;
     max-width: fit-content;
 } */
-
-
-.evacuation-complete-button {
-    left: 10px;
-    height: 20px;
-    width: 20px;
-    padding: 0 0 0 0;
-    border: none;
-    background-color: #21de4d;
-}
-
-.edit-button:hover,
-.evacuation-complete-button:hover {
-    background-color: #0056b3;
-}
 
 .edit-options-menu {
     display: flex;
@@ -910,8 +912,12 @@ p {
         transform: rotate(0deg) scale(1, 1);
     }
 
-    100% {
+    50% {
         transform: rotate(360deg) scale(1.5, 1.5);
+    }
+
+    100% {
+        transform: rotate(720deg) scale(1, 1);
     }
 }
 
@@ -928,20 +934,17 @@ p {
 
 @keyframes pulseZoom {
     0% {
-        background-position: 35% 60%;
-        backdrop-filter: saturate(100%) hue-rotate(0deg);
+        transform: scale(1);
     }
 
     50% {
-        background-position: 40% 70%;
-        backdrop-filter: saturate(150%) hue-rotate(90deg);
+        transform: scale(1.1);
+        opacity: 100%;
     }
 
     100% {
-        background-position: 55% 40%;
-        backdrop-filter: saturate(100%) hue-rotate(180deg);
+        transform: scale(1);
     }
-
 }
 
 @keyframes gradient-animation {

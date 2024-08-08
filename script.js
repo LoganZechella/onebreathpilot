@@ -740,8 +740,10 @@ function createSampleCard(sample) {
                 </div>
             </div>
             <div class="card-buttons">
+                <button class="edit-button">Edit</button>
+                ${sample.status === 'In Process' ? '<button id="finish-early-button" class="finish-early-button"><img src="assets/images/icons8-check-ios-17-filled-96.png"></button>' : ''}
                 ${sample.status === 'Ready for Pickup' ? '<button class="pickup-button">Pickup Chip</button>' : ''}
-                ${sample.status === 'Picked up. Ready for Analysis' ? '<button class="complete-button">Complete</button>' : '<button class="edit-button">Edit</button>'}
+                ${sample.status === 'Picked up. Ready for Analysis' ? '<button class="complete-button">Complete</button>' : ''}
             </div>
         </div>
     `;
@@ -810,16 +812,16 @@ function handlePickupButtonClick(event) {
 
 function toggleEditMenu(card, show) {
     const cardContent = card.querySelector('.card-content');
-    const editMenu = card.querySelector('.edit-menu');
+    // const editMenu = card.querySelector('.edit-menu');
 
     if (show) {
         cardContent.classList.add('hidden');
-        editMenu.classList.remove('hidden');
-        editMenu.classList.add('visible');
+        // editMenu.classList.remove('hidden');
+        // editMenu.classList.add('visible');
     } else {
         cardContent.classList.remove('hidden');
-        editMenu.classList.remove('visible');
-        editMenu.classList.add('hidden');
+        // editMenu.classList.remove('visible');
+        // editMenu.classList.add('hidden');
     }
 }
 
