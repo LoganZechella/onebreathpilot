@@ -10,7 +10,7 @@
 body {
     background: linear-gradient(15deg, #014969, #0F92BB, #00E8C6, #0F92BB, #014969);
     font-family: var(--primaryFont);
-    background-size: contain;
+    background-size: cover;
     backdrop-filter: blur(100px);
     background-position: center;
     background-repeat: repeat;
@@ -174,7 +174,25 @@ p {
     height: 250px;
 }
 
-#add-new-sample,
+#add-new-sample {
+    background-color: #ffffff;
+    border: none;
+    backdrop-filter: blur(10px);
+    color: #000000;
+    /* margin: 0 0 0.5em 0.5em; */
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    padding: 0.5em 0.25em 0.5em 0.25em;
+    transition: all 0.3s ease-in-out;
+}
+
+#add-new-sample:hover {
+    animation: pulseZoom 1s ease-in-out infinite;
+;}
+
 #qr-close-btn,
 #manual-add-btn {
     background-color: #d2d2d2;
@@ -387,9 +405,8 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
-    min-width: 100px;
-    margin: 0.5em 0.5em 0.5em 0.5em;
+    align-self: flex-end;
+    margin: -1em 0 0.5em 0;
 }
 
 #confirm-button {
@@ -628,9 +645,9 @@ p {
     background-color: transparent;
 }
 
-.pickup-button {
+.pickup-button, .complete-button {
     background-color: #28a745;
-    width: 150px;
+    max-width: max-content;
     color: white;
     flex: 1;
     margin-right: 0.5em;

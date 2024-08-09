@@ -1,14 +1,25 @@
 
-const animateCSS = (element, animation, prefix = 'animate__') =>
+const animateCSS = (element, animation, options = {}) =>
     new Promise((resolve, reject) => {
+        const { prefix = 'animate__', delay, duration, iterationCount } = options;
         const animationName = `${prefix}${animation}`;
         const node = document.querySelector(element);
+
+        if (delay) node.style.setProperty('--animate-delay', delay);
+        if (duration) node.style.setProperty('--animate-duration', duration);
+        if (iterationCount) node.style.setProperty('--animate-iteration-count', iterationCount);
 
         node.classList.add(`${prefix}animated`, animationName);
 
         function handleAnimationEnd(event) {
             event.stopPropagation();
             node.classList.remove(`${prefix}animated`, animationName);
+
+            // Remove the inline styles after the animation ends
+            if (delay) node.style.removeProperty('--animate-delay');
+            if (duration) node.style.removeProperty('--animate-duration');
+            if (iterationCount) node.style.removeProperty('--animate-iteration-count');
+
             resolve('Animation ended');
         }
 
@@ -34,15 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
     enumerateVideoDevices();
 });
 
-function showElementWithAnimation(elementId, animation) {
+function showElementWithAnimation(elementId, animation, options = {}) {
     const element = document.getElementById(elementId);
     element.style.display = 'block';
-    animateCSS(`#${elementId}`, animation);
+    animateCSS(`#${elementId}`, animation, options);
 }
 
-function hideElementWithAnimation(elementId, animation) {
+// Function to hide an element with an animation
+function hideElementWithAnimation(elementId, animation, options = {}) {
     const element = document.getElementById(elementId);
-    animateCSS(`#${elementId}`, animation).then(() => {
+    animateCSS(`#${elementId}`, animation, options).then(() => {
         element.style.display = 'none';
     });
 }
@@ -143,28 +155,35 @@ function checkAuthState() {
     }
 }
 
+// Setup the confirm button to trigger animations and sample upload
 function setupSampleConfirmation() {
     const confirmButton = document.getElementById('confirm-button');
+
     confirmButton.addEventListener('click', async function (event) {
         event.preventDefault();
         const sample = collectSampleFormData();
         if (sample) {
             sample.timestamp = new Date().toISOString();
             sample.status = 'In Process';
-            // document.getElementById('loading-dashes').style.display = 'block';
-            // showElementWithAnimation('loading-dashes', 'zoomInBig');
+
+            // Add pulsing animation to the confirm button
+            animateCSS('#confirm-button', 'pulse', { iterationCount: 'infinite' });
+
             await sendSample(sample).then(() => {
-                setTimeout(() => {
-                    // hideElementWithAnimation('loading-dashes', 'zoomOutBig');
-                    animateCSS('#sample-reg-section', 'pulse').then(() => {
-                        hideElementWithAnimation('sample-reg-section', 'fadeOut');
-                    });
-                    document.getElementById('sample-reg-section').style.display = 'none';
-                    showOptionButtons();
-                }, 1000);
+                alert('Sample uploaded successfully.');
+
+                // Stop pulsing animation
+                confirmButton.classList.remove('animate__pulse', 'animate__animated');
+
+                // Hide sample-reg-section with fadeOut animation
+                hideElementWithAnimation('sample-reg-section', 'fadeOut').then(() => {
+                    // After fadeOut, show options-container with fadeIn animation
+                    showElementWithAnimation('options-container', 'fadeIn');
+                });
             }).catch(error => {
                 console.error('Failed to submit sample:', error);
                 alert('Failed to submit sample.');
+                confirmButton.classList.remove('animate__pulse', 'animate__animated');
             });
         }
     });
@@ -183,19 +202,18 @@ function collectSampleFormData() {
 }
 
 async function sendSample(sampleData) {
-    fetch('https://onebreathpilot.onrender.com/update_sample', {
+    return fetch('https://onebreathpilot.onrender.com/update_sample', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sampleData),
     })
         .then(response => response.json())
         .then(data => {
-            // alert('Sample update successful.');
-            return true;
+            return true;  // Indicate success
         })
         .catch(error => {
-            alert(`Sample submission failed: ${error}.  Please try again.`);
-            return false;
+            alert(`Sample submission failed: ${error}. Please try again.`);
+            return false;  // Indicate failure
         });
 }
 
@@ -455,9 +473,9 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
                 });
                 loader.style.display = 'none';
                 alert('Document uploaded successfully.');
-                stopDocumentScanning();
-                document.getElementById('review-section').style.display = 'none';
-                resetSampleRegistration();
+                // stopDocumentScanning();
+                // document.getElementById('review-section').style.display = 'none';
+                window.location.reload();
             }
         }));
     } catch (error) {
@@ -610,8 +628,9 @@ function setupQRCodeScanner() {
             'elution': document.getElementById('elution-section')
         };
         Object.values(bodySections).forEach(section => section.style.display = 'none');
-        document.getElementById('qr-close-btn').style.display = 'block';
-        document.getElementById('manual-add-btn').style.display = 'block';
+        document.getElementById('qr-close-btn').style.display = 'flex';
+        document.getElementById('manual-add-btn').style.display = 'flex';
+        document.getElementById('add-button-div').style.alignSelf = 'center';
         document.getElementById('reader').style.display = 'block';
         if (window.window.innerWidth >= 768) {
             document.getElementById('reader').removeAttribute('style');
@@ -742,7 +761,7 @@ function createSampleCard(sample) {
             <div class="card-buttons">
                 <button class="edit-button">Edit</button>
                 ${sample.status === 'In Process' ? '<button id="finish-early-button" class="finish-early-button"><img src="assets/images/icons8-check-ios-17-filled-96.png"></button>' : ''}
-                ${sample.status === 'Ready for Pickup' ? '<button class="pickup-button">Pickup Chip</button>' : ''}
+                ${sample.status === 'Ready for Pickup' ? '<button class="pickup-button">Pickup</button>' : ''}
                 ${sample.status === 'Picked up. Ready for Analysis' ? '<button class="complete-button">Complete</button>' : ''}
             </div>
         </div>
