@@ -485,6 +485,24 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
     }
 });
 
+function startDocumentScanningFromEditMenu() {
+    const bodySections = {
+        'add-button': document.getElementById('add-new-sample'),
+        'in-process': document.getElementById('in-process-section'),
+        'pickup': document.getElementById('pickup-section'),
+        'shipping': document.getElementById('shipping-section'),
+        'elution': document.getElementById('elution-section')
+    };
+    Object.values(bodySections).forEach(section => section.style.display = 'none');
+    document.getElementById('scanner-container').style.display = 'block';
+    document.getElementById('back-button-intake').innerText = 'Cancel';
+    document.getElementById('back-button-intake').addEventListener('click', () => {window.location.href = '/index.html'; fetchSamplesAndUpdateUI();});
+    document.getElementById('change-camera-button').innerText = 'Upload File';
+
+    // Start the document scanning process
+    startDocumentScanning();
+}
+
 async function uploadDocumentMetadata(chipId, documentUrls) {
     try {
         const response = await fetch('https://onebreathpilot.onrender.com/upload_document_metadata', {
@@ -860,8 +878,11 @@ function handleEditMenuOptionClick(event) {
             // Add logic for updating the sample here
             break;
         case 'upload':
-            alert(`Upload selected for ${chipId}`);
-            // Add logic for uploading documents here
+            menuContainer.style.display = 'none';
+            editButton.style.display = 'none';
+
+            // Start document scanning
+            startDocumentScanningFromEditMenu();
             break;
         case 'cancel':
             // Hide the menu and show the edit button
