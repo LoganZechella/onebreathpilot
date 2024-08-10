@@ -9,7 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
     <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
     <title>OneBreath Sample Dashboard</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
@@ -47,7 +46,7 @@
         <label for="password">Password:</label>
         <input type="password" id="password" placeholder="Required" required>
         <button id="sign-in">Sign In</button>
-        <button id="sign-in-google" type="button" disabled>Sign In with Google</button>
+        <button id="sign-in-google" type="button" disabled hidden>Sign In with Google</button>
     </div>
 
     <div class="blocker animate__animated animate__fadeIn animate__slow" id="blocker">
@@ -298,7 +297,7 @@
             <section class="section elution-section" id="elution-section" data-aos="slide-up" data-aos-duration="500"
                 style="display: none">
                 <div class="section-title" id="elution-title">
-                    <h3>Elution</h3>
+                    <h3>Complete</h3>
                 </div>
                 <div class="grid">
                 </div>
@@ -314,6 +313,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
     <script src="./server/auth.js" type="module"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="assets/html5scanner/html5-qrcode 2.3.8.min.js" type="module"></script>
+    <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
     <script src="script.js"></script>
 </body>
 

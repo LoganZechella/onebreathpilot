@@ -176,10 +176,10 @@ function setupSampleConfirmation() {
                 confirmButton.classList.remove('animate__pulse', 'animate__animated');
 
                 // Hide sample-reg-section with fadeOut animation
-                hideElementWithAnimation('sample-reg-section', 'fadeOut').then(() => {
-                    // After fadeOut, show options-container with fadeIn animation
-                    showElementWithAnimation('options-container', 'fadeIn');
-                });
+                hideElementWithAnimation('sample-reg-section', 'fadeOut');
+                document.getElementById('sample-reg-section').style.display = 'none';
+                showElementWithAnimation('option-container', 'fadeIn');
+                document.getElementById('option-container').style.display = 'flex';
             }).catch(error => {
                 console.error('Failed to submit sample:', error);
                 alert('Failed to submit sample.');
@@ -631,6 +631,7 @@ function setupQRCodeScanner() {
         document.getElementById('qr-close-btn').style.display = 'flex';
         document.getElementById('manual-add-btn').style.display = 'flex';
         document.getElementById('add-button-div').style.alignSelf = 'center';
+        document.getElementById('add-button-div').style.margin = '0.5em 0 2em 0'
         document.getElementById('reader').style.display = 'block';
         if (window.window.innerWidth >= 768) {
             document.getElementById('reader').removeAttribute('style');
@@ -689,7 +690,6 @@ function resetSampleRegistration() {
     const bodySections = {
         'landing-main': document.getElementById('landing-main'),
         'add-button-div': document.getElementById('add-button-div'),
-        'add-button': document.getElementById('add-new-sample'),
         'in-process': document.getElementById('in-process-section'),
         'pickup': document.getElementById('pickup-section'),
         'shipping': document.getElementById('shipping-section'),
@@ -699,9 +699,12 @@ function resetSampleRegistration() {
     document.getElementById('patient-intake-form-section').style.display = 'none';
     document.getElementById('qr-close-btn').style.display = 'none';
     document.getElementById('manual-add-btn').style.display = 'none';
-    document.getElementById('add-button-div').querySelector('.add-new-sample').style.display = 'flex';
+    document.getElementById('add-button-div').style.alignSelf = 'flex-end';
+    document.getElementById('add-button-div').style.margin = '-1em 0 0.5em 0';
+    document.getElementById('add-new-sample').style.display = 'flex';
     Object.values(bodySections).forEach(section => section.style.display = 'grid');
     Object.values(bodySections)[0].style.display = 'flex';
+    Object.values(bodySections)[1].style.display = 'flex';
     AOS.refresh();
 }
 
@@ -734,7 +737,11 @@ function updateSampleQueues(samples) {
             case 'Picked up. Ready for Analysis': shippingElement.appendChild(sampleCard); break;
         }
     });
-
+    for (const element of [inProcessElement, pickupElement, shippingElement]) {
+        const cardCount = element.querySelectorAll('.card').length;
+        const sectionTitle = element.parentElement.querySelector('.section-title h3');
+        sectionTitle.textContent = `${sectionTitle.textContent}: ${cardCount}`;
+    }
 
     for (const element of [inProcessElement, pickupElement, shippingElement, analysisElement]) {
         element.style.display = 'grid';
@@ -760,7 +767,7 @@ function createSampleCard(sample) {
             </div>
             <div class="card-buttons">
                 <button class="edit-button">Edit</button>
-                ${sample.status === 'In Process' ? '<button id="finish-early-button" class="finish-early-button"><img src="assets/images/icons8-check-ios-17-filled-96.png"></button>' : ''}
+                ${sample.status === 'In Process' ? '<button class="finish-early-button"><img src="assets/images/icons8-check-ios-17-filled-96.png"></button>' : ''}
                 ${sample.status === 'Ready for Pickup' ? '<button class="pickup-button">Pickup</button>' : ''}
                 ${sample.status === 'Picked up. Ready for Analysis' ? '<button class="complete-button">Complete</button>' : ''}
             </div>
