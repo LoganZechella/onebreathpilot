@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPatientIntakeForm();
     setupQRCodeScanner();
     fetchSamplesAndUpdateUI();
-    setupNewButtonsEventListeners();
     setupSampleEventListeners();
     setupPatientIntakeEventListeners();
     setupOptionContainerEventListeners();
@@ -766,13 +765,14 @@ function createSampleCard(sample) {
                 </div>
             </div>
             <div class="card-buttons">
-                <button class="edit-button">Edit</button>
                 ${sample.status === 'In Process' ? '<button class="finish-early-button"><img src="assets/images/icons8-check-ios-17-filled-96.png"></button>' : ''}
                 ${sample.status === 'Ready for Pickup' ? '<button class="pickup-button">Pickup</button>' : ''}
                 ${sample.status === 'Picked up. Ready for Analysis' ? '<button class="complete-button">Complete</button>' : ''}
+                <button class="edit-button">Edit</button>
             </div>
         </div>
-    `;
+    `
+    ;
 
     // Append card to the respective status section (ensuring it's in the DOM)
     switch (sample.status) {
@@ -781,9 +781,11 @@ function createSampleCard(sample) {
             break;
         case 'Ready for Pickup':
             document.getElementById('pickup-section').querySelector('.grid').appendChild(card);
+            card.querySelector('.edit-button').remove();
             break;
         case 'Picked up. Ready for Analysis':
             document.getElementById('shipping-section').querySelector('.grid').appendChild(card);
+            card.querySelector('.edit-button').remove();
             break;
     }
 
@@ -800,9 +802,10 @@ function createSampleCard(sample) {
     }
 
     // Attach event listeners for buttons
-    if (sample.status !== 'Picked up. Ready for Analysis') {
+    if (sample.status === 'In Process') {
         card.querySelector('.edit-button').addEventListener('click', handleEditButtonClick);
-    } else {
+    }
+    if (sample.status === 'Picked up. Ready for Analysis') {
         card.querySelector('.complete-button').addEventListener('click', () => completeSample(sample.chip_id));
     }
 
@@ -813,19 +816,59 @@ function createSampleCard(sample) {
     return card;
 }
 
-function setupNewButtonsEventListeners() {
-    document.querySelectorAll('.edit-button').forEach(button => {
-        button.addEventListener('click', handleEditButtonClick);
-    });
-
-    document.querySelectorAll('.evacuation-complete-button').forEach(button => {
-        button.addEventListener('click', handleEvacuationCompleteButtonClick);
-    });
-}
-
 function handleEditButtonClick(event) {
     const card = event.target.closest('.card');
-    toggleEditMenu(card, true);
+    const editButton = event.target;
+    const chipId = card.querySelector('.chip-id').innerText;
+
+    // Add a class to the edit button for identification
+    editButton.classList.add(chipId);
+
+    // Toggle the display of the edit options menu
+    let menuContainer = card.querySelector('.edit-options-menu');
+    if (!menuContainer) {
+        // Create and show the menu if it doesn't exist
+        menuContainer = document.createElement('div');
+        menuContainer.classList.add('edit-options-menu');
+        menuContainer.innerHTML = `
+            <button data-option="update">Update</button>
+            <button data-option="upload">Upload</button>
+            <button data-option="cancel">Cancel</button>
+        `;
+        editButton.style.display = 'none'; // Hide the edit button
+        card.querySelector('.card-buttons').appendChild(menuContainer);
+
+        // Attach event listeners for menu options
+        menuContainer.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', handleEditMenuOptionClick);
+        });
+    } else {
+        // Toggle the menu visibility
+        menuContainer.style.display = menuContainer.style.display === 'none' ? 'flex' : 'none';
+    }
+}
+
+function handleEditMenuOptionClick(event) {
+    const option = event.target.getAttribute('data-option');
+    const menuContainer = event.target.closest('.edit-options-menu');
+    const chipId = event.target.closest('.card').querySelector('.chip-id').innerText;
+    const editButton = document.querySelector(`.edit-button.${chipId}`);
+
+    switch (option) {
+        case 'update':
+            alert(`Update selected for ${chipId}`);
+            // Add logic for updating the sample here
+            break;
+        case 'upload':
+            alert(`Upload selected for ${chipId}`);
+            // Add logic for uploading documents here
+            break;
+        case 'cancel':
+            // Hide the menu and show the edit button
+            menuContainer.style.display = 'none';
+            editButton.style.display = 'flex';
+            break;
+    }
 }
 
 function handlePickupButtonClick(event) {
@@ -836,24 +879,9 @@ function handlePickupButtonClick(event) {
     showPickupForm(formId);
 }
 
-function toggleEditMenu(card, show) {
-    const cardContent = card.querySelector('.card-content');
-    // const editMenu = card.querySelector('.edit-menu');
-
-    if (show) {
-        cardContent.classList.add('hidden');
-        // editMenu.classList.remove('hidden');
-        // editMenu.classList.add('visible');
-    } else {
-        cardContent.classList.remove('hidden');
-        // editMenu.classList.remove('visible');
-        // editMenu.classList.add('hidden');
-    }
-}
-
 function handleEvacuationCompleteButtonClick(event) {
     const chipID = event.target.closest('.card').querySelector('h3').innerText;
-    
+
     // Implement the functionality to mark the sample as evacuated
 }
 
@@ -923,7 +951,7 @@ function updateStatusToReadyForAnalysis(chipId) {
         .catch(error => {
             console.error('Error updating sample status:', error);
         });
-    
+
 }
 
 function clearElements(elements) {
@@ -973,7 +1001,13 @@ function displayNoSamplesMessage(elements) {
 }
 
 function appendButtonsBasedOnStatus(card, sample) {
+    if (sample.status === 'In Process') {
+        card.querySelector('.finish-early-button').className = `finish-early-button ${sample.chip_id}`;
+        card.querySelector('.edit-button').className = `edit-button ${sample.chip_id}`;
+    }
+
     if (sample.status === 'Ready for Pickup') {
+        card.querySelector('.edit-button').remove();
         const pickupButton = document.createElement('button');
         pickupButton.className = 'pickup-button';
         pickupButton.id = sample.chip_id;
@@ -1017,7 +1051,7 @@ function setupSampleEventListeners() {
         }
         if (event.target.classList.contains('finish-button')) {
             completeSample(event.target.id);
-            
+
         }
         if (event.target.classList.contains('sample-reg-close-btn')) {
             resetSampleRegistration();

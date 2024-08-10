@@ -589,7 +589,7 @@ p {
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     min-height: 100px;  
     max-height: 200px;  
-    overflow: hidden; 
+    /* overflow: hidden;  */
 }
 
 .card-header {
@@ -641,7 +641,7 @@ p {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    flex-direction: row-reverse;
+    flex-direction: row;
     margin: 0 0 -1em 0;
     min-width: 50%;
     height: 40px;
@@ -696,6 +696,8 @@ p {
     animation: pulseZoom 1s ease-in-out 2;
     transition: ease-in-out 0.3s;
 }
+
+
 .card h3 {
     font-size: 1.2em;
     line-height: 1em;
@@ -750,28 +752,9 @@ p {
     display: flex;
 }
 
-/* .edit-button,
-.evacuation-complete-button {
-    position: absolute;
-    bottom: 10px;
-    padding: 0.25em 0.5em 0.25em 0.5em;
-    margin: 2em 0.25em 0.25em 0.25em;
-    font-size: 10px;
-    border-radius: 5px;
-    border: 1px solid #000;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
-    background-color: transparent;
-    color: #000;
-    max-width: fit-content;
-} */
-
 .edit-options-menu {
     display: flex;
     flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 5px;
