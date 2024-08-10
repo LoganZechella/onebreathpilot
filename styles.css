@@ -10,7 +10,7 @@
 body {
     background: linear-gradient(15deg, #014969, #0F92BB, #00E8C6, #0F92BB, #014969);
     font-family: var(--primaryFont);
-    background-size: contain;
+    background-size: cover;
     backdrop-filter: blur(100px);
     background-position: center;
     background-repeat: repeat;
@@ -141,6 +141,7 @@ p {
 }
 
 #sample-reg-section {
+    margin-top: 2em;
     padding: 1em 1em 1em 1em;
     background-color: #ffffff;
     border-radius: 1em;
@@ -174,14 +175,34 @@ p {
     height: 250px;
 }
 
-#add-new-sample,
+#add-new-sample {
+    background-color: #ffffff;
+    border: none;
+    backdrop-filter: blur(10px);
+    color: #000000;
+    /* margin: 0 0 0.5em 0.5em; */
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    padding: 0.5em 0.25em 0.5em 0.25em;
+    transition: all 0.3s ease-in-out;
+}
+
+#add-new-sample:hover {
+    animation: pulseZoom 1s ease-in-out infinite;
+}
+
 #qr-close-btn,
 #manual-add-btn {
-    background-color: #d2d2d2;
+    background-color: #ffffff;
     color: #000000;
     margin: 0 0.5em 0.5em 0.5em;
-    max-height: min-content;
+    max-width: max-content;
     display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.5em 0.25em 0.5em 0.25em;
     transition: all 0.3s ease-in-out;
 }
@@ -329,19 +350,18 @@ p {
 }
 
 #option-container {
-    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: space-evenly;
     margin-top: 20px;
     background-color: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border-radius: 0.7em;
     max-height: 65vh;
-    height: 55vh;
+    height: 50vh;
     padding: 0 1em 0 1em;
-    transition: all 0.3s ease-in-out;
+    transition: all 1s ease-in-out;
+    display: none;
 }
 
 #option-message {
@@ -351,23 +371,31 @@ p {
     text-align: center;
     max-width: 50vw;
     font-size: 28px;
-    font-weight: 550;
-    text-shadow: 0px 0px 3px #222;
-    margin: 1em 1em 1em 1em;
+    font-weight: 500;
+    text-shadow: -1px 0px 7px #222;
+    /* margin: 1em 1em 1em 1em; */
 }
 
 #digital-form-button {
     margin: 0 1em 0 1em;
     padding: 1em 0.5em 1em 0.5em;
-    min-width: 95%;
-    height: 65px;
+    max-width: 80%;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #scan-document-button {
     margin: 0 1em 0 1em;
     padding: 1em 0.5em 1em 0.5em;
-    min-width: 95%;
-    height: 65px;
+    max-width: fit-content;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #capture-button {
@@ -387,9 +415,9 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
-    min-width: 100px;
-    margin: 0.5em 0.5em 0.5em 0.5em;
+    align-self: flex-end;
+    margin: -1em 0 0.5em 0;
+    min-width: min-content;
 }
 
 #confirm-button {
@@ -446,11 +474,11 @@ p {
     background-color: #ffffffb5;
     backdrop-filter: blur(20px);
     color: black;
-    min-height: 20%;
-    max-height: 100vh;
-    overflow-y: scroll;
-    max-width: 100%;
-    min-width: 75%;
+    min-height: 200px;  
+    max-height: 500px; 
+    overflow-y: auto; 
+    max-width: 90%;
+    min-width: 90%;
     justify-items: stretch;
     transition: all 0.3s ease-in-out;
 }
@@ -474,6 +502,7 @@ p {
     gap: 20px;
     width: 100%;
     justify-items: center;
+    align-items: center;
 }
 
 .section>.grid>p {
@@ -552,13 +581,15 @@ p {
     text-align: left;
     padding: 1em;
     width: 90%;
-    max-height: 200px;
     margin: 0.5em auto;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    min-height: 100px;  
+    max-height: 200px;  
+    overflow: hidden; 
 }
 
 .card-header {
@@ -581,7 +612,7 @@ p {
 }
 
 .location {
-    font-size: 0.9em;
+    font-size: 10px;
     color: #777;
     margin: 0.2em 0;
 }
@@ -597,18 +628,23 @@ p {
 }
 
 .timer {
-    font-size: 0.9em;
-    color: #999;
+    font-size: 10px;
+    color: #000;
     margin-top: 0.2em;
+    width: 100%;      
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden; 
 }
 
 .card-buttons {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
     flex-direction: row-reverse;
-    margin: 0.5em 0 -1em 0;
+    margin: 0 0 -1em 0;
     min-width: 50%;
+    height: 40px;
 }
 
 .card-buttons button {
@@ -628,9 +664,13 @@ p {
     background-color: transparent;
 }
 
-.pickup-button {
+.finish-early-button>img {
+    z-index: 999;
+}
+
+.pickup-button, .complete-button {
     background-color: #28a745;
-    width: 150px;
+    max-width: max-content;
     color: white;
     flex: 1;
     margin-right: 0.5em;
@@ -653,7 +693,7 @@ p {
 }
 
 .finish-early-button:hover {
-    animation: pulseZoom 1s ease-in-out infinite;
+    animation: pulseZoom 1s ease-in-out 2;
     transition: ease-in-out 0.3s;
 }
 .card h3 {
@@ -661,11 +701,11 @@ p {
     line-height: 1em;
     color: var(--hTexts);
     font-weight: bolder;
-    margin: 10px 0;
+    /* margin: 10px 0; */
 }
 
 .card p {
-    font-size: 1rem;
+    /* font-size: 1rem; */
     line-height: 1.3rem;
     color: #535353;
     
@@ -685,7 +725,7 @@ p {
 .card .card-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    /* align-items: center; */
 }
 
 .card .edit-menu {
