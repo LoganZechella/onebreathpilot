@@ -378,11 +378,11 @@ function stopDocumentScanning() {
     document.getElementById('scanner-container').style.display = 'none';
 }
 
-function changeCamera() {
-    stopDocumentScanning();
-    currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
-    startDocumentScanning();
-}
+// function changeCamera() {
+//     stopDocumentScanning();
+//     currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
+//     startDocumentScanning();
+// }
 
 function handleDocumentScanResult(result) {
     console.log('Scan result:', result);
@@ -443,7 +443,7 @@ async function uploadFileToGCS(destinationBlobName, contents) {
 }
 
 document.getElementById('confirm-upload-button').addEventListener('click', async () => {
-    const chipId = document.getElementById('chipID').value;
+    const chipId = window.chipId || document.getElementById('chipID').value;
     const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
 
     const reviewSection = document.querySelectorAll('.review-non-loader');
@@ -497,10 +497,74 @@ function startDocumentScanningFromEditMenu() {
     document.getElementById('scanner-container').style.display = 'block';
     document.getElementById('back-button-intake').innerText = 'Cancel';
     document.getElementById('back-button-intake').addEventListener('click', () => {window.location.href = '/index.html'; fetchSamplesAndUpdateUI();});
-    document.getElementById('change-camera-button').innerText = 'Upload File';
 
     // Start the document scanning process
     startDocumentScanning();
+}
+
+function uploadFromFile() {
+    // Reference the existing file input element
+    const fileInput = document.getElementById('capture-input');
+
+    // Trigger the file browser when the input is clicked
+    fileInput.click();
+
+    // Handle file selection
+    fileInput.addEventListener('change', async function (event) {
+        const file = event.target.files[0];
+        const loader = document.getElementById('document-upload-loader');
+        const scanner = document.getElementById('scanner-container');
+        const reviewSection = document.getElementById('review-section');
+        const captureButtons = document.getElementById('back-button-intake-container');
+        scanner.style.display = 'none';
+        captureButtons.style.display = 'none';
+        reviewSection.style.display = 'flex';
+        document.getElementById('rescan-button').innerText = 'Select New File';
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = async function () {
+                const imageDataUrl = reader.result;
+                const chipId = window.chipId;
+                // Display the uploaded image
+                    const capturedImage = document.getElementById('scanned-images');
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageDataUrl;
+                    capturedImage.appendChild(imgElement);
+                    capturedImage.style.display = 'flex';
+                try {
+                    const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        body: JSON.stringify({ file_name: `document_${chipId}.jpeg` })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        const imageUrl = data.url.split('?')[0];
+                        const shortBlobName = imageUrl.split('/')[4];
+                        console.log(shortBlobName);
+                        
+
+                        // await uploadFileToGCS(shortBlobName, imageDataUrl).then(() => {
+                        //     uploadDocumentMetadata(chipId, imageUrl);
+                        // });
+                        loader.style.display = 'none';
+                        // alert('Document uploaded successfully.');
+                    } else {
+                        alert('Failed to generate presigned URL.');
+                    }
+                } catch (error) {
+                    console.error('Error during document upload:', error);
+                    alert('Document upload failed. Please try again.');
+                }
+            };
+
+            // Read the file as a data URL
+            reader.readAsDataURL(file);
+        }
+    });
 }
 
 async function uploadDocumentMetadata(chipId, documentUrls) {
@@ -866,6 +930,114 @@ function handleEditButtonClick(event) {
     }
 }
 
+function handleUpdateClick(event) {
+    const card = event.target.closest('.card');
+
+    // Get the elements that display the chip ID and location
+    const chipIdElement = card.querySelector('.chip-id');
+    const locationElement = card.querySelector('.location');
+    const editButton = card.querySelector('.edit-button');
+
+
+    // Save the current text values
+    const currentChipId = chipIdElement.innerText;
+    const currentLocation = locationElement.innerText.replace('Location: ', '');
+    chipIdElement.style.display = 'none';
+    locationElement.style.display = 'none';
+
+    // Replace chip ID text with an input field
+    const chipIdInput = document.createElement('input');
+    chipIdInput.type = 'text';
+    chipIdInput.value = currentChipId;
+    chipIdInput.className = 'chip-id-input'; // Optional: Add a class for styling
+    chipIdInput.style.width = '100px';
+    chipIdInput.style.height = '25px';
+    chipIdInput.style.fontSize = '12px';
+    card.querySelector('.chip-id-location').appendChild(chipIdInput);
+
+    // Replace location text with an input field
+    const locationInput = document.createElement('select');
+    locationInput.className = 'location-input'; // Optional: Add a class for styling
+    locationInput.style.width = '160px';
+    locationInput.style.height = '25px';
+    locationInput.style.fontSize = '12px';
+    if (currentLocation === 'CT - Radiology') {
+        locationInput.selectedIndex = 0;
+    } else {
+        locationInput.selectedIndex = 1;
+    }
+
+    const option1 = document.createElement('option');
+    option1.value = 'CT - Radiology';
+    option1.text = 'CT - Radiology';
+    option1.style.color = '#ffffff';
+    locationInput.appendChild(option1);
+
+    const option2 = document.createElement('option');
+    option2.value = 'BCC - 3rd Floor Clinic';
+    option2.text = 'BCC - 3rd Floor Clinic';
+    option2.style.color = '#ffffff';
+    locationInput.appendChild(option2);
+
+    card.querySelector('.chip-id-location').appendChild(locationInput);
+
+    // Add a save button to save the changes
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save';
+    saveButton.className = 'save-button';
+    card.querySelector('.card-buttons').appendChild(saveButton);
+
+    // Event listener to handle save action
+    saveButton.addEventListener('click', async () => {
+        const updatedChipId = chipIdInput.value;
+        const updatedLocation = locationInput.value;
+        chipIdElement.innerText = updatedChipId;
+        locationElement.innerText = `Location: ${updatedLocation}`;
+        chipIdInput.remove();
+        locationInput.remove();
+        chipIdElement.style.display = 'flex';
+        locationElement.style.display = 'flex';
+        
+
+        try {
+            // Make an API call to update the sample in the database
+            const response = await fetch('https://onebreathpilot.onrender.com/update_sample', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({
+                    chip_id: updatedChipId,      // The updated chip ID
+                    location: updatedLocation        // The updated location
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Replace the input fields with the updated text
+                chipIdElement.innerText = updatedChipId;
+                locationElement.innerText = `Location: ${updatedLocation}`;
+                chipIdInput.remove();
+                locationInput.remove();
+                chipIdElement.style.display = 'flex';
+                locationElement.style.display = 'flex';
+            } else {
+                throw new Error('Failed to update the sample.');
+            }
+        } catch (error) {
+            console.error('Error updating sample:', error);
+            alert(`Error updating sample: ${error}`);
+        }
+
+        // Remove the save button after saving
+        saveButton.remove();
+        editButton.style.display = 'flex';
+    });
+}
+
+
 function handleEditMenuOptionClick(event) {
     const option = event.target.getAttribute('data-option');
     const menuContainer = event.target.closest('.edit-options-menu');
@@ -874,13 +1046,13 @@ function handleEditMenuOptionClick(event) {
 
     switch (option) {
         case 'update':
-            alert(`Update selected for ${chipId}`);
-            // Add logic for updating the sample here
+            menuContainer.style.display = 'none';
+            handleUpdateClick(event);
             break;
         case 'upload':
             menuContainer.style.display = 'none';
             editButton.style.display = 'none';
-
+            window.chipId = chipId;
             // Start document scanning
             startDocumentScanningFromEditMenu();
             break;
@@ -1084,7 +1256,8 @@ function setupSampleEventListeners() {
             startDocumentScanning();
         }
         if (event.target.id === 'change-camera-button') {
-            changeCamera();
+            // changeCamera();
+            uploadFromFile();
         }
     });
 
