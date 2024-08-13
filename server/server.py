@@ -205,12 +205,7 @@ def upload_document_metadata():
 @app.route('/api/completed_samples', methods=['GET'])
 def get_completed_samples():
     # Query the samples collection for documents where status is "Complete"
-    completed_samples = db.samples.find({"status": "Complete"})
-    
-    # Convert the MongoDB cursor to a list of dictionaries
-    samples_list = []
-    for sample in completed_samples:
-        sample["_id"] = str(sample["_id"])  # Convert ObjectId to string
-        samples_list.append(sample)
-    
-    return jsonify(samples_list), 200
+    # completed_samples = db.collection.find({"status": "Complete"})
+    completed_samples = get_samples()
+    print(completed_samples)
+    return jsonify(completed_samples), 200
