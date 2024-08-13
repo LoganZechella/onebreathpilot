@@ -1,4 +1,3 @@
-
 const animateCSS = (element, animation, options = {}) =>
     new Promise((resolve, reject) => {
         const { prefix = 'animate__', delay, duration, iterationCount } = options;
@@ -806,9 +805,9 @@ function updateSampleQueues(samples) {
     const inProcessElement = document.getElementById('in-process-section').querySelector('.grid');
     const pickupElement = document.getElementById('pickup-section').querySelector('.grid');
     const shippingElement = document.getElementById('shipping-section').querySelector('.grid');
-    const analysisElement = document.getElementById('elution-section').querySelector('.grid');
+    // const analysisElement = document.getElementById('elution-section').querySelector('.grid');
 
-    clearElements([inProcessElement, pickupElement, shippingElement, analysisElement]);
+    clearElements([inProcessElement, pickupElement, shippingElement]);
 
     samples.forEach(sample => {
         const sampleCard = createSampleCard(sample);
@@ -821,14 +820,15 @@ function updateSampleQueues(samples) {
     for (const element of [inProcessElement, pickupElement, shippingElement]) {
         const cardCount = element.querySelectorAll('.card').length;
         const sectionTitle = element.parentElement.querySelector('.section-title h3');
-        sectionTitle.textContent = `${sectionTitle.textContent}: ${cardCount}`;
+        const sectionTitleText = sectionTitle.textContent.split(': ')[0];
+        sectionTitle.textContent = `${sectionTitleText}: ${cardCount}`;
     }
 
-    for (const element of [inProcessElement, pickupElement, shippingElement, analysisElement]) {
+    for (const element of [inProcessElement, pickupElement, shippingElement]) {
         element.style.display = 'grid';
     }
 
-    displayNoSamplesMessage([inProcessElement, pickupElement, shippingElement, analysisElement]);
+    displayNoSamplesMessage([inProcessElement, pickupElement, shippingElement]);
 }
 
 function createSampleCard(sample) {
@@ -1068,7 +1068,6 @@ function handlePickupButtonClick(event) {
     formId = event.target.closest('.card').querySelector('.chip-id').innerText;
     document.getElementById('pickup-form').elements['confirm-pickup-button'].classList.add(formId);
     const chipID = event.target.closest('.card').querySelector('.chip-id').innerText;
-    showElementWithAnimation('pickup-form', 'pulse');
     showPickupForm(formId);
 }
 
@@ -1093,7 +1092,7 @@ function initializeCountdown(timestamp, timerId, chipId) {
 
         if (distance < 0) {
             clearInterval(interval);
-            timerElement.innerHTML = "Time's up";
+            // timerElement.innerHTML = "Time's up";
             updateStatusToReadyForPickup(chipId);
             return;
         }
@@ -1126,11 +1125,28 @@ function updateStatusToReadyForPickup(chipId) {
         });
 }
 
-function updateStatusToReadyForAnalysis(chipId) {
+function collectPickupFormData() {
+    let chip_id = document.getElementById('chipID').value;
+    let patient_id = document.getElementById('patientID').value;
+    let location = document.getElementById('location').value;
+
+    if (!chip_id || !patient_id || !location) {
+        alert('Please fill in all required fields.');
+        return null;
+    }
+    return { chip_id, patient_id, location };
+}
+
+async function updateStatusToReadyForAnalysis(chipId, volume, co2, error) {
     const sampleData = {
         chip_id: chipId,
-        status: "Picked up. Ready for Analysis"
+        status: "Picked up. Ready for Analysis",
+        final_volume: volume,
+        average_co2: co2
     };
+    if (error) {
+        sampleData.error = error;
+    }
 
     fetch('https://onebreathpilot.onrender.com/update_sample', {
         method: 'POST',
@@ -1158,7 +1174,7 @@ function clearElements(elements) {
 function showPickupForm(chipId) {
     const form = document.getElementById('pickup-form');
     form.elements['data-chip-id'].value = chipId;
-    showElementWithAnimation('pickup-form-modal', 'bounceIn');
+    showElementWithAnimation('pickup-form-modal', 'fadeIn', { duration: '800ms', delay: '0s' });
     document.getElementById('pickup-form-modal').style.display = 'block';
     document.getElementById('pickup-form-modal').style.marginTop = '5em';
 }
@@ -1176,8 +1192,7 @@ function completeSample(chipId) {
     })
         .then(response => response.json())
         .then(data => {
-            fetchSamplesAndUpdateUI();
-            alert('Sample completed successfully.');
+            alert('Sample completed successfully.');fetchSamplesAndUpdateUI();
         })
         .catch(error => {
             console.error('Error updating sample status:', error);
@@ -1200,7 +1215,7 @@ function appendButtonsBasedOnStatus(card, sample) {
     }
 
     if (sample.status === 'Ready for Pickup') {
-        card.querySelector('.edit-button').remove();
+        // card.querySelector('.edit-button').remove();
         const pickupButton = document.createElement('button');
         pickupButton.className = 'pickup-button';
         pickupButton.id = sample.chip_id;
@@ -1233,14 +1248,34 @@ function setupSampleEventListeners() {
     document.getElementById('pickup-form').addEventListener('submit', function (event) {
         event.preventDefault();
         const chipId = event.target.elements['confirm-pickup-button'].classList[0];
-        updateStatusToReadyForAnalysis(chipId);
-        document.getElementById('pickup-form-modal').style.display = 'none';
-        document.getElementById('pickup-form').reset();
+        const volume = event.target.elements['final-volume'].value;
+        const co2 = event.target.elements['average-co2'].value;
+        if (event.target.elements['error-codes'].value) {
+            const error = event.target.elements['error-codes'].value;
+            updateStatusToReadyForAnalysis(chipId, volume, co2, error).then(() => {
+                hideElementWithAnimation('pickup-form-modal', 'fadeOut', 'duration-500ms', 'delay-0s');
+                // document.getElementById('pickup-form-modal').style.display = 'none';
+                document.getElementById('pickup-form').reset();
+                
+            }).catch(error => {
+                console.error('Failed to update sample status:', error);
+                alert('Failed to update sample status.');
+            });
+        } else {
+            updateStatusToReadyForAnalysis(chipId, volume, co2).then(() => {
+                hideElementWithAnimation('pickup-form-modal', 'fadeOut', 'duration-500ms', 'delay-0s');
+                // document.getElementById('pickup-form-modal').style.display = 'none';
+                document.getElementById('pickup-form').reset();
+            }).catch(error => {
+                console.error('Failed to update sample status:', error);
+                alert('Failed to update sample status.');
+            });
+        }
     });
 
     document.getElementById('pickup-close-button').addEventListener('click', function () {
-        hideElementWithAnimation('pickup-form-modal', 'zoomOut');
-        document.getElementById('pickup-form-modal').style.display = 'none';
+        hideElementWithAnimation('pickup-form-modal', 'fadeOut', { duration: '1000ms', delay: '0s' });
+        // document.getElementById('pickup-form-modal').style.display = 'none';
     });
 
     document.addEventListener('click', function (event) {
