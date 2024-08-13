@@ -71,7 +71,7 @@ collection = db[COLLECTION_NAME]
 
 def get_samples():
     # Fetches samples from the database with specified statuses.
-    statuses = ["In Process", "Ready for Pickup", "Picked up. Ready for Analysis"]
+    statuses = ["In Process", "Ready for Pickup", "Picked up. Ready for Analysis", "Complete"]
     query_result = collection.find({"status": {"$in": statuses}}, {"_id": 0})
     samples = list(query_result)
     # print(samples)
@@ -201,3 +201,16 @@ def upload_document_metadata():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/completed_samples', methods=['GET'])
+def get_completed_samples():
+    # Query the samples collection for documents where status is "Complete"
+    completed_samples = db.samples.find({"status": "Complete"})
+    
+    # Convert the MongoDB cursor to a list of dictionaries
+    samples_list = []
+    for sample in completed_samples:
+        sample["_id"] = str(sample["_id"])  # Convert ObjectId to string
+        samples_list.append(sample)
+    
+    return jsonify(samples_list), 200
