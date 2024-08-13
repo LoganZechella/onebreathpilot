@@ -1224,6 +1224,11 @@ function updateTimerDisplay(timerElement, distance) {
     timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s remaining`;
 }
 
+function toggleMenu() {
+    const navLinks = document.getElementById('nav-links');
+    navLinks.classList.toggle('responsive');
+}
+
 function setupSampleEventListeners() {
     document.getElementById('pickup-form').addEventListener('submit', function (event) {
         event.preventDefault();

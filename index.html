@@ -23,14 +23,33 @@
             class="animate__animated animate__pulse animate__slow splash-logo">
     </div>
 
-    <nav class="container-fluid animate__animated animate__fadeInDown" id="container-fluid" role="navigation"
+    <!-- <nav class="container-fluid animate__animated animate__fadeInDown" id="container-fluid" role="navigation"
         aria-label="Main navigation">
         <header class="nav-header">
             <ul>
                 <li id="nav-title-text"><strong>OneBreath Pilot Study</strong></li>
+                
             </ul>
         </header>
         <ul class="nav-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="#" id="show-sign-in" class="logged-out">Sign In</a></li>
+        </ul>
+    </nav> -->
+
+    <nav class="container-fluid animate__animated animate__fadeInDown" id="container-fluid" role="navigation"
+        aria-label="Main navigation">
+        <header class="nav-header">
+            <ul>
+                <!-- <li id="nav-title-text"><strong>OneBreath Pilot Study</strong></li> -->
+                <li class="hamburger-menu">
+                    <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
+                        &#9776;
+                    </a>
+                </li>
+            </ul>
+        </header>
+        <ul class="nav-links" id="nav-links">
             <li><a href="/index.html">Home</a></li>
             <li><a href="#" id="show-sign-in" class="logged-out">Sign In</a></li>
         </ul>
