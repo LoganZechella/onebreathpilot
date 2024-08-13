@@ -45,6 +45,7 @@ body {
     display: none;
     background-color: #00000080;
     position: sticky;
+    z-index: 1;
 }
 
 h1,
@@ -127,6 +128,86 @@ p {
 
 .nav-links>li>a {
     color: aliceblue;
+}
+
+.nav-header ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    padding: 8px 12px;
+}
+
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.nav-links li a:hover {
+    color: #ddd;
+}
+
+/* Hamburger menu styles */
+.hamburger-menu {
+    display: none;
+    /* Hidden by default */
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.hamburger-menu a {
+    text-decoration: none;
+    color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        /* Hide the links by default */
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: #333;
+        z-index: 100;
+        animation: slideIn 0.3s ease forwards;
+    }
+
+    .nav-links.responsive {
+        display: flex;
+    }
+
+    .hamburger-menu {
+        display: block;
+        /* Show hamburger icon on smaller screens */
+    }
+}
+
+/* Animation for the menu */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 #new-sample-form {
