@@ -72,11 +72,11 @@ db = client[DATABASE_NAME]
 collection = db[COLLECTION_NAME]
 
 def get_samples():
-    # Fetches samples from the database with specified statuses.
     statuses = ["In Process", "Ready for Pickup", "Picked up. Ready for Analysis", "Complete"]
     query_result = collection.find({"status": {"$in": statuses}}, {"_id": 0})
     samples = list(query_result)
-    # print(samples)
+    # Ensure all Decimal128 fields are converted before returning
+    samples = [convert_decimal128(sample) for sample in samples]
     return samples
 
 @app.route('/samples', methods=['GET'])
@@ -154,7 +154,7 @@ def generate_presigned_url():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 def upload_blob_from_memory(destination_blob_name, file_stream):
     """Uploads a file to the bucket."""
     blob = bucket.blob(destination_blob_name)
@@ -207,14 +207,18 @@ def upload_document_metadata():
 def convert_decimal128(sample):
     for key, value in sample.items():
         if isinstance(value, Decimal128):
-            sample[key] = float(value.to_decimal())  # Convert Decimal128 to float or use str(value) to convert to string
+            sample[key] = float(value.to_decimal())  # Convert Decimal128 to float
+        elif isinstance(value, dict):
+            sample[key] = convert_decimal128(value)  # Recursively convert nested documents
+        elif isinstance(value, list):
+            sample[key] = [convert_decimal128(item) if isinstance(item, dict) else item for item in value]
     return sample
 
 @app.route('/api/completed_samples', methods=['GET'])
 def get_completed_samples():
     all_samples = get_samples()
 
-    # Filter to only include samples with the "Complete" status
+    # Convert all Decimal128 fields to JSON serializable formats (floats)
     completed_samples = [convert_decimal128(sample) for sample in all_samples if sample["status"] == "Complete"]
 
     return jsonify(completed_samples), 200
