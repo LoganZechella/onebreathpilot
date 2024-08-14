@@ -115,10 +115,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
             });
             const data = await response.json();
+            
+
             if (data.success) {
                 // Optionally, save the document metadata if needed
-                await saveDocumentMetadata(chipId, data.document_url);
-
+                const documentUrl = `https://storage.cloud.google.com/breathdocument_bucket/document_${chipId}.jpeg`;
+                await saveDocumentMetadata(chipId, documentUrl);
                 alert('Document uploaded successfully.');
                 clearImagePreview();  // Clear the image preview after successful upload
                 loadCompletedSamples(); // Refresh the table to update the image status
