@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
             if (data.success) {
                 // Optionally, save the document metadata if needed
-                await saveDocumentMetadata(chipId, data.url);
+                await saveDocumentMetadata(chipId, data.document_urls);
 
                 alert('Document uploaded successfully.');
                 clearImagePreview();  // Clear the image preview after successful upload
