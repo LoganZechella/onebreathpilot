@@ -204,8 +204,10 @@ def upload_document_metadata():
 
 @app.route('/api/completed_samples', methods=['GET'])
 def get_completed_samples():
-    # Query the samples collection for documents where status is "Complete"
-    # completed_samples = db.collection.find({"status": "Complete"})
-    completed_samples = get_samples()
-    print(completed_samples)
+    # Get all samples with the specified statuses
+    all_samples = get_samples()
+
+    # Filter to only include samples with the "Complete" status
+    completed_samples = [sample for sample in all_samples if sample["status"] == "Complete"]
+
     return jsonify(completed_samples), 200
