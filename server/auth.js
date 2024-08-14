@@ -1,6 +1,6 @@
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getIdToken } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+
 
 // Initialize Firebase App
 const firebaseConfig = {
@@ -16,13 +16,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-function handleAuthStateChange(user) {
-    window.user = user;
-    const event = new CustomEvent('authStateChanged', { detail: { user } });
-    window.dispatchEvent(event);
-}
+// Function to handle auth state changes
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is signed in
+        window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+    } else {
+        // No user is signed in
+        window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user: null } }));
+    }
+});
 
-onAuthStateChanged(auth, handleAuthStateChange);
+// Expose auth for other scripts to use
+window.firebaseAuth = auth;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('show-sign-in').addEventListener('click', (event) => {

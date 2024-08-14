@@ -2,24 +2,61 @@ function toggleMenu() {
     const navLinks = document.getElementById('nav-links');
     navLinks.classList.toggle('responsive');
 }
+
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.user) {
-        updateUIBasedOnAuth(window.user);
-    } else {
-        updateUIBasedOnAuth(null);
+    const auth = window.firebaseAuth;
+    auth.onAuthStateChanged((user) => {
+        updateUIBasedOnAuth(user);
+    });
+
+    function updateUIBasedOnAuth(user) {
+        const authButton = document.getElementById('show-sign-in');
+        const tableSection = document.getElementById('table-section');
+        const signInContainer = document.getElementById('sign-in-container');
+        const mainContent = document.getElementById('main-content');
+
+        if (user) {
+            authButton.textContent = 'Sign Out';
+            authButton.addEventListener('click', () => auth.signOut());
+            tableSection.style.display = 'block';
+            signInContainer.hidden = true;
+            loadCompletedSamples();
+        } else {
+            authButton.textContent = 'Sign In';
+            authButton.addEventListener('click', () => {
+                signInContainer.hidden = false;
+                tableSection.style.display = 'none';
+            });
+            tableSection.style.display = 'none';
+            signInContainer.hidden = false;
+        }
     }
-    const tableBody = document.querySelector('#completed-samples-table tbody');
+
+    document.getElementById('sign-in').addEventListener('click', function () {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                updateUIBasedOnAuth(user);
+            })
+            .catch((error) => {
+                console.error('Error during sign-in:', error.message);
+                alert('Sign-in failed. Please check your credentials and try again.');
+            });
+    });
 
     // Function to fetch and populate completed samples
     function loadCompletedSamples() {
         fetch('https://onebreathpilot.onrender.com/api/completed_samples')
             .then(response => response.json())
             .then(data => {
-                console.log('Completed samples:', data);
+                const tableBody = document.querySelector('#completed-samples-table tbody');
+                tableBody.innerHTML = '';
                 data.forEach(sample => {
                     const row = document.createElement('tr');
 
-                    // Create cells for each column
                     const sampleIdCell = document.createElement('td');
                     sampleIdCell.textContent = sample.chip_id;
 
@@ -35,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     const imageCell = document.createElement('td');
                     imageCell.textContent = sample.document_urls ? 'Yes' : 'No';
 
-                    // Create the Upload button cell
                     const uploadCell = document.createElement('td');
                     const uploadButton = document.createElement('button');
                     uploadButton.className = 'upload-button';
@@ -43,14 +79,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     uploadButton.textContent = 'Upload';
                     uploadCell.appendChild(uploadButton);
 
-                    // Append cells to the row
                     row.appendChild(sampleIdCell);
                     row.appendChild(patientIdCell);
                     row.appendChild(dateCompletedCell);
                     row.appendChild(imageCell);
                     row.appendChild(uploadCell);
 
-                    // Append the row to the table body
                     tableBody.appendChild(row);
                 });
             })
@@ -61,13 +95,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('upload-button')) {
-            showUploadMenu(event.target.dataset.chipId);
+            const chipId = event.target.dataset.chipId;
+            if (auth.currentUser) {
+                showUploadMenu(chipId);
+            } else {
+                alert('You must be signed in to upload a file.');
+            }
         }
     });
 
-    // Show the upload menu when the Upload button is clicked
     function showUploadMenu(chipId) {
-        clearImagePreview();  // Clear any previous image preview
+        clearImagePreview();
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
@@ -80,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 reader.onloadend = function () {
                     const imageDataUrl = reader.result;
 
-                    // Create preview and confirm upload
                     const imgDiv = document.createElement('div');
                     imgDiv.className = 'img-preview-div';
                     document.getElementById('main-content').appendChild(imgDiv);
@@ -89,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     imgElement.src = imageDataUrl;
                     imgDiv.appendChild(imgElement);
 
-                    // Display a preview and confirmation button
                     const confirmationButton = document.createElement('button');
                     confirmationButton.className = 'confirm-upload-button';
                     confirmationButton.dataset.chipId = chipId;
@@ -119,15 +155,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
             });
             const data = await response.json();
-
-
             if (data.success) {
-                // Optionally, save the document metadata if needed
                 const documentUrl = `https://storage.cloud.google.com/breathdocument_bucket/document_${chipId}.jpeg`;
                 await saveDocumentMetadata(chipId, documentUrl);
                 alert('Document uploaded successfully.');
-                clearImagePreview();  // Clear the image preview after successful upload
-                // loadCompletedSamples(); // Refresh the table to update the image status
+                clearImagePreview();
+                loadCompletedSamples();
             } else {
                 alert('Failed to upload document.');
             }
@@ -162,69 +195,5 @@ document.addEventListener('DOMContentLoaded', function () {
         if (imgPreviewDiv) {
             imgPreviewDiv.remove();
         }
-        // Clear the table body before refreshing
-        tableBody.innerHTML = '';
-
-        // Load completed samples to refresh the table
-        loadCompletedSamples();
     }
-
-    // Load completed samples on page load
-    loadCompletedSamples();
 });
-
-function showElementWithAnimation(elementId, animation, options = {}) {
-    const element = document.getElementById(elementId);
-    element.style.display = 'block';
-    animateCSS(`#${elementId}`, animation, options);
-}
-
-// Function to hide an element with an animation
-function hideElementWithAnimation(elementId, animation, options = {}) {
-    const element = document.getElementById(elementId);
-    animateCSS(`#${elementId}`, animation, options).then(() => {
-        element.style.display = 'none';
-    });
-}
-
-function updateUIBasedOnAuth(user) {
-    // const signInContainer = document.getElementById('sign-in-container');
-    const landingMain = document.getElementById('landing-main');
-    const blocker = document.querySelector('.blocker');
-    const signInButton = document.getElementById('show-sign-in');
-
-    if (user) {
-        // hideElementWithAnimation('sign-in-container', 'fadeOut');
-        if (window.location.search.includes('chipID') === true) {
-            document.getElementById('landing-main').style.display = 'none';
-            signInButton.textContent = 'Sign Out';
-            showElementWithAnimation('add-sample-main', 'fadeIn');
-            document.getElementById('add-sample-main').style.display = 'flex';
-        } else {
-            
-        }
-    } else {
-        // window.location.href = '/index.html';
-        // showElementWithAnimation('sign-in-container', 'fadeIn');
-        // // hideElementWithAnimation('landing-main', 'fadeOut');
-        // blocker.style.display = 'none';
-        // signInButton.textContent = 'Sign In';
-    }
-}
-window.addEventListener('authStateChanged', (event) => {
-    const user = event.detail.user;
-    updateUIBasedOnAuth(user);
-});
-
-
-
-
-function checkAuthState() {
-    const user = window.user;
-    if (user) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
