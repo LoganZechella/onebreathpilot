@@ -72,11 +72,11 @@ db = client[DATABASE_NAME]
 collection = db[COLLECTION_NAME]
 
 def get_samples():
+    # Fetches samples from the database with specified statuses.
     statuses = ["In Process", "Ready for Pickup", "Picked up. Ready for Analysis", "Complete"]
     query_result = collection.find({"status": {"$in": statuses}}, {"_id": 0})
     samples = list(query_result)
-    # Ensure all Decimal128 fields are converted before returning
-    samples = [convert_decimal128(sample) for sample in samples]
+    # print(samples)
     return samples
 
 @app.route('/samples', methods=['GET'])
@@ -172,9 +172,7 @@ def upload_from_memory():
         image_data = base64.b64decode(image_data.split(",")[1])
         image_stream = BytesIO(image_data)
         
-        # Upload to GCS
-        blob = bucket.blob(destination_blob_name)
-        blob.upload_from_file(image_stream, content_type='image/jpeg')
+        upload_blob_from_memory(destination_blob_name, image_stream)
 
         return jsonify({'success': True, 'message': 'File uploaded successfully'}), 200
 
