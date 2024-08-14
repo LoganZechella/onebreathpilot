@@ -172,7 +172,9 @@ def upload_from_memory():
         image_data = base64.b64decode(image_data.split(",")[1])
         image_stream = BytesIO(image_data)
         
-        upload_blob_from_memory(destination_blob_name, image_stream)
+        # Upload to GCS
+        blob = bucket.blob(destination_blob_name)
+        blob.upload_from_file(image_stream, content_type='image/jpeg')
 
         return jsonify({'success': True, 'message': 'File uploaded successfully'}), 200
 
