@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('upload-button')) {
             showUploadMenu(event.target.dataset.chipId);
@@ -88,38 +89,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     confirmationButton.addEventListener('click', async function () {
                         try {
-                            const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
+                            const response = await fetch('https://onebreathpilot.onrender.com/upload_from_memory', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                     'Access-Control-Allow-Origin': '*'
                                 },
-                                body: JSON.stringify({ file_name: `document_${chipId}.jpeg` })
+                                body: JSON.stringify({
+                                    destination_blob_name: `document_${chipId}.jpeg`,
+                                    source_file_name: imageDataUrl
+                                })
                             });
                             const data = await response.json();
                             if (data.success) {
-                                const presignedUrl = data.url;
-
-                                // Upload the file directly to the storage using the presigned URL
-                                const uploadResponse = await fetch(presignedUrl, {
-                                    method: 'PUT',
-                                    headers: {
-                                        'Content-Type': 'image/jpeg',
-                                        'Access-Control-Allow-Origin': '*'
-                                    },
-                                    body: new Blob([imageDataUrl], { type: 'image/jpeg' })
-                                });
-
-                                if (!uploadResponse.ok) {
-                                    throw new Error('Failed to upload image to the presigned URL.');
-                                }
-
-                                // After the file is uploaded, save the metadata in the database
-                                const destinationBlobName = presignedUrl.split('?')[0];
-                                await saveDocumentMetadata(chipId, destinationBlobName);
                                 alert('Document uploaded successfully.');
                             } else {
-                                alert('Failed to generate presigned URL.');
+                                alert('Failed to upload document.');
                             }
                         } catch (error) {
                             console.error('Error during document upload:', error);
@@ -155,4 +140,3 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load completed samples on page load
     loadCompletedSamples();
 });
-
