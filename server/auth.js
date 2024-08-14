@@ -39,23 +39,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('sign-in').addEventListener('click', async () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            window.location.reload();
-        } catch (error) {
-            console.error('Login failed:', error);
-        }
-    });
+    if (document.getElementById('sign-in')) {    
+        document.getElementById('sign-in').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.reload();
+            } catch (error) {
+                console.error('Login failed:', error);
+            }
+        });
+        window.user = auth.currentUser;
+    }
 
-    document.getElementById('sign-in-google').addEventListener('click', async () => {
-        const googleProvider = new GoogleAuthProvider();
-        try {
-            await signInWithPopup(auth, googleProvider);
-        } catch (error) {
-            console.error('Google sign-in failed:', error);
-        }
-    });
+    // document.getElementById('sign-in-google').addEventListener('click', async () => {
+    //     const googleProvider = new GoogleAuthProvider();
+    //     try {
+    //         await signInWithPopup(auth, googleProvider);
+    //     } catch (error) {
+    //         console.error('Google sign-in failed:', error);
+    //     }
+    // });
 });
