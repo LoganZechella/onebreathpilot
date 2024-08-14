@@ -107,18 +107,21 @@ function initApp() {
     const splashScreen = document.getElementById('splash-screen');
 
     setTimeout(() => {
-        animateCSS('#splash-screen', 'fadeOut').then(() => {
-            document.getElementById('splash-screen').style.display = 'none';
-        });
-        animateCSS('#sign-in-container', 'fadeIn');
+        // animateCSS('#splash-screen', 'fadeOut').then(() => {
+        //     document.getElementById('splash-screen').style.display = 'none';
+        // });
+        // animateCSS('#sign-in-container', 'fadeIn');
+        hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '1000ms' });
+        showElementWithAnimation('sign-in-container', 'fadeIn', { duration: '1000ms' });
         checkAuthState();
         if (checkAuthState() === true) {
             hideElementWithAnimation('sign-in-container', 'fadeOut');
+            hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '1000ms' });
             // showElementWithAnimation('landing-main', 'fadeIn');
-            showElementWithAnimation('blocker', 'fadeIn');
-            showElementWithAnimation('container-fluid', 'fadeIn');
+            showElementWithAnimation('blocker', 'fadeIn', { delay: '500ms', duration: '1000ms' });
+            showElementWithAnimation('container-fluid', 'fadeIn', { delay: '500ms', duration: '1000ms' });
             // document.getElementById('landing-main').style.display = 'flex';
-            document.querySelector('.blocker').style.display = 'flex';
+            // document.querySelector('.blocker').style.display = 'flex';
             const nav = document.querySelector('.container-fluid');
             nav.style.display = 'flex';
         } else {
@@ -126,9 +129,9 @@ function initApp() {
             document.getElementById('landing-main').style.display = 'none';
             document.getElementById('sign-in-container').removeAttribute('hidden');
         }
-        hideElementWithAnimation('splash-screen', 'fadeOut');
-        showElementWithAnimation('sign-in-container', 'fadeIn');
-    }, 1500);
+        
+        // showElementWithAnimation('sign-in-container', 'fadeIn', { duration: '500ms' });
+    }, 1200);
 
     const queryParams = window.location.search;
     if (queryParams) {
@@ -145,7 +148,7 @@ function initApp() {
 }
 
 function checkAuthState() {
-    const user = window.user;
+    const user = window.firebaseAuth;
     if (user) {
         return true;
     } else {
@@ -823,10 +826,20 @@ function updateSampleQueues(samples) {
         const sectionTitleText = sectionTitle.textContent.split(': ')[0];
         sectionTitle.textContent = `${sectionTitleText}: ${cardCount}`;
     }
+    
+    const inprocessSection = document.getElementById('in-process-section');
+    const pickupSection = document.getElementById('pickup-section');
+    const shippingSection = document.getElementById('shipping-section');
+
+    for (const element of [inprocessSection, pickupSection, shippingSection]) {
+        showElementWithAnimation(element.id, 'zoomIn', { duration: '700ms', delay: '1200ms' });
+    }
 
     for (const element of [inProcessElement, pickupElement, shippingElement]) {
         element.style.display = 'grid';
     }
+
+    
 
     displayNoSamplesMessage([inProcessElement, pickupElement, shippingElement]);
 }
@@ -880,7 +893,7 @@ function createSampleCard(sample) {
             initializeCountdown(sample.timestamp, timerElementId, sample.chip_id);
         }
     } else {
-        console.error(`Timer element with ID ${timerElementId} not found. Skipping countdown.`);
+        // console.error(`Timer element with ID ${timerElementId} not found. Skipping countdown.`);
     }
 
     // Attach event listeners for buttons
@@ -1092,7 +1105,6 @@ function initializeCountdown(timestamp, timerId, chipId) {
 
         if (distance < 0) {
             clearInterval(interval);
-            // timerElement.innerHTML = "Time's up";
             updateStatusToReadyForPickup(chipId);
             return;
         }
@@ -1301,8 +1313,6 @@ function setupSampleEventListeners() {
         }
         if (event.target.id === 'completed-samples-button') {
             window.location.href = '/completed.html';
-            const user = window.user // Replace 'John Doe' with the actual user name
-            localStorage.setItem('user', user);
         }
     });
 
