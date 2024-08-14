@@ -489,8 +489,8 @@ function startDocumentScanningFromEditMenu() {
         'add-button': document.getElementById('add-new-sample'),
         'in-process': document.getElementById('in-process-section'),
         'pickup': document.getElementById('pickup-section'),
-        'shipping': document.getElementById('shipping-section'),
-        'elution': document.getElementById('elution-section')
+        'shipping': document.getElementById('shipping-section')
+        // 'elution': document.getElementById('elution-section')
     };
     Object.values(bodySections).forEach(section => section.style.display = 'none');
     document.getElementById('scanner-container').style.display = 'block';
@@ -704,8 +704,8 @@ function setupQRCodeScanner() {
             'add-button': document.getElementById('add-new-sample'),
             'in-process': document.getElementById('in-process-section'),
             'pickup': document.getElementById('pickup-section'),
-            'shipping': document.getElementById('shipping-section'),
-            'elution': document.getElementById('elution-section')
+            'shipping': document.getElementById('shipping-section')
+            // 'elution': document.getElementById('elution-section')
         };
         Object.values(bodySections).forEach(section => section.style.display = 'none');
         document.getElementById('qr-close-btn').style.display = 'flex';
@@ -772,8 +772,8 @@ function resetSampleRegistration() {
         'add-button-div': document.getElementById('add-button-div'),
         'in-process': document.getElementById('in-process-section'),
         'pickup': document.getElementById('pickup-section'),
-        'shipping': document.getElementById('shipping-section'),
-        'elution': document.getElementById('elution-section')
+        'shipping': document.getElementById('shipping-section')
+        // 'elution': document.getElementById('elution-section')
     };
     document.getElementById('sample-reg-section').style.display = 'none';
     document.getElementById('patient-intake-form-section').style.display = 'none';
