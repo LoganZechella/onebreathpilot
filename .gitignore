@@ -142,3 +142,4 @@ dist
 # Local Netlify folder
 .netlify
 assets/images/.DS_Store
+assets/.DS_Store
