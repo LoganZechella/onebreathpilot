@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <!-- <link rel="stylesheet" href="/styles.css"> -->
+    <link rel="stylesheet" href="/completedstyles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <title>Completed Page</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <meta name="description" content="Completed Page Description">
+</head>
+
+<body>
+    <!-- <div id="splash-screen" class="animate__animated animate__fadeIn">
+        <img src="./assets/images/BREATH DIAGNOSTICS-2.png" alt="Splash Logo" class="splash-logo">
+    </div> -->
+
+    <nav class="container-fluid animate__animated animate__fadeInDown" id="container-fluid" role="navigation"
+        aria-label="Main navigation">
+        <header class="nav-header">
+            <ul>
+                <li class="hamburger-menu">
+                    <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
+                        &#9776;
+                    </a>
+                </li>
+            </ul>
+        </header>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="#" id="show-sign-in" class="logged-out">Sign In</a></li>
+            <li><a href="/completed.html">Completed Samples</a></li>
+        </ul>
+    </nav>
+
+    <div class="blocker animate__animated animate__fadeIn animate__slow" id="blocker">
+        <main class="container" id="main-content" data-aos="fade-in" data-aos-duration="800">
+            <!-- Main content sections will go here -->
+            <section id="table-section" class="animate__animated animate__slideInUp">
+                <h2>Completed Samples</h2>
+                <table id="completed-samples-table">
+                    <thead>
+                        <tr>
+                            <th>Sample ID</th>
+                            <th>Patient ID</th>
+                            <!-- <th>Location</th> -->
+                            <th>Date Completed</th>
+                            <th>Upload</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically populated by JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script src="completedscript.js"></script>
+
+</body>
+
+</html>
