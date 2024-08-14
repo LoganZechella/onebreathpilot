@@ -1299,6 +1299,11 @@ function setupSampleEventListeners() {
             // changeCamera();
             uploadFromFile();
         }
+        if (event.target.id === 'completed-samples-button') {
+            window.location.href = '/completed.html';
+            const user = window.user // Replace 'John Doe' with the actual user name
+            localStorage.setItem('user', user);
+        }
     });
 
 }

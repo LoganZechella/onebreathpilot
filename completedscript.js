@@ -2,8 +2,12 @@ function toggleMenu() {
     const navLinks = document.getElementById('nav-links');
     navLinks.classList.toggle('responsive');
 }
-
 document.addEventListener('DOMContentLoaded', function () {
+    if (window.user) {
+        updateUIBasedOnAuth(window.user);
+    } else {
+        updateUIBasedOnAuth(null);
+    }
     const tableBody = document.querySelector('#completed-samples-table tbody');
 
     // Function to fetch and populate completed samples
@@ -115,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
             });
             const data = await response.json();
-            
+
 
             if (data.success) {
                 // Optionally, save the document metadata if needed
@@ -123,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 await saveDocumentMetadata(chipId, documentUrl);
                 alert('Document uploaded successfully.');
                 clearImagePreview();  // Clear the image preview after successful upload
-                loadCompletedSamples(); // Refresh the table to update the image status
+                // loadCompletedSamples(); // Refresh the table to update the image status
             } else {
                 alert('Failed to upload document.');
             }
@@ -158,8 +162,69 @@ document.addEventListener('DOMContentLoaded', function () {
         if (imgPreviewDiv) {
             imgPreviewDiv.remove();
         }
+        // Clear the table body before refreshing
+        tableBody.innerHTML = '';
+
+        // Load completed samples to refresh the table
+        loadCompletedSamples();
     }
 
     // Load completed samples on page load
     loadCompletedSamples();
 });
+
+function showElementWithAnimation(elementId, animation, options = {}) {
+    const element = document.getElementById(elementId);
+    element.style.display = 'block';
+    animateCSS(`#${elementId}`, animation, options);
+}
+
+// Function to hide an element with an animation
+function hideElementWithAnimation(elementId, animation, options = {}) {
+    const element = document.getElementById(elementId);
+    animateCSS(`#${elementId}`, animation, options).then(() => {
+        element.style.display = 'none';
+    });
+}
+
+function updateUIBasedOnAuth(user) {
+    // const signInContainer = document.getElementById('sign-in-container');
+    const landingMain = document.getElementById('landing-main');
+    const blocker = document.querySelector('.blocker');
+    const signInButton = document.getElementById('show-sign-in');
+
+    if (user) {
+        // hideElementWithAnimation('sign-in-container', 'fadeOut');
+        if (window.location.search.includes('chipID') === true) {
+            document.getElementById('landing-main').style.display = 'none';
+            signInButton.textContent = 'Sign Out';
+            showElementWithAnimation('add-sample-main', 'fadeIn');
+            document.getElementById('add-sample-main').style.display = 'flex';
+        } else {
+            
+        }
+    } else {
+        // window.location.href = '/index.html';
+        // showElementWithAnimation('sign-in-container', 'fadeIn');
+        // // hideElementWithAnimation('landing-main', 'fadeOut');
+        // blocker.style.display = 'none';
+        // signInButton.textContent = 'Sign In';
+    }
+}
+window.addEventListener('authStateChanged', (event) => {
+    const user = event.detail.user;
+    updateUIBasedOnAuth(user);
+});
+
+
+
+
+function checkAuthState() {
+    const user = window.user;
+    if (user) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
