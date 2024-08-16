@@ -69,7 +69,7 @@ GCS_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 # GCS_CREDENTIALS = "server/dashboard424301Copy.json"
 
 # Recipient email address for notifications
-RECIPIENT_EMAILS = os.getenv("RECIPIENT_EMAILS")
+RECIPIENT_EMAILS = os.getenv('RECIPIENT_EMAILS', '').split(',')
 
 # Initialize GCS client
 storage_client = storage.Client.from_service_account_json(GCS_CREDENTIALS)
@@ -86,8 +86,8 @@ db = client[DATABASE_NAME]
 collection = db[COLLECTION_NAME]
 
 # Function to send email notification
-def send_email(subject, body, recipients):
-    msg = Message(subject, sender=app.config['MAIL_USERNAME'], recipients=recipients)
+def send_email(subject, body):
+    msg = Message(subject, sender=app.config['MAIL_USERNAME'], recipients=RECIPIENT_EMAILS)
     msg.body = body
     try:
         mail.send(msg)
@@ -108,28 +108,33 @@ def samples():
 def update_sample():
     # Endpoint to update a sample based on 'chipID'.
     try:
-        # Extracting data from request
+        # Extracting data from the request
         update_data = request.json
-        chip_id = update_data['chip_id']
-        
+        chip_id = update_data.get('chip_id')
+        status = update_data.get('status')
+
+        # Check if 'chip_id' and 'status' are provided
+        if not chip_id or not status:
+            return jsonify({"error": "Missing chipID or status in the submitted data."}), 400
+
         # Finding and updating the document in the database
         update_result = collection.update_one(
             {"chip_id": chip_id},
             {"$set": update_data}
         )
-        
+
         # Check if the document was successfully updated
-        if update_result.modified_count == 1 & update_data.status == "In Process" or update_data.status == "Ready for Pickup":
-            # Send email notification
-            subject = "Sample Updated"
-            body = f"The sample with chip ID {chip_id} has been updated in the database:\n\n{update_data}"
-            recipients = RECIPIENT_EMAILS  # Replace with actual recipient email(s)
-            send_email(subject, body, recipients)
-            
-            return jsonify({"success": True, "message": "Sample updated successfully and email notification sent."}), 200
+        if update_result.modified_count == 1:
+            # Only send email if the status is "In Process" or "Ready for Pickup"
+            if status in ["In Process", "Ready for Pickup"]:
+                subject = f"Sample Status Updated: {status}"
+                body = f"The sample with chip ID {chip_id} has been updated to '{status}' in the database:\n\n{update_data}"
+                send_email(subject, body)
+
+            return jsonify({"success": True, "message": "Sample updated successfully."}), 200
         else:
             return jsonify({"success": False, "message": "No sample found with the given chipID or no new data to update."}), 404
-        
+
     except KeyError:
         return jsonify({"error": "Missing chipID in the submitted data."}), 400
     except Exception as e:
