@@ -10,6 +10,7 @@ from google.cloud import storage
 from io import BytesIO
 import base64
 from bson.decimal128 import Decimal128
+from flask_mail import Mail, Message
 
 
 load_dotenv()
@@ -17,9 +18,18 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+# Configure Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME') 
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  
+
+mail = Mail(app)
+
 # Firebase Admin SDK settings
 cred = credentials.Certificate('/etc/secrets/Firebaseadminsdk.json')
-# cred = credentials.Certificate('server/Firebaseadminsdk.json')
+# cred = credentials.Certificate('server/FirebaseadminsdkCopy.json')
 firebase_admin.initialize_app(cred)
 
 @app.route('/api/auth/signin', methods=['POST'])
@@ -56,6 +66,10 @@ COLLECTION_NAME = "collectedsamples"
 # Google Cloud Storage Configuration
 GCS_BUCKET = os.getenv("GCS_BUCKET")
 GCS_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+# GCS_CREDENTIALS = "server/dashboard424301Copy.json"
+
+# Recipient email address for notifications
+RECIPIENT_EMAILS = os.getenv("RECIPIENT_EMAILS")
 
 # Initialize GCS client
 storage_client = storage.Client.from_service_account_json(GCS_CREDENTIALS)
@@ -70,6 +84,16 @@ headers = {
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 collection = db[COLLECTION_NAME]
+
+# Function to send email notification
+def send_email(subject, body, recipients):
+    msg = Message(subject, sender=app.config['MAIL_USERNAME'], recipients=recipients)
+    msg.body = body
+    try:
+        mail.send(msg)
+        print("Email sent successfully")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
 @app.route('/samples', methods=['GET'])
 def samples():
@@ -95,8 +119,14 @@ def update_sample():
         )
         
         # Check if the document was successfully updated
-        if update_result.modified_count == 1:
-            return jsonify({"success": True, "message": "Sample updated successfully."}), 200
+        if update_result.modified_count == 1 & update_data.status == "In Process" or update_data.status == "Ready for Pickup":
+            # Send email notification
+            subject = "Sample Updated"
+            body = f"The sample with chip ID {chip_id} has been updated in the database:\n\n{update_data}"
+            recipients = RECIPIENT_EMAILS  # Replace with actual recipient email(s)
+            send_email(subject, body, recipients)
+            
+            return jsonify({"success": True, "message": "Sample updated successfully and email notification sent."}), 200
         else:
             return jsonify({"success": False, "message": "No sample found with the given chipID or no new data to update."}), 404
         
