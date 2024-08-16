@@ -70,6 +70,7 @@ GCS_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 # Recipient email address for notifications
 RECIPIENT_EMAILS = os.getenv('RECIPIENT_EMAILS', '').split(',')
+MAIL_FROM_ADDRESS = os.getenv('MAIL_FROM_ADDRESS')
 
 # Initialize GCS client
 storage_client = storage.Client.from_service_account_json(GCS_CREDENTIALS)
@@ -87,7 +88,7 @@ collection = db[COLLECTION_NAME]
 
 # Function to send email notification
 def send_email(subject, body):
-    msg = Message(subject, sender=app.config['MAIL_USERNAME'], recipients=RECIPIENT_EMAILS)
+    msg = Message(subject, sender=MAIL_FROM_ADDRESS, recipients=RECIPIENT_EMAILS)
     msg.body = body
     try:
         mail.send(msg)
