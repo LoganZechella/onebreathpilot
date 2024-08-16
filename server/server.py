@@ -113,6 +113,7 @@ def update_sample():
         update_data = request.json
         chip_id = update_data.get('chip_id')
         status = update_data.get('status')
+        location = update_data.get('location')
 
         # Check if 'chip_id' and 'status' are provided
         if not chip_id or not status:
@@ -129,7 +130,7 @@ def update_sample():
             # Only send email if the status is "In Process" or "Ready for Pickup"
             if status in ["In Process", "Ready for Pickup"]:
                 subject = f"Sample Status Updated: {status}"
-                body = f"The sample with chip ID {chip_id} has been updated to '{status}' in the database:\n\n{update_data}"
+                body = f"The sample with chip ID {chip_id} has been updated to '{status}' at '{location}'.Please check the dashboard at https://onebreathpilot.netlify.app for more details."
                 send_email(subject, body)
 
             return jsonify({"success": True, "message": "Sample updated successfully."}), 200
