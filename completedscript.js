@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (user) {
             authButton.textContent = 'Sign Out';
             authButton.addEventListener('click', () => auth.signOut());
-            tableSection.style.display = 'block';
+            tableSection.style.display = 'flex';
             signInContainer.hidden = true;
             loadCompletedSamples();
         } else {
@@ -74,9 +74,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const uploadCell = document.createElement('td');
                     const uploadButton = document.createElement('button');
+                    uploadButton.innerHTML = '<img class="upload-icon" src="assets/images/icons8-upload-96.png" alt="Upload"/>';
                     uploadButton.className = 'upload-button';
                     uploadButton.dataset.chipId = sample.chip_id;
-                    uploadButton.textContent = 'Upload';
                     uploadCell.appendChild(uploadButton);
 
                     row.appendChild(sampleIdCell);
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('click', function (event) {
-        if (event.target.classList.contains('upload-button')) {
+        if (event.target.classList.contains('upload-icon')) {
             const chipId = event.target.dataset.chipId;
             if (auth.currentUser) {
                 showUploadMenu(chipId);
@@ -132,8 +132,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     confirmationButton.textContent = 'Confirm Upload';
                     imgDiv.appendChild(confirmationButton);
 
+                    const cancelButton = document.createElement('button');
+                    cancelButton.className = 'cancel-upload-button';
+                    cancelButton.textContent = 'Cancel';
+                    imgDiv.appendChild(cancelButton);
+
                     confirmationButton.addEventListener('click', async function () {
                         await uploadImage(chipId, imageDataUrl);
+                    });
+
+                    cancelButton.addEventListener('click', function () {
+                        clearImagePreview();
                     });
                 };
                 reader.readAsDataURL(file);

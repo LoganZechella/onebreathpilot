@@ -118,8 +118,8 @@ function initApp() {
             hideElementWithAnimation('sign-in-container', 'fadeOut');
             hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '1000ms' });
             // showElementWithAnimation('landing-main', 'fadeIn');
-            showElementWithAnimation('blocker', 'fadeIn', { delay: '500ms', duration: '1000ms' });
-            showElementWithAnimation('container-fluid', 'fadeIn', { delay: '500ms', duration: '1000ms' });
+            showElementWithAnimation('blocker', 'fadeIn', { delay: '1000ms', duration: '1000ms' });
+            showElementWithAnimation('container-fluid', 'fadeIn', { delay: '1000ms', duration: '1000ms' });
             // document.getElementById('landing-main').style.display = 'flex';
             // document.querySelector('.blocker').style.display = 'flex';
             const nav = document.querySelector('.container-fluid');
