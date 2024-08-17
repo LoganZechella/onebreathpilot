@@ -148,7 +148,7 @@ def update_sample():
             # Only send email if the status is "In Process" or "Ready for Pickup"
             if status in ["In Process", "Ready for Pickup"]:
                 subject = f"Sample Status Updated: {status}"
-                body = f"Sample with chip ID {chip_id} has been updated to '{status}' at '{location}'. Please check the dashboard at <a href='https://onebreathpilot.netlify.app'>onebreathpilot.netlify.app</a> for more details."
+                body = f"Sample with chip ID {chip_id} has been updated to '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
                 send_email(subject, body)
                 
                  # SMS Notification
