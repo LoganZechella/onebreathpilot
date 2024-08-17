@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from twilio.rest import Client 
 import firebase_admin
 from firebase_admin import credentials, auth
 from pymongo import MongoClient
@@ -11,7 +12,6 @@ from io import BytesIO
 import base64
 from bson.decimal128 import Decimal128
 from flask_mail import Mail, Message
-
 
 load_dotenv()
 
@@ -27,9 +27,16 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
 mail = Mail(app)
 
+# Twilio client setup
+twilio_client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
+twilio_phone_number = os.getenv('TWILIO_PHONE_NUMBER')
+
+# Load recipient numbers from environment variable and split into a list
+twilio_recipient_numbers = os.getenv('TWILIO_RECIPIENT_NUMBERS', '').split(',')
+
+
 # Firebase Admin SDK settings
 cred = credentials.Certificate('/etc/secrets/Firebaseadminsdk.json')
-# cred = credentials.Certificate('server/FirebaseadminsdkCopy.json')
 firebase_admin.initialize_app(cred)
 
 @app.route('/api/auth/signin', methods=['POST'])
@@ -66,7 +73,6 @@ COLLECTION_NAME = "collectedsamples"
 # Google Cloud Storage Configuration
 GCS_BUCKET = os.getenv("GCS_BUCKET")
 GCS_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-# GCS_CREDENTIALS = "server/dashboard424301Copy.json"
 
 # Recipient email address for notifications
 RECIPIENT_EMAILS = os.getenv('RECIPIENT_EMAILS', '').split(',')
@@ -95,6 +101,18 @@ def send_email(subject, body):
         print("Email sent successfully")
     except Exception as e:
         print(f"Failed to send email: {e}")
+        
+def send_sms(to_numbers, message_body):
+    for number in to_numbers:
+        try:
+            message = twilio_client.messages.create(
+                body=message_body,
+                from_=twilio_phone_number,
+                to=number.strip()  # Strip any extra spaces
+            )
+            print(f"Message sent successfully to {number}. SID: {message.sid}")
+        except Exception as e:
+            print(f"Failed to send message to {number}: {e}")
 
 @app.route('/samples', methods=['GET'])
 def samples():
@@ -130,8 +148,16 @@ def update_sample():
             # Only send email if the status is "In Process" or "Ready for Pickup"
             if status in ["In Process", "Ready for Pickup"]:
                 subject = f"Sample Status Updated: {status}"
-                body = f"The sample with chip ID {chip_id} has been updated to '{status}' at '{location}'.Please check the dashboard at https://onebreathpilot.netlify.app for more details."
+                body = f"Sample with chip ID {chip_id} has been updated to '{status}' at '{location}'. 
+                
+                Please check the dashboard at https://onebreathpilot.netlify.app for more details."
                 send_email(subject, body)
+                
+                 # SMS Notification
+                sms_body = f"Sample with chip ID {chip_id} status updated to '{status}' at '{location}'. 
+                
+                Please check the dashboard at https://onebreathpilot.netlify.app for more details."
+                send_sms(twilio_recipient_numbers, sms_body)
 
             return jsonify({"success": True, "message": "Sample updated successfully."}), 200
         else:
@@ -152,7 +178,6 @@ def update_patient_info():
         if not chip_id or not patient_info:
             return jsonify({"success": False, "message": "Invalid data."}), 400
         
-        # Replace '<DB_CONNECTION_STRING>' with your MongoDB connection string
         client = MongoClient(MONGO_URI)
         db = client.get_database(DATABASE_NAME)
         patient_collection = db.get_collection(COLLECTION_NAME)
