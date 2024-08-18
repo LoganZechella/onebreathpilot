@@ -152,8 +152,8 @@ def update_sample():
                 send_email(subject, body)
                 
                  # SMS Notification
-                sms_body = f"Sample with chip ID {chip_id} status updated to '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
-                send_sms(twilio_recipient_numbers, sms_body)
+                # sms_body = f"Sample with chip ID {chip_id} is now '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
+                # send_sms(twilio_recipient_numbers, sms_body)
 
             return jsonify({"success": True, "message": "Sample updated successfully."}), 200
         else:
