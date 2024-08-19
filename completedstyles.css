@@ -57,6 +57,7 @@ body {
     background-color: #00000080;
     position: sticky;
     z-index: 1;
+    justify-content: baseline;
 }
 
 h1,
@@ -214,11 +215,14 @@ p {
     color: #fff;
     text-decoration: none;
     font-size: 16px;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease-in;
+    
 }
 
 .nav-links li a:hover {
     color: #ddd;
+    text-decoration: underline #dfeaf2;
+    animation: pulse 2000ms ease infinite;
 }
 
 /* Hamburger menu styles */
