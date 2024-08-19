@@ -292,7 +292,7 @@ def download_dataset():
         # Create an in-memory CSV file
         output = StringIO()
         writer = csv.writer(output)
-        writer.writerow(['Date', 'Chip ID', 'Batch' 'Patient ID', 'Final Volume (mL)', 'Avg. CO2 (%)', 'Patient Form Uploaded'])
+        writer.writerow(['Date', 'Chip ID', 'Batch', 'Mfg. Date', 'Patient ID', 'Final Volume (mL)', 'Avg. CO2 (%)', 'Patient Form Uploaded'])
         
         for sample in samples:
             formatted_date = sample['timestamp'].split('T')[0]
