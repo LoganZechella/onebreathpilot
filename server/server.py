@@ -1,4 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
+import csv
+from io import StringIO
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -280,3 +282,37 @@ def get_samples():
     # Ensure all Decimal128 fields are converted before returning
     samples = [convert_decimal128(sample) for sample in samples]
     return samples
+
+@app.route('/download_dataset', methods=['GET'])
+def download_dataset():
+    try:
+        # Fetch the completed samples from MongoDB
+        samples = collection.find({"status": "Complete"}, {"_id": 0})
+        
+        # Create an in-memory CSV file
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['Date', 'Chip ID', 'Patient ID', 'Volume', 'Avg. CO2', 'Form'])
+        
+        for sample in samples:
+            formatted_date = sample['timestamp'].split('T')[0]
+            parts = formatted_date.split('-')
+            short_year = parts[0].split('0')
+            short_date = f"{parts[1]}/{parts[2]}/{short_year[1]}"
+            writer.writerow([
+                short_date,
+                sample['chip_id'],
+                sample.get('patient_id', 'N/A'),
+                f"{sample['final_volume']} mL",
+                f"{sample['average_co2']}%",
+                'Yes' if sample.get('document_urls') else 'No'
+            ])
+        
+        # Move the buffer cursor to the beginning
+        output.seek(0)
+        
+        # Return the CSV file as a response
+        return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=completed_samples.csv"})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
