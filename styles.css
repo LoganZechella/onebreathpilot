@@ -262,8 +262,8 @@ p {
     backdrop-filter: blur(10px);
     color: #000000;
     /* margin: 0 0 0.5em 0.5em; */
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     align-items: center;
     justify-content: center;
     display: flex;
@@ -273,6 +273,8 @@ p {
 
 #add-new-sample:hover {
     animation: pulseZoom 1s ease-in-out infinite;
+    border: 2px solid #87bfec;
+    box-shadow: 0px 1px 8px #f3f3f3;
 }
 
 #qr-close-btn,
