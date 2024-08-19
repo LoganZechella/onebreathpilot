@@ -300,10 +300,10 @@ def download_dataset():
             short_year = parts[0].split('0')
             short_date = f"{parts[1]}/{parts[2]}/{short_year[1]}"
             
-            formatted_mfg = sample['mfg_date'].split('T')[0]
+            formatted_mfg = sample['mfg_date'].strftime('%Y-%m-%d')
             mfg_parts = formatted_mfg.split('-')
-            mfg_short_year = mfg_parts[0].split('0')
-            mfg_short_date = f"{mfg_parts[1]}/{mfg_parts[2]}/{mfg_short_year[1]}"
+            mfg_short_year = mfg_parts[0][-2:]
+            mfg_short_date = f"{mfg_parts[1]}/{mfg_parts[2]}/{mfg_short_year}"
             
             writer.writerow([
                 short_date,
