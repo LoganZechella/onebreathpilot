@@ -292,19 +292,27 @@ def download_dataset():
         # Create an in-memory CSV file
         output = StringIO()
         writer = csv.writer(output)
-        writer.writerow(['Date', 'Chip ID', 'Patient ID', 'Volume', 'Avg. CO2', 'Form'])
+        writer.writerow(['Date', 'Chip ID', 'Batch' 'Patient ID', 'Final Volume (mL)', 'Avg. CO2 (%)', 'Patient Form Uploaded'])
         
         for sample in samples:
             formatted_date = sample['timestamp'].split('T')[0]
             parts = formatted_date.split('-')
             short_year = parts[0].split('0')
             short_date = f"{parts[1]}/{parts[2]}/{short_year[1]}"
+            
+            formatted_mfg = sample['mfg_date'].split('T')[0]
+            mfg_parts = formatted_mfg.split('-')
+            mfg_short_year = mfg_parts[0].split('0')
+            mfg_short_date = f"{mfg_parts[1]}/{mfg_parts[2]}/{mfg_short_year[1]}"
+            
             writer.writerow([
                 short_date,
                 sample['chip_id'],
+                sample['batch_number'],
+                mfg_short_date,
                 sample.get('patient_id', 'N/A'),
-                f"{sample['final_volume']} mL",
-                f"{sample['average_co2']}%",
+                f"{sample['final_volume']}",
+                f"{sample['average_co2']}",
                 'Yes' if sample.get('document_urls') else 'No'
             ])
         
