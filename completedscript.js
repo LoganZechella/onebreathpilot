@@ -66,11 +66,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     const dateCompletedCell = document.createElement('td');
                     const formattedDate = sample.timestamp.split('T')[0];
                     const parts = formattedDate.split('-');
-                    const shortDate = `${parts[1]}/${parts[2]}/${parts[0]}`;
+                    const shortYear = parts[0].split('0');
+                    const shortDate = `${parts[1]}/${parts[2]}/${shortYear[1]}`;
                     dateCompletedCell.textContent = shortDate || 'N/A';
 
-                    const imageCell = document.createElement('td');
-                    imageCell.textContent = sample.document_urls ? 'Yes' : 'No';
+                    const volumeCell = document.createElement('td');
+                    volumeCell.textContent = `${sample.final_volume} mL`;
+
+                    const co2Cell = document.createElement('td');
+                    co2Cell.textContent = `${sample.average_co2}%`
+
+                    // const imageCell = document.createElement('td');
+                    // imageCell.textContent = sample.document_urls ? 'Yes' : 'No';
 
                     const uploadCell = document.createElement('td');
                     const uploadButton = document.createElement('button');
@@ -78,11 +85,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     uploadButton.className = 'upload-button';
                     uploadButton.dataset.chipId = sample.chip_id;
                     uploadCell.appendChild(uploadButton);
-
+                    
+                    row.appendChild(dateCompletedCell);
                     row.appendChild(sampleIdCell);
                     row.appendChild(patientIdCell);
-                    row.appendChild(dateCompletedCell);
-                    row.appendChild(imageCell);
+                    row.appendChild(volumeCell);
+                    row.appendChild(co2Cell);
+                    // row.appendChild(imageCell);
                     row.appendChild(uploadCell);
 
                     tableBody.appendChild(row);
@@ -103,6 +112,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // Download dataset button logic
+    document.getElementById('download-dataset-button').addEventListener('click', function () {
+        const confirmation = confirm('Are you sure you want to download the dataset as a CSV file?');
+        if (confirmation) {
+            window.location.href = 'https://onebreathpilot.onrender.com/download_dataset';
+        }
+    });
+
 
     function showUploadMenu(chipId) {
         clearImagePreview();
