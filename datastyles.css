@@ -1,0 +1,249 @@
+@import url(https://fonts.googleapis.com/css?family=Figtree:300,regular,500,600,700,800,900,300italic,italic,500italic,600italic,700italic,800italic,900italic);
+
+:root {
+    --primaryFont: "Figtree", "helvetica", "arial", sans-serif;
+    --backgroundColor: #19191a;
+    --hTexts: #2b2c34;
+    --pTexts: #2b2c34;
+}
+
+body {
+    background: linear-gradient(15deg, #014969, #0F92BB, #00E8C6, #0F92BB, #014969);
+    font-family: var(--primaryFont);
+    background-size: cover;
+    backdrop-filter: blur(100px);
+    background-position: center;
+    background-repeat: repeat;
+    min-height: 100vh;
+    transition: background 0.3s ease-in-out;
+}
+
+.container {
+    flex-direction: column;
+    max-width: 100vw;
+    min-height: 95%;
+    justify-content: center;
+    padding: 1em;
+    align-items: center;
+    margin-top: 1em;
+}
+
+.container-fluid {
+    background-color: #00000080;
+    position: sticky;
+    z-index: 1;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    color: black;
+    transition: color 0.3s ease-in-out;
+}
+
+main {
+    display: flex;
+}
+
+#nav-title-text>strong {
+    color: #87bfec;
+    text-shadow: #000000bb 1px 2px 5px;
+}
+
+.nav-links>li>a {
+    color: aliceblue;
+}
+
+.nav-header ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    padding: 8px 12px;
+}
+
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.nav-links li a:hover {
+    color: #ddd;
+}
+
+/* Hamburger menu styles */
+.hamburger-menu {
+    display: none;
+    /* Hidden by default */
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.hamburger-menu a {
+    text-decoration: none;
+    color: #fff;
+}
+
+#visualization-section {
+    background-color: var(--chartBackground);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+#table-section,
+#visualization-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffffb5;
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    padding: 1em;
+    margin-bottom: 2em;
+    width: 95%;
+    /* max-width: 1200px; */
+}
+
+#table-title,
+#visualization-section h2 {
+    color: #2b2c34;
+    /* text-shadow: 1px 2px 3px #1f1f1f09; */
+    margin-bottom: 1em;
+}
+
+#completed-samples-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+#completed-samples-table th,
+#completed-samples-table td {
+    padding: 0.75em;
+    text-align: left;
+}
+
+#completed-samples-table th {
+    background-color: #19191a;
+    color: #f3f3f3;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+}
+
+#completed-samples-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#completed-samples-table tr:hover {
+    background-color: #ddd;
+}
+
+#download-dataset-button {
+    background-color: #2196f3;
+    color: white;
+    padding: 0.5em 1em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 1em;
+}
+
+#download-dataset-button:hover {
+    background-color: #0d8bf2;
+}
+
+#chart-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+#chart-controls select {
+    padding: 0.5em;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: white;
+    font-size: 0.9em;
+}
+
+#chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-height: 95%;
+    margin-bottom: 2em;
+}
+
+#d3-container {
+    width: 100%;
+    height: 400px;
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .nav-links {
+        display: none;
+        /* Hide the links by default */
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: #333;
+        z-index: 100;
+        animation: slideIn 0.3s ease forwards;
+    }
+
+    .nav-links.responsive {
+        display: flex;
+    }
+
+    .hamburger-menu {
+        display: block;
+        /* Show hamburger icon on smaller screens */
+    }
+
+    #completed-samples-table {
+        font-size: 0.8em;
+    }
+
+    #chart-controls {
+        flex-direction: column;
+    }
+
+    #chart-controls select {
+        margin-bottom: 0.5em;
+    }
+
+    #chart-container,
+    #d3-container {
+        height: 300px;
+    }
+}

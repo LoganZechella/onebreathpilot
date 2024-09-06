@@ -14,6 +14,9 @@ from io import BytesIO
 import base64
 from bson.decimal128 import Decimal128
 from flask_mail import Mail, Message
+import threading
+import time
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -116,6 +119,35 @@ def send_sms(to_numbers, message_body):
         except Exception as e:
             print(f"Failed to send message to {number}: {e}")
 
+# Global dictionary to store sample timers
+sample_timers = {}
+
+def check_and_update_samples():
+    while True:
+        current_time = datetime.utcnow()
+        samples_to_update = collection.find({
+            "status": "In Process",
+            "expected_completion_time": {"$lte": current_time}
+        })
+
+        for sample in samples_to_update:
+            update_sample_status(sample['chip_id'], "Ready for Pickup")
+
+        time.sleep(60)  # Check every minute
+
+# Start the background task
+threading.Thread(target=check_and_update_samples, daemon=True).start()
+
+def update_sample_status(chip_id, new_status):
+    update_result = collection.update_one(
+        {"chip_id": chip_id},
+        {"$set": {"status": new_status}}
+    )
+    if update_result.modified_count == 1:
+        subject = f"Sample Status Updated: {new_status}"
+        body = f"Sample with chip ID {chip_id} has been updated to '{new_status}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
+        send_email(subject, body)
+
 @app.route('/samples', methods=['GET'])
 def samples():
     # Endpoint to get samples with certain statuses.
@@ -125,44 +157,77 @@ def samples():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+# @app.route('/update_sample', methods=['POST'])
+# def update_sample():
+#     # Endpoint to update a sample based on 'chipID'.
+#     try:
+#         # Extracting data from the request
+#         update_data = request.json
+#         chip_id = update_data.get('chip_id')
+#         status = update_data.get('status')
+#         location = update_data.get('location')
+
+#         # Check if 'chip_id' and 'status' are provided
+#         if not chip_id or not status:
+#             return jsonify({"error": "Missing chipID or status in the submitted data."}), 400
+
+#         # Finding and updating the document in the database
+#         update_result = collection.update_one(
+#             {"chip_id": chip_id},
+#             {"$set": update_data}
+#         )
+
+#         # Check if the document was successfully updated
+#         if update_result.modified_count == 1:
+#             # Only send email if the status is "In Process" or "Ready for Pickup"
+#             if status in ["In Process", "Ready for Pickup"]:
+#                 subject = f"Sample Status Updated: {status}"
+#                 body = f"Sample with chip ID {chip_id} has been updated to '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
+#                 send_email(subject, body)
+                
+#                  # SMS Notification
+#                 # sms_body = f"Sample with chip ID {chip_id} is now '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
+#                 # send_sms(twilio_recipient_numbers, sms_body)
+
+#             return jsonify({"success": True, "message": "Sample updated successfully."}), 200
+#         else:
+#             return jsonify({"success": False, "message": "No sample found with the given chipID or no new data to update."}), 404
+
+#     except KeyError:
+#         return jsonify({"error": "Missing chipID in the submitted data."}), 400
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
 @app.route('/update_sample', methods=['POST'])
 def update_sample():
-    # Endpoint to update a sample based on 'chipID'.
     try:
-        # Extracting data from the request
         update_data = request.json
         chip_id = update_data.get('chip_id')
         status = update_data.get('status')
         location = update_data.get('location')
 
-        # Check if 'chip_id' and 'status' are provided
         if not chip_id or not status:
             return jsonify({"error": "Missing chipID or status in the submitted data."}), 400
 
-        # Finding and updating the document in the database
+        # If status is "In Process", set the expected completion time
+        if status == "In Process":
+            update_data['expected_completion_time'] = datetime.utcnow() + timedelta(hours=2)
+
         update_result = collection.update_one(
             {"chip_id": chip_id},
             {"$set": update_data}
         )
 
-        # Check if the document was successfully updated
         if update_result.modified_count == 1:
-            # Only send email if the status is "In Process" or "Ready for Pickup"
             if status in ["In Process", "Ready for Pickup"]:
                 subject = f"Sample Status Updated: {status}"
                 body = f"Sample with chip ID {chip_id} has been updated to '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
                 send_email(subject, body)
                 
-                 # SMS Notification
-                # sms_body = f"Sample with chip ID {chip_id} is now '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
-                # send_sms(twilio_recipient_numbers, sms_body)
-
             return jsonify({"success": True, "message": "Sample updated successfully."}), 200
         else:
             return jsonify({"success": False, "message": "No sample found with the given chipID or no new data to update."}), 404
 
-    except KeyError:
-        return jsonify({"error": "Missing chipID in the submitted data."}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

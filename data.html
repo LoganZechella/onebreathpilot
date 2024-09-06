@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="/datastyles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
+    <script src="/server/auth.js" type="module"></script>
+    <script src="datascript.js"></script>
+    <title>Completed Page</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <meta name="description" content="Completed Page Description">
+</head>
+
+<body>
+    <!-- <div id="splash-screen" class="animate__animated animate__fadeIn">
+        <img src="./assets/images/BREATH DIAGNOSTICS-2.png" alt="Splash Logo" class="splash-logo">
+    </div> -->
+
+
+
+    <nav class="container-fluid animate__animated animate__fadeInDown" id="container-fluid" role="navigation"
+        aria-label="Main navigation">
+        <header class="nav-header">
+            <ul>
+                <li class="hamburger-menu">
+                    <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
+                        &#9776;
+                    </a>
+                </li>
+            </ul>
+        </header>
+        <ul class="nav-links" id="nav-links">
+            <li id="home-link"><a href="/index.html">Home</a></li>
+            <li><a href="/completed.html">Completed Samples</a></li>
+            <li><a href="#" id="show-sign-in" class="logged-out">Sign In</a></li>
+        </ul>
+    </nav>
+
+
+
+    <div class="blocker animate__animated animate__fadeIn animate__slow" id="blocker">
+
+        <div id="sign-in-container" class="animate__animated animate__fadeIn" data-aos="fade-up" data-aos-duration="500"
+            hidden>
+            <img src="assets/images/BREATH DIAGNOSTICS-2.png" alt="Logo of Breath Diagnostics"
+                style="width: 200px; display: block; margin: 0 auto 20px;">
+            <div id="loading-spinner" class="spinner"></div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Required" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Required" required>
+            <button id="sign-in">Sign In</button>
+            <button id="sign-in-google" type="button" disabled hidden>Sign In with Google</button>
+        </div>
+
+        <main class="container" id="main-content" data-aos="fade-in" data-aos-duration="800">
+            
+            <section id="visualization-section" class="animate__animated animate__slideInUp">
+                <h2>Data Visualization</h2>
+                <div id="chart-controls">
+                    <select id="chart-type">
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="scatter">Scatter Plot</option>
+                        <option value="boxplot">Box Plot</option>
+                    </select>
+                    <select id="x-axis">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <select id="y-axis">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <select id="aggregation">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+                <div id="chart-container">
+                    <canvas id="chart"></canvas>
+                </div>
+                <div id="d3-container"></div>
+            </section>
+        </main>
+    </div>
+
+
+    <script src="datascript.js"></script>
+</body>
+
+</html>

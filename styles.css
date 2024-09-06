@@ -8,14 +8,17 @@
 }
 
 body {
-    background: linear-gradient(15deg, #014969, #0F92BB, #00E8C6, #0F92BB, #014969);
+    /* background: linear-gradient(15deg, #014969, #0F92BB, #00E8C6, #0F92BB, #014969); */
     font-family: var(--primaryFont);
-    background-size: cover;
-    backdrop-filter: blur(100px);
+    /* background-size: cover; */
+    backdrop-filter: blur(50px);
     background-position: center;
     background-repeat: repeat;
     min-height: 100vh;
     transition: background 0.3s ease-in-out;
+    background: linear-gradient(0deg, #0056b3, #2196f3, #11d0d7df);
+    background-size: 400% 400%;
+    /* animation: gradientShift 15s ease-out infinite; */
 }
 
 #splash-screen {
@@ -71,7 +74,7 @@ p {
     .card {
         width: 95%;
     }
-    
+
     .section {
         border-radius: 10px;
         padding: 1rem;
@@ -121,7 +124,7 @@ p {
     }
 }
 
-#nav-title-text>strong  {
+#nav-title-text>strong {
     color: #87bfec;
     text-shadow: #000000bb 1px 2px 5px;
 }
@@ -554,12 +557,12 @@ p {
     border-radius: 10px;
     padding: 0.25em 0.75em 1em 0.75em;
     box-sizing: border-box;
-    background-color: #ffffffb5;
-    backdrop-filter: blur(20px);
+    background-color: #ffffff7b;
+    backdrop-filter: blur(20px) brightness(120%);
     color: black;
-    min-height: 200px;  
-    max-height: 500px; 
-    overflow-y: auto; 
+    min-height: 200px;
+    max-height: 500px;
+    overflow-y: auto;
     max-width: 90%;
     min-width: 90%;
     justify-items: stretch;
@@ -670,8 +673,8 @@ p {
     flex-direction: column;
     justify-content: space-between;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    min-height: 100px;  
-    max-height: 200px;  
+    min-height: 100px;
+    max-height: 200px;
     /* overflow: hidden;  */
 }
 
@@ -714,10 +717,10 @@ p {
     font-size: 10px;
     color: #000;
     margin-top: 0.2em;
-    width: 100%;      
+    width: 100%;
     text-align: center;
     white-space: nowrap;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .card-buttons {
@@ -751,7 +754,8 @@ p {
     z-index: 999;
 }
 
-.pickup-button, .complete-button {
+.pickup-button,
+.complete-button {
     background-color: #28a745;
     max-width: max-content;
     color: white;
@@ -780,7 +784,8 @@ p {
     transition: ease-in-out 0.3s;
 }
 
-.chip-id-input, .location-input {
+.chip-id-input,
+.location-input {
     width: 100px;
     height: 25px;
 }
@@ -803,7 +808,7 @@ p {
     /* font-size: 1rem; */
     line-height: 1.3rem;
     color: #535353;
-    
+
 }
 
 .card button:hover {
@@ -1077,6 +1082,20 @@ p {
     100% {
         background-position: 50% 20%;
         rotation: 360deg;
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
     }
 }
 
