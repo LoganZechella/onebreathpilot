@@ -33,7 +33,15 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 mail = Mail(app)
 
 # Twilio client setup
-twilio_client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
+account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+
+# Check if credentials are available
+if not account_sid or not auth_token:
+    raise ValueError("Twilio credentials are missing. Please check your .env file.")
+
+# Create Twilio client
+twilio_client = Client(account_sid, auth_token)
 twilio_phone_number = os.getenv('TWILIO_PHONE_NUMBER')
 
 # Load recipient numbers from environment variable and split into a list
@@ -389,3 +397,6 @@ def download_dataset():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
