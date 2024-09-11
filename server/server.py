@@ -16,7 +16,7 @@ from bson.decimal128 import Decimal128
 from flask_mail import Mail, Message
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 load_dotenv()
 
@@ -132,7 +132,7 @@ sample_timers = {}
 
 def check_and_update_samples():
     while True:
-        current_time = datetime.utcnow()
+        current_time = datetime.now(timezone.utc)
         samples_to_update = collection.find({
             "status": "In Process",
             "expected_completion_time": {"$lte": current_time}
@@ -365,7 +365,7 @@ def download_dataset():
         # Create an in-memory CSV file
         output = StringIO()
         writer = csv.writer(output)
-        writer.writerow(['Date', 'Chip ID', 'Batch', 'Mfg. Date', 'Patient ID', 'Final Volume (mL)', 'Avg. CO2 (%)', 'Patient Form Uploaded'])
+        writer.writerow(['Date', 'Chip ID', 'Batch', 'Mfg. Date', 'Patient ID', 'Final Volume (mL)', 'Avg. CO2 (%)', 'Error Code', 'Patient Form Uploaded'])
         
         for sample in samples:
             formatted_date = sample['timestamp'].split('T')[0]
@@ -386,6 +386,7 @@ def download_dataset():
                 sample.get('patient_id', 'N/A'),
                 f"{sample['final_volume']}",
                 f"{sample['average_co2']}",
+                f"{sample['error']}",
                 'Yes' if sample.get('document_urls') else 'No'
             ])
         
@@ -397,6 +398,3 @@ def download_dataset():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)

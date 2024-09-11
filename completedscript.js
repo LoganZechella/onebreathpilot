@@ -52,6 +52,9 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('https://onebreathpilot.onrender.com/api/completed_samples')
             .then(response => response.json())
             .then(data => {
+                // Sort the data by timestamp (oldest first)
+                data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
                 const tableBody = document.querySelector('#completed-samples-table tbody');
                 tableBody.innerHTML = '';
                 data.forEach(sample => {
