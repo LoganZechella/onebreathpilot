@@ -417,7 +417,7 @@ def download_dataset():
         for sample in samples:
             formatted_date = sample['timestamp'].split('T')[0]
             parts = formatted_date.split('-')
-            short_year = parts[0][-2:]
+            short_year = parts[0].split('0')
             short_date = f"{parts[1]}/{parts[2]}/{short_year[1]}"
             
             formatted_mfg = sample['mfg_date'].strftime('%Y-%m-%d')
