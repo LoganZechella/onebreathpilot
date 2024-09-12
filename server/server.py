@@ -407,8 +407,8 @@ def get_samples():
 def download_dataset():
     try:
         # Fetch the completed samples from MongoDB
-        samples = collection.find({"status": "Complete"}, {"_id": 0})
-        
+        samples = collection.find({"status": "Complete"}, {"_id": 0}).sort("timestamp", 1)
+
         # Create an in-memory CSV file
         output = StringIO()
         writer = csv.writer(output)
@@ -417,7 +417,7 @@ def download_dataset():
         for sample in samples:
             formatted_date = sample['timestamp'].split('T')[0]
             parts = formatted_date.split('-')
-            short_year = parts[0].split('0')
+            short_year = parts[0][-2:]
             short_date = f"{parts[1]}/{parts[2]}/{short_year[1]}"
             
             formatted_mfg = sample['mfg_date'].strftime('%Y-%m-%d')
@@ -433,7 +433,7 @@ def download_dataset():
                 sample.get('patient_id', 'N/A'),
                 f"{sample['final_volume']}",
                 f"{sample['average_co2']}",
-                sample.get('error_code', 'N/A'), 
+                sample.get('error', 'N/A'), 
                 'Yes' if sample.get('document_urls') else 'No'
             ])
         
