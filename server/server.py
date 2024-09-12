@@ -20,7 +20,6 @@ from datetime import datetime, timedelta, timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pytz import timezone
-import datetime
 import json
 import gzip
 
@@ -138,13 +137,13 @@ def backup_database():
     except Exception as e:
         error_message = f"Database backup failed: {str(e)}"
         print(error_message)
-        send_email("Database Backup Failed", error_message)
+        # send_email("Database Backup Failed", error_message)
 
 # Initialize the scheduler
 scheduler = BackgroundScheduler()
 scheduler.add_job(
     backup_database,
-    trigger=CronTrigger(hour=23, minute=00, timezone=timezone('US/Eastern')),
+    trigger=CronTrigger(hour=22, minute=00, timezone=timezone('US/Eastern')),
     id='database_backup_job',
     name='Daily database backup at 10 PM EST',
     replace_existing=True
