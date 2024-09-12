@@ -144,7 +144,7 @@ def backup_database():
 scheduler = BackgroundScheduler()
 scheduler.add_job(
     backup_database,
-    trigger=CronTrigger(hour=22, minute=50, timezone=timezone('US/Eastern')),
+    trigger=CronTrigger(hour=23, minute=00, timezone=timezone('US/Eastern')),
     id='database_backup_job',
     name='Daily database backup at 10 PM EST',
     replace_existing=True
