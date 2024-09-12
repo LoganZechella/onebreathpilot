@@ -791,9 +791,10 @@ function resetSampleRegistration() {
     AOS.refresh();
 }
 
+setInterval(fetchSamplesAndUpdateUI, 60000); // Refresh every minute
+
 // Function to fetch samples and update UI
 function fetchSamplesAndUpdateUI() {
-    // Fetch data
     fetch('https://onebreathpilot.onrender.com/samples')
         .then(response => response.json())
         .then(samples => {
@@ -1090,13 +1091,40 @@ function handleEvacuationCompleteButtonClick(event) {
     // Implement the functionality to mark the sample as evacuated
 }
 
+// function initializeCountdown(timestamp, timerId, chipId) {
+//     const endTime = new Date(timestamp).getTime() + 7200000; // 2 hours from timestamp
+//     const timerElement = document.getElementById(timerId);
+
+//     if (!timerElement) {
+//         console.error(`Timer element with ID ${timerId} not found. Skipping countdown.`);
+//         return;  // Exit if no timer element is found
+//     }
+
+//     const interval = setInterval(() => {
+//         const now = new Date().getTime();
+//         const distance = endTime - now;
+
+//         if (distance < 0) {
+//             clearInterval(interval);
+//             updateStatusToReadyForPickup(chipId);
+//             return;
+//         }
+
+//         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+//         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+//         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+//         timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s remaining`;
+//     }, 1000);
+// }
+
 function initializeCountdown(timestamp, timerId, chipId) {
     const endTime = new Date(timestamp).getTime() + 7200000; // 2 hours from timestamp
     const timerElement = document.getElementById(timerId);
 
     if (!timerElement) {
         console.error(`Timer element with ID ${timerId} not found. Skipping countdown.`);
-        return;  // Exit if no timer element is found
+        return;
     }
 
     const interval = setInterval(() => {
@@ -1105,7 +1133,7 @@ function initializeCountdown(timestamp, timerId, chipId) {
 
         if (distance < 0) {
             clearInterval(interval);
-            updateStatusToReadyForPickup(chipId);
+            timerElement.innerHTML = 'Awaiting status update...';
             return;
         }
 
@@ -1116,6 +1144,7 @@ function initializeCountdown(timestamp, timerId, chipId) {
         timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s remaining`;
     }, 1000);
 }
+// Refresh every minute
 
 function updateStatusToReadyForPickup(chipId) {
     const sampleData = {

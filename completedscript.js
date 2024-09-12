@@ -52,6 +52,9 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('https://onebreathpilot.onrender.com/api/completed_samples')
             .then(response => response.json())
             .then(data => {
+                // Sort the data by timestamp (oldest first)
+                data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
                 const tableBody = document.querySelector('#completed-samples-table tbody');
                 tableBody.innerHTML = '';
                 data.forEach(sample => {
@@ -79,6 +82,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     // const imageCell = document.createElement('td');
                     // imageCell.textContent = sample.document_urls ? 'Yes' : 'No';
 
+                    const errorCodeCell = document.createElement('td');
+                    errorCodeCell.textContent = sample.error || 'N/A';
+
                     const uploadCell = document.createElement('td');
                     const uploadButton = document.createElement('button');
                     uploadButton.innerHTML = '<img class="upload-icon" src="assets/images/icons8-upload-96.png" alt="Upload"/>';
@@ -92,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     row.appendChild(volumeCell);
                     row.appendChild(co2Cell);
                     // row.appendChild(imageCell);
+                    row.appendChild(errorCodeCell);
                     row.appendChild(uploadCell);
 
                     tableBody.appendChild(row);

@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-    <!-- <link rel="stylesheet" href="/styles.css"> -->
-    <link rel="stylesheet" href="/completedstyles.css">
+    <link rel="stylesheet" href="/datastyles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
     <script src="/server/auth.js" type="module"></script>
-    <script src="completedscript.js"></script>
+    <script src="datascript.js"></script>
     <title>Completed Page</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <meta name="description" content="Completed Page Description">
@@ -59,38 +59,38 @@
             <button id="sign-in">Sign In</button>
             <button id="sign-in-google" type="button" disabled hidden>Sign In with Google</button>
         </div>
-        
+
         <main class="container" id="main-content" data-aos="fade-in" data-aos-duration="800">
-            <!-- Main content sections will go here -->
-            <section id="table-section" class="animate__animated animate__slideInUp">
-                <h2 id="table-title">Completed Samples</h2>
-                <button id="download-dataset-button">Download Dataset</button>
-                <table id="completed-samples-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Chip ID</th>
-                            <th>Patient ID</th>
-                            <!-- <th>Location</th> -->
-                            <th>Volume</th>
-                            <th>Avg. CO2</th>
-                            <th>Error Code</th>
-                            <!-- <th>Form</th> -->
-                            <th>Form</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rows will be dynamically populated by JavaScript -->
-                    </tbody>
-                </table>
+            
+            <section id="visualization-section" class="animate__animated animate__slideInUp">
+                <h2>Data Visualization</h2>
+                <div id="chart-controls">
+                    <select id="chart-type">
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="scatter">Scatter Plot</option>
+                        <option value="boxplot">Box Plot</option>
+                    </select>
+                    <select id="x-axis">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <select id="y-axis">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <select id="aggregation">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+                <div id="chart-container">
+                    <canvas id="chart"></canvas>
+                </div>
+                <div id="d3-container"></div>
             </section>
         </main>
     </div>
 
 
-
-
-
+    <script src="datascript.js"></script>
 </body>
 
 </html>
