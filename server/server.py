@@ -19,7 +19,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from pytz import timezone
+import pytz
 import json
 import gzip
 
@@ -179,7 +179,7 @@ sample_timers = {}
 
 def check_and_update_samples():
     while True:
-        current_time = datetime.now(timezone.utc)
+        current_time = datetime.now(pytz.utc)
         samples_to_update = collection.find({
             "status": "In Process",
             "expected_completion_time": {"$lte": current_time}
@@ -188,7 +188,7 @@ def check_and_update_samples():
         for sample in samples_to_update:
             update_sample_status(sample['chip_id'], "Ready for Pickup")
 
-        time.sleep(60)  # Check every minute
+        time.sleep(60) # Check every minute
 
 # Start the background task
 threading.Thread(target=check_and_update_samples, daemon=True).start()
@@ -266,7 +266,7 @@ def update_sample():
 
         # If status is "In Process", set the expected completion time
         if status == "In Process":
-            update_data['expected_completion_time'] = datetime.utcnow() + timedelta(hours=2)
+            update_data['expected_completion_time'] = datetime.now(pytz.utc) + timedelta(hours=2)
 
         update_result = collection.update_one(
             {"chip_id": chip_id},
