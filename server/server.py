@@ -433,7 +433,7 @@ def download_dataset():
                 sample.get('patient_id', 'N/A'),
                 f"{sample['final_volume']}",
                 f"{sample['average_co2']}",
-                f"{sample['error']}",
+                sample.get('error_code', 'N/A'), 
                 'Yes' if sample.get('document_urls') else 'No'
             ])
         
