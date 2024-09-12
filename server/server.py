@@ -17,6 +17,12 @@ from flask_mail import Mail, Message
 import threading
 import time
 from datetime import datetime, timedelta, timezone
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from pytz import timezone
+import datetime
+import json
+import gzip
 
 load_dotenv()
 
@@ -104,6 +110,48 @@ headers = {
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 collection = db[COLLECTION_NAME]
+
+def backup_database():
+    try:
+        # Generate a timestamp for the backup file name
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_file_name = f"backup_{timestamp}.json.gz"
+        
+        # Fetch all documents from the collection
+        documents = list(collection.find({}, {'_id': False}))
+        
+        # Convert documents to JSON and compress
+        json_data = json.dumps(documents)
+        compressed_data = gzip.compress(json_data.encode('utf-8'))
+        
+        # Upload the compressed backup to Google Cloud Storage
+        backup_blob = bucket.blob(f"database_backups/{backup_file_name}")
+        backup_blob.upload_from_string(compressed_data, content_type='application/gzip')
+        
+        print(f"Database backup completed and uploaded to GCS: {backup_file_name}")
+        
+        # Send email notification
+        # subject = "Database Backup Completed"
+        # body = f"The database backup has been completed and uploaded to Google Cloud Storage: {backup_file_name}"
+        # send_email(subject, body)
+        
+    except Exception as e:
+        error_message = f"Database backup failed: {str(e)}"
+        print(error_message)
+        send_email("Database Backup Failed", error_message)
+
+# Initialize the scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(
+    backup_database,
+    trigger=CronTrigger(hour=22, minute=50, timezone=timezone('US/Eastern')),
+    id='database_backup_job',
+    name='Daily database backup at 10 PM EST',
+    replace_existing=True
+)
+
+# Start the scheduler
+scheduler.start()
 
 # Function to send email notification
 def send_email(subject, body):
