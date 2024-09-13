@@ -57,7 +57,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const tableBody = document.querySelector('#completed-samples-table tbody');
                 tableBody.innerHTML = '';
+                let completedCount = 0;
+                
                 data.forEach(sample => {
+                    if (sample.status === 'Complete') {
+                        completedCount++;
+                    }
                     const row = document.createElement('tr');
 
                     const sampleIdCell = document.createElement('td');
@@ -103,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     tableBody.appendChild(row);
                 });
+                document.getElementById('sample-count').textContent = `Total: ${completedCount}`;
             })
             .catch(error => {
                 console.error('Error fetching completed samples:', error);
