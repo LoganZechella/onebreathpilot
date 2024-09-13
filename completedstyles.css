@@ -291,7 +291,18 @@ p {
 
 #table-title {
     color: #fff;
+    text-shadow: 1px 1px 8px #333;
+    margin: 0 0 0.5em 0;
+    border-bottom: 2px solid #fff;
+    padding: 0 0.5em 0.25em 0.5em;
+}
+
+#sample-count {
+    color: #fff;
     text-shadow: 1px 3px 8px #333;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 1em 0;
 }
 
 #completed-samples-table td {
@@ -315,7 +326,7 @@ p {
     justify-content: center;
     align-items: center;
     max-width: fit-content;
-    margin: 0 0 0 0;
+    margin: 0.25em 0 0 0;
     transition: background-color 0.5s ease;
 }
 
