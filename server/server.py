@@ -14,11 +14,9 @@ from io import BytesIO
 import base64
 from bson.decimal128 import Decimal128
 from flask_mail import Mail, Message
-import threading
-import time
-from datetime import datetime, timedelta, timezone
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
+from datetime import datetime, timedelta
 import pytz
 import json
 import gzip
@@ -90,6 +88,7 @@ COLLECTION_NAME = "collectedsamples"
 
 # Google Cloud Storage Configuration
 GCS_BUCKET = os.getenv("GCS_BUCKET")
+GCS_BACKUP_BUCKET = os.getenv("GCS_BACKUP_BUCKET")
 GCS_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 # Recipient email address for notifications
@@ -99,6 +98,7 @@ MAIL_FROM_ADDRESS = os.getenv('MAIL_FROM_ADDRESS')
 # Initialize GCS client
 storage_client = storage.Client.from_service_account_json(GCS_CREDENTIALS)
 bucket = storage_client.bucket(GCS_BUCKET)
+backup_bucket = storage_client.bucket(GCS_BACKUP_BUCKET)
 
 headers = {
     "Content-Type": "application/json",
@@ -113,7 +113,7 @@ collection = db[COLLECTION_NAME]
 def backup_database():
     try:
         # Generate a timestamp for the backup file name
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_file_name = f"backup_{timestamp}.json.gz"
         
         # Fetch all documents from the collection
@@ -124,33 +124,15 @@ def backup_database():
         compressed_data = gzip.compress(json_data.encode('utf-8'))
         
         # Upload the compressed backup to Google Cloud Storage
-        backup_blob = bucket.blob(f"database_backups/{backup_file_name}")
+        backup_blob = backup_bucket.blob(f"database_backups/{backup_file_name}")
         backup_blob.upload_from_string(compressed_data, content_type='application/gzip')
         
         print(f"Database backup completed and uploaded to GCS: {backup_file_name}")
-        
-        # Send email notification
-        # subject = "Database Backup Completed"
-        # body = f"The database backup has been completed and uploaded to Google Cloud Storage: {backup_file_name}"
-        # send_email(subject, body)
-        
+        return True
     except Exception as e:
         error_message = f"Database backup failed: {str(e)}"
         print(error_message)
-        # send_email("Database Backup Failed", error_message)
-
-# Initialize the scheduler
-scheduler = BackgroundScheduler()
-scheduler.add_job(
-    backup_database,
-    trigger=CronTrigger(hour=22, minute=0, timezone=pytz.timezone('US/Eastern')),
-    id='database_backup_job',
-    name='Daily database backup at 10 PM EST',
-    replace_existing=True
-)
-
-# Start the scheduler
-scheduler.start()
+        return False
 
 # Function to send email notification
 def send_email(subject, body):
@@ -175,23 +157,23 @@ def send_sms(to_numbers, message_body):
             print(f"Failed to send message to {number}: {e}")
 
 # Global dictionary to store sample timers
-sample_timers = {}
+# sample_timers = {}
 
-def check_and_update_samples():
-    while True:
-        current_time = datetime.now(pytz.utc)
-        samples_to_update = collection.find({
-            "status": "In Process",
-            "expected_completion_time": {"$lte": current_time}
-        })
+# def check_and_update_samples():
+#     while True:
+#         current_time = datetime.now(pytz.utc)
+#         samples_to_update = collection.find({
+#             "status": "In Process",
+#             "expected_completion_time": {"$lte": current_time}
+#         })
 
-        for sample in samples_to_update:
-            update_sample_status(sample['chip_id'], "Ready for Pickup")
+#         for sample in samples_to_update:
+#             update_sample_status(sample['chip_id'], "Ready for Pickup")
 
-        time.sleep(60) # Check every minute
+#         time.sleep(60) # Check every minute
 
-# Start the background task
-threading.Thread(target=check_and_update_samples, daemon=True).start()
+# # Start the background task
+# threading.Thread(target=check_and_update_samples, daemon=True).start()
 
 def update_sample_status(chip_id, new_status):
     update_result = collection.update_one(
@@ -253,6 +235,10 @@ def samples():
 #     except Exception as e:
 #         return jsonify({"error": str(e)}), 500
 
+# Initialize the scheduler
+scheduler = BackgroundScheduler()
+scheduler.start()
+
 @app.route('/update_sample', methods=['POST'])
 def update_sample():
     try:
@@ -264,20 +250,33 @@ def update_sample():
         if not chip_id or not status:
             return jsonify({"error": "Missing chipID or status in the submitted data."}), 400
 
-        # If status is "In Process", set the expected completion time
-        if status == "In Process":
-            update_data['expected_completion_time'] = datetime.now(pytz.utc) + timedelta(hours=2)
-
         update_result = collection.update_one(
             {"chip_id": chip_id},
             {"$set": update_data}
         )
 
         if update_result.modified_count == 1:
+            if status == "In Process":
+                # Schedule status change to 'Ready for Pickup' after 2 hours
+                run_time = datetime.now(pytz.utc) + timedelta(hours=2)
+                scheduler.add_job(
+                    change_status_to_ready,
+                    trigger=DateTrigger(run_date=run_time),
+                    args=[chip_id]
+                )
+
             if status in ["In Process", "Ready for Pickup"]:
                 subject = f"Sample Status Updated: {status}"
                 body = f"Sample with chip ID {chip_id} has been updated to '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
                 send_email(subject, body)
+            
+            # If the status is changed to 'Complete', backup the entire database
+            if status == "Complete":
+                backup_success = backup_database()
+                if backup_success:
+                    print("Full database backup completed")
+                else:
+                    print("Failed to create full database backup")
                 
             return jsonify({"success": True, "message": "Sample updated successfully."}), 200
         else:
@@ -285,6 +284,23 @@ def update_sample():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+def change_status_to_ready(chip_id):
+    try:
+        update_result = collection.update_one(
+            {"chip_id": chip_id, "status": "In Process"},
+            {"$set": {"status": "Ready for Pickup"}}
+        )
+        if update_result.modified_count == 1:
+            # sample = collection.find_one({"chip_id": chip_id})
+            # subject = "Sample Status Updated: Ready for Pickup"
+            # body = f"Sample with chip ID {chip_id} is now Ready for Pickup at '{sample['location']}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
+            # send_email(subject, body)
+            print(f"Status changed to Ready for Pickup for chip ID: {chip_id}")
+        else:
+            print(f"Failed to update status for chip ID: {chip_id}. Sample may have been already updated or removed.")
+    except Exception as e:
+        print(f"Error changing status for chip ID {chip_id}: {str(e)}")
 
 @app.route('/update_patient_info', methods=['POST'])
 def update_patient_info():
