@@ -87,6 +87,7 @@ MONGODB_DATA_API_KEY = os.getenv("MONGODB_DATA_API_KEY")
 MONGO_URI = os.getenv("MONGO_URI")
 DATABASE_NAME = "pilotstudy2024"
 COLLECTION_NAME = "collectedsamples"
+ANALYZED_COLLECTION_NAME = os.getenv("ANALYZED_COLLECTION_NAME")
 
 # Google Cloud Storage Configuration
 GCS_BUCKET = os.getenv("GCS_BUCKET")
@@ -109,6 +110,7 @@ headers = {
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 collection = db[COLLECTION_NAME]
+analyzed_collection = db[ANALYZED_COLLECTION_NAME]
 
 def backup_database():
     try:
@@ -443,5 +445,18 @@ def download_dataset():
         # Return the CSV file as a response
         return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=completed_samples.csv"})
     
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/analyzed', methods=['GET'])
+def get_analyzed_samples():
+    try:
+        # Fetch all documents from the analyzedsamples collection, sorted by timestamp
+        analyzed_samples = list(analyzed_collection.find({}, {'_id': 0}).sort("timestamp", 1))
+        
+        # Convert Decimal128 fields to float for JSON serialization
+        analyzed_samples = [convert_decimal128(sample) for sample in analyzed_samples]
+        
+        return jsonify(analyzed_samples), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
