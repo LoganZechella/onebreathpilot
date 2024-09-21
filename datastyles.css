@@ -179,9 +179,21 @@ main {
 
 #chart-controls {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 1em;
+    justify-content: center;
+    margin: 0.5em 0 0.5em 0;
     width: 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+#chart-controls label {
+    color: #333;
+    padding: 1em 0.5em 1em 0.5em;
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 0;
+    font-weight: 600;
 }
 
 #chart-controls select {
@@ -189,7 +201,10 @@ main {
     border-radius: 4px;
     border: 1px solid #ccc;
     background-color: white;
-    font-size: 0.9em;
+    font-size: 12px;
+    color: #33333357;
+    width: 20%;
+    margin: 0 0 0 0;
 }
 
 #chart-container {
@@ -198,7 +213,7 @@ main {
     align-items: center;
     width: 100%;
     max-height: 95%;
-    margin-bottom: 2em;
+    margin: 1em 0 2em 0;
 }
 
 #d3-container {
@@ -238,12 +253,8 @@ main {
         flex-direction: column;
     }
 
-    #chart-controls select {
-        margin-bottom: 0.5em;
-    }
-
-    #chart-container,
+    /* #chart-container,
     #d3-container {
         height: 300px;
-    }
+    } */
 }
