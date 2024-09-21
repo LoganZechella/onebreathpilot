@@ -10,6 +10,14 @@
         const aggregation = document.getElementById('aggregation');
 
         if (chartType && xAxis && yAxis && aggregation) {
+            // Only add labels if they don't already exist
+            if (!chartType.previousElementSibling || chartType.previousElementSibling.tagName !== 'LABEL') {
+                addLabelForSelect(chartType, 'Chart Type:');
+                addLabelForSelect(xAxis, 'X-Axis:');
+                addLabelForSelect(yAxis, 'Y-Axis:');
+                addLabelForSelect(aggregation, 'Aggregation:');
+            }
+
             chartType.addEventListener('change', createVisualization);
             xAxis.addEventListener('change', createVisualization);
             yAxis.addEventListener('change', createVisualization);
@@ -22,7 +30,7 @@
 
     async function fetchData() {
         try {
-            const response = await fetch('https://onebreathpilot.onrender.com/api/completed_samples');
+            const response = await fetch('https://onebreathpilot.onrender.com/analyzed');
             const allSamples = await response.json();
             completedSamples = allSamples.filter(sample => sample.status === "Complete");
             populateAxisOptions();
@@ -32,15 +40,26 @@
         }
     }
 
+    function addLabelForSelect(selectElement, labelText) {
+        const label = document.createElement('label');
+        label.htmlFor = selectElement.id;
+        label.textContent = labelText;
+        selectElement.parentNode.insertBefore(label, selectElement);
+    }
+
     function populateAxisOptions() {
         const xAxis = document.getElementById('x-axis');
         const yAxis = document.getElementById('y-axis');
         const aggregation = document.getElementById('aggregation');
         if (!xAxis || !yAxis || !aggregation) return;
 
-        const numericFields = ['final_volume', 'average_co2', 'batch_number'];
+        const numericFields = [
+            'final_volume', 'average_co2', 'batch_number',
+            '2-Butanone', 'Pentanal', 'Decanal', '2-hydroxy-acetaldehyde',
+            '2-hydroxy-3-butanone', '4-HHE', '4HNE'
+        ];
         const dateFields = ['timestamp', 'mfg_date'];
-        const categoricalFields = ['location', 'patient_id', 'chip_id'];
+        const categoricalFields = ['location', 'patient_id', 'chip_id', 'status', 'Dx'];
 
         xAxis.innerHTML = '';
         yAxis.innerHTML = '';
@@ -266,8 +285,25 @@
 
         if (aggregationField === 'none') {
             samples.forEach(sample => {
-                processedData.labels.push(formatFieldValue(sample[xField], xField));
-                processedData.data.push(parseFloat(sample[yField]) || 0);
+                let xValue = formatFieldValue(sample[xField], xField);
+                let yValue = parseFloat(sample[yField]);
+
+                // Handle special cases for average_co2 and final_volume
+                if (xField === 'average_co2' && typeof sample[xField] === 'object') {
+                    xValue = parseFloat(sample[xField].$numberDecimal);
+                }
+                if (yField === 'average_co2' && typeof sample[yField] === 'object') {
+                    yValue = parseFloat(sample[yField].$numberDecimal);
+                }
+                if (xField === 'final_volume') {
+                    xValue = parseInt(sample[xField]);
+                }
+                if (yField === 'final_volume') {
+                    yValue = parseInt(sample[yField]);
+                }
+
+                processedData.labels.push(xValue);
+                processedData.data.push(yValue || 0);
             });
         } else {
             let aggregatedData = {};
@@ -291,6 +327,12 @@
     function formatFieldValue(value, field) {
         if (field === 'timestamp' || field === 'mfg_date') {
             return new Date(value).toLocaleDateString();
+        }
+        if (field === 'average_co2' && typeof value === 'object') {
+            return parseFloat(value.$numberDecimal);
+        }
+        if (field === 'final_volume') {
+            return parseInt(value);
         }
         return value;
     }
