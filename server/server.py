@@ -22,6 +22,8 @@ from apscheduler.triggers.cron import CronTrigger
 import pytz
 import json
 import gzip
+import openai
+from openai import OpenAI
 
 load_dotenv()
 
@@ -111,6 +113,10 @@ client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 collection = db[COLLECTION_NAME]
 analyzed_collection = db[ANALYZED_COLLECTION_NAME]
+
+# OpenAI client setup
+openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def backup_database():
     try:
@@ -460,3 +466,36 @@ def get_analyzed_samples():
         return jsonify(analyzed_samples), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/ai_analysis', methods=['GET'])
+def ai_analysis():
+    try:
+        # Fetch all documents from the analyzedsamples collection
+        analyzed_samples = list(analyzed_collection.find({}, {'_id': 0}))
+        
+        # Convert Decimal128 fields to float for JSON serialization
+        analyzed_samples = [convert_decimal128(sample) for sample in analyzed_samples]
+        
+        # Prepare data for OpenAI API
+        data_summary = json.dumps(analyzed_samples[:10])  # Limit to 10 samples for brevity
+        
+        # Call OpenAI API
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are an expert in analyzing scientific breath analysis data. You are working with data from breath analysis tests, which include levels of various chemical compounds, CO2 levels, timestamps, and other metadata. Your task is to: - Identify trends in the data and highlight emerging patterns. - Provide clear and comprehensible summaries of the chemical compound levels.- Spot and highlight any outliers or unusual patterns in the dataset. - Provide both high-level summaries (e.g., overall trends) and more detailed analysis (e.g., highlighting specific compound level variations). Keep your analysis informative, yet concise, providing actionable insights and making the data easy to interpret for a non-expert but also informative enough for professionals."},
+                {"role": "user", "content": f"Here is a set of breath analysis results from multiple patients. Each record contains various compound levels, CO2 levels, and additional metadata. Please analyze the dataset and provide:
+                1. A high-level summary of the key trends in the compound levels.
+                2. Any outliers or unusual patterns (e.g., significantly high or low compound concentrations).
+                3. A detailed analysis of the most notable entries, explaining why they stand out.
+                4. If possible, suggest any hypotheses or potential next steps for further investigation.
+                Data: {data_summary}"}
+            ]
+        )
+        
+        # Extract the AI-generated insights
+        insights = response.choices[0].message.content
+        
+        return jsonify({"success": True, "insights": insights}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

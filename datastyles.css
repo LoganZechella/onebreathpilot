@@ -25,7 +25,6 @@ body {
     justify-content: center;
     padding: 1em;
     align-items: center;
-    margin-top: 1em;
 }
 
 .container-fluid {
@@ -47,6 +46,13 @@ p {
 
 main {
     display: flex;
+}
+
+#blocker {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #nav-title-text>strong {
@@ -98,6 +104,136 @@ main {
 .hamburger-menu a {
     text-decoration: none;
     color: #fff;
+}
+
+#visual-header {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#visual-header h2 {
+    margin: 0.5em 0 0 0.75em;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ai-analysis-btn {
+    position: relative;
+    max-width: max-content;
+    max-height: 36px;
+    margin: 0em 0.5em 0.5em 0.5em;
+    padding: 0.5em 1em;
+    z-index: 1000;
+    font-size: 14px;
+    background-color: #0F92BB;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+}
+
+.ai-analysis-btn:hover {
+    background-color: #00e8c5a3;
+    color: #222;
+    border: 1px solid #01332c;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
+    animation: glowAnimation 3s ease-in-out infinite;
+    transform: scale(1.05);
+}
+
+.ai-analysis-btn:active {
+    transform: scale(0.98);
+    background-color: #014969;
+    animation: none;
+    box-shadow:
+        inset 0 0 10px rgba(255, 255, 255, 0.4),
+        inset 5px 0 15px rgba(255, 0, 255, 0.2),
+        inset -5px 0 15px rgba(0, 255, 255, 0.2),
+        0 0 10px rgba(255, 255, 255, 0.2),
+        -3px 0 15px rgba(255, 0, 255, 0.2),
+        3px 0 15px rgba(0, 255, 255, 0.2);
+}
+
+@keyframes glowAnimation {
+    0%, 100% {
+        box-shadow:
+            inset 0 0 20px rgba(255, 255, 255, 0.5),
+            inset 10px 0 30px rgba(255, 0, 255, 0.3),
+            inset -10px 0 30px rgba(0, 255, 255, 0.3),
+            0 0 20px rgba(255, 255, 255, 0.3),
+            -5px 0 30px rgba(255, 0, 255, 0.3),
+            5px 0 30px rgba(0, 255, 255, 0.3);
+    }
+    25% {
+        box-shadow:
+            inset 0 0 20px rgba(255, 255, 255, 0.5),
+            inset -10px 0 30px rgba(255, 0, 255, 0.3),
+            inset 10px 0 30px rgba(0, 255, 255, 0.3),
+            0 0 20px rgba(255, 255, 255, 0.3),
+            5px 0 30px rgba(255, 0, 255, 0.3),
+            -5px 0 30px rgba(0, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow:
+            inset 0 0 20px rgba(255, 255, 255, 0.5),
+            inset 0 10px 30px rgba(255, 0, 255, 0.3),
+            inset 0 -10px 30px rgba(0, 255, 255, 0.3),
+            0 0 20px rgba(255, 255, 255, 0.3),
+            0 5px 30px rgba(255, 0, 255, 0.3),
+            0 -5px 30px rgba(0, 255, 255, 0.3);
+    }
+    75% {
+        box-shadow:
+            inset 0 0 20px rgba(255, 255, 255, 0.5),
+            inset 10px 0 30px rgba(0, 255, 255, 0.3),
+            inset -10px 0 30px rgba(255, 0, 255, 0.3),
+            0 0 20px rgba(255, 255, 255, 0.3),
+            -5px 0 30px rgba(0, 255, 255, 0.3),
+            5px 0 30px rgba(255, 0, 255, 0.3);
+    }
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 #visualization-section {
