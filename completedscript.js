@@ -84,9 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     const co2Cell = document.createElement('td');
                     co2Cell.textContent = `${sample.average_co2}%`
 
-                    // const imageCell = document.createElement('td');
-                    // imageCell.textContent = sample.document_urls ? 'Yes' : 'No';
-
                     const errorCodeCell = document.createElement('td');
                     errorCodeCell.textContent = sample.error || 'N/A';
 
@@ -102,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     row.appendChild(patientIdCell);
                     row.appendChild(volumeCell);
                     row.appendChild(co2Cell);
-                    // row.appendChild(imageCell);
                     row.appendChild(errorCodeCell);
                     row.appendChild(uploadCell);
 
@@ -133,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = 'https://onebreathpilot.onrender.com/download_dataset';
         }
     });
-
 
     function showUploadMenu(chipId) {
         clearImagePreview();

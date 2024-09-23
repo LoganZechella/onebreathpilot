@@ -58,8 +58,6 @@ function hideElementWithAnimation(elementId, animation, options = {}) {
 }
 
 function updateUIBasedOnAuth(user) {
-    const signInContainer = document.getElementById('sign-in-container');
-    const landingMain = document.getElementById('landing-main');
     const blocker = document.querySelector('.blocker');
     const signInButton = document.getElementById('show-sign-in');
 
@@ -78,7 +76,6 @@ function updateUIBasedOnAuth(user) {
         }
     } else {
         showElementWithAnimation('sign-in-container', 'fadeIn');
-        // hideElementWithAnimation('landing-main', 'fadeOut');
         blocker.style.display = 'none';
         signInButton.textContent = 'Sign In';
     }
@@ -103,25 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function initApp() {
-    const signIn = document.getElementById('sign-in-container');
-    const splashScreen = document.getElementById('splash-screen');
-
     setTimeout(() => {
-        // animateCSS('#splash-screen', 'fadeOut').then(() => {
-        //     document.getElementById('splash-screen').style.display = 'none';
-        // });
-        // animateCSS('#sign-in-container', 'fadeIn');
         hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '1000ms' });
         showElementWithAnimation('sign-in-container', 'fadeIn', { duration: '1000ms' });
         checkAuthState();
         if (checkAuthState() === true) {
             hideElementWithAnimation('sign-in-container', 'fadeOut');
             hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '1000ms' });
-            // showElementWithAnimation('landing-main', 'fadeIn');
             showElementWithAnimation('blocker', 'fadeIn', { delay: '1000ms', duration: '1000ms' });
             showElementWithAnimation('container-fluid', 'fadeIn', { delay: '1000ms', duration: '1000ms' });
-            // document.getElementById('landing-main').style.display = 'flex';
-            // document.querySelector('.blocker').style.display = 'flex';
             const nav = document.querySelector('.container-fluid');
             nav.style.display = 'flex';
         } else {
@@ -129,8 +116,6 @@ function initApp() {
             document.getElementById('landing-main').style.display = 'none';
             document.getElementById('sign-in-container').removeAttribute('hidden');
         }
-        
-        // showElementWithAnimation('sign-in-container', 'fadeIn', { duration: '500ms' });
     }, 1200);
 
     const queryParams = window.location.search;
@@ -239,8 +224,6 @@ function showOptionButtons() {
     });
 
     document.getElementById('back-button-options').addEventListener('click', () => {
-        // document.getElementById('sample-reg-section').style.display = 'block';
-        // optionContainer.style.display = 'none';
         window.location.reload();
     });
 }
@@ -262,8 +245,6 @@ function setupOptionContainerEventListeners() {
     });
 
     backButton.addEventListener('click', () => {
-        // document.getElementById('sample-reg-section').style.display = 'block';
-        // optionContainer.style.display = 'none';
         window.location.href = '/index.html';
     });
 }
@@ -380,12 +361,6 @@ function stopDocumentScanning() {
     document.getElementById('scanner-container').style.display = 'none';
 }
 
-// function changeCamera() {
-//     stopDocumentScanning();
-//     currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
-//     startDocumentScanning();
-// }
-
 function handleDocumentScanResult(result) {
     console.log('Scan result:', result);
 
@@ -474,8 +449,6 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
                 });
                 loader.style.display = 'none';
                 alert('Document uploaded successfully.');
-                // stopDocumentScanning();
-                // document.getElementById('review-section').style.display = 'none';
                 window.location.reload();
             }
         }));
@@ -493,7 +466,6 @@ function startDocumentScanningFromEditMenu() {
         'in-process': document.getElementById('in-process-section'),
         'pickup': document.getElementById('pickup-section'),
         'shipping': document.getElementById('shipping-section')
-        // 'elution': document.getElementById('elution-section')
     };
     Object.values(bodySections).forEach(section => section.style.display = 'none');
     document.getElementById('scanner-container').style.display = 'block';
@@ -547,13 +519,7 @@ function uploadFromFile() {
                         const imageUrl = data.url.split('?')[0];
                         const shortBlobName = imageUrl.split('/')[4];
                         console.log(shortBlobName);
-                        
-
-                        // await uploadFileToGCS(shortBlobName, imageDataUrl).then(() => {
-                        //     uploadDocumentMetadata(chipId, imageUrl);
-                        // });
                         loader.style.display = 'none';
-                        // alert('Document uploaded successfully.');
                     } else {
                         alert('Failed to generate presigned URL.');
                     }
@@ -708,7 +674,6 @@ function setupQRCodeScanner() {
             'in-process': document.getElementById('in-process-section'),
             'pickup': document.getElementById('pickup-section'),
             'shipping': document.getElementById('shipping-section')
-            // 'elution': document.getElementById('elution-section')
         };
         Object.values(bodySections).forEach(section => section.style.display = 'none');
         document.getElementById('qr-close-btn').style.display = 'flex';
@@ -743,8 +708,6 @@ function setupQRCodeScanner() {
             (decodedText, decodedResult) => {
                 window.location.href = `${decodedText}`;
                 html5QrCode.stop().then(() => {
-                    // resetSampleRegistration();
-
                 }).catch((err) => console.error('Failed to stop the QR Scanner', err));
             },
             (errorMessage) => console.error(`QR scan error: ${errorMessage}`)
@@ -776,7 +739,6 @@ function resetSampleRegistration() {
         'in-process': document.getElementById('in-process-section'),
         'pickup': document.getElementById('pickup-section'),
         'shipping': document.getElementById('shipping-section')
-        // 'elution': document.getElementById('elution-section')
     };
     document.getElementById('sample-reg-section').style.display = 'none';
     document.getElementById('patient-intake-form-section').style.display = 'none';
@@ -809,7 +771,6 @@ function updateSampleQueues(samples) {
     const inProcessElement = document.getElementById('in-process-section').querySelector('.grid');
     const pickupElement = document.getElementById('pickup-section').querySelector('.grid');
     const shippingElement = document.getElementById('shipping-section').querySelector('.grid');
-    // const analysisElement = document.getElementById('elution-section').querySelector('.grid');
 
     clearElements([inProcessElement, pickupElement, shippingElement]);
 
@@ -839,8 +800,6 @@ function updateSampleQueues(samples) {
     for (const element of [inProcessElement, pickupElement, shippingElement]) {
         element.style.display = 'grid';
     }
-
-    
 
     displayNoSamplesMessage([inProcessElement, pickupElement, shippingElement]);
 }
@@ -971,7 +930,7 @@ function handleUpdateClick(event) {
 
     // Replace location text with an input field
     const locationInput = document.createElement('select');
-    locationInput.className = 'location-input'; // Optional: Add a class for styling
+    locationInput.className = 'location-input';
     locationInput.style.width = '160px';
     locationInput.style.height = '25px';
     locationInput.style.fontSize = '12px';
@@ -1011,7 +970,6 @@ function handleUpdateClick(event) {
         locationInput.remove();
         chipIdElement.style.display = 'flex';
         locationElement.style.display = 'flex';
-        
 
         try {
             // Make an API call to update the sample in the database
@@ -1022,8 +980,8 @@ function handleUpdateClick(event) {
                     'Access-Control-Allow-Origin': '*'
                 },
                 body: JSON.stringify({
-                    chip_id: updatedChipId,      // The updated chip ID
-                    location: updatedLocation        // The updated location
+                    chip_id: updatedChipId,
+                    location: updatedLocation
                 })
             });
 
@@ -1087,36 +1045,7 @@ function handlePickupButtonClick(event) {
 
 function handleEvacuationCompleteButtonClick(event) {
     const chipID = event.target.closest('.card').querySelector('h3').innerText;
-
-    // Implement the functionality to mark the sample as evacuated
 }
-
-// function initializeCountdown(timestamp, timerId, chipId) {
-//     const endTime = new Date(timestamp).getTime() + 7200000; // 2 hours from timestamp
-//     const timerElement = document.getElementById(timerId);
-
-//     if (!timerElement) {
-//         console.error(`Timer element with ID ${timerId} not found. Skipping countdown.`);
-//         return;  // Exit if no timer element is found
-//     }
-
-//     const interval = setInterval(() => {
-//         const now = new Date().getTime();
-//         const distance = endTime - now;
-
-//         if (distance < 0) {
-//             clearInterval(interval);
-//             updateStatusToReadyForPickup(chipId);
-//             return;
-//         }
-
-//         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-//         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-//         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-//         timerElement.innerHTML = `${hours}h ${minutes}m ${seconds}s remaining`;
-//     }, 1000);
-// }
 
 function initializeCountdown(timestamp, timerId, chipId) {
     const endTime = new Date(timestamp).getTime() + 7200000; // 2 hours from timestamp
@@ -1256,7 +1185,6 @@ function appendButtonsBasedOnStatus(card, sample) {
     }
 
     if (sample.status === 'Ready for Pickup') {
-        // card.querySelector('.edit-button').remove();
         const pickupButton = document.createElement('button');
         pickupButton.className = 'pickup-button';
         pickupButton.id = sample.chip_id;
@@ -1295,7 +1223,6 @@ function setupSampleEventListeners() {
             const error = event.target.elements['error-codes'].value;
             updateStatusToReadyForAnalysis(chipId, volume, co2, error).then(() => {
                 hideElementWithAnimation('pickup-form-modal', 'fadeOut', 'duration-500ms', 'delay-0s');
-                // document.getElementById('pickup-form-modal').style.display = 'none';
                 document.getElementById('pickup-form').reset();
                 
             }).catch(error => {
@@ -1305,7 +1232,6 @@ function setupSampleEventListeners() {
         } else {
             updateStatusToReadyForAnalysis(chipId, volume, co2).then(() => {
                 hideElementWithAnimation('pickup-form-modal', 'fadeOut', 'duration-500ms', 'delay-0s');
-                // document.getElementById('pickup-form-modal').style.display = 'none';
                 document.getElementById('pickup-form').reset();
             }).catch(error => {
                 console.error('Failed to update sample status:', error);
@@ -1316,7 +1242,6 @@ function setupSampleEventListeners() {
 
     document.getElementById('pickup-close-button').addEventListener('click', function () {
         hideElementWithAnimation('pickup-form-modal', 'fadeOut', { duration: '1000ms', delay: '0s' });
-        // document.getElementById('pickup-form-modal').style.display = 'none';
     });
 
     document.addEventListener('click', function (event) {
@@ -1337,12 +1262,10 @@ function setupSampleEventListeners() {
             startDocumentScanning();
         }
         if (event.target.id === 'change-camera-button') {
-            // changeCamera();
             uploadFromFile();
         }
         if (event.target.id === 'completed-samples-button') {
             window.location.href = '/completed.html';
         }
     });
-
 }
