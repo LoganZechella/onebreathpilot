@@ -394,3 +394,29 @@ main {
         height: 300px;
     } */
 }
+
+.insight-section {
+    margin-bottom: 20px;
+}
+
+.insight-section h3 {
+    color: #333;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.insight-section ul {
+    padding-left: 20px;
+    color: #222;
+}
+
+.insight-section li {
+    margin-bottom: 5px;
+}
+
+#ai-insights-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 15px;
+}

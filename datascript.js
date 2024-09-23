@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeModal = aiInsightsModal.querySelector('.close');
     const aiInsightsContent = document.getElementById('ai-insights-content');
 
-    aiAnalysisBtn.addEventListener('click', function () {
+    aiAnalysisBtn.addEventListener('click', function() {
         aiInsightsContent.innerHTML = '<p>Generating insights...</p>';
         aiInsightsModal.style.display = 'block';
 
@@ -368,7 +368,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    aiInsightsContent.innerHTML = `<p>${data.insights}</p>`;
+                    // Format the insights
+                    const formattedInsights = formatInsights(data.insights);
+                    aiInsightsContent.innerHTML = formattedInsights;
                 } else {
                     aiInsightsContent.innerHTML = `<p>Error: ${data.error}</p>`;
                 }
@@ -378,13 +380,45 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    closeModal.addEventListener('click', function () {
+    closeModal.addEventListener('click', function() {
         aiInsightsModal.style.display = 'none';
     });
 
-    window.addEventListener('click', function (event) {
+    window.addEventListener('click', function(event) {
         if (event.target == aiInsightsModal) {
             aiInsightsModal.style.display = 'none';
         }
     });
 });
+
+function formatInsights(insights) {
+    // Split the insights into sections
+    const sections = insights.split('###').filter(section => section.trim() !== '');
+
+    // Format each section
+    const formattedSections = sections.map(section => {
+        const [title, ...content] = section.split('\n');
+        return `
+            <div class="insight-section">
+                <h3>${title.trim()}</h3>
+                ${formatContent(content.join('\n'))}
+            </div>
+        `;
+    });
+
+    return formattedSections.join('');
+}
+
+function formatContent(content) {
+    // Format lists
+    content = content.replace(/- /g, '<li>').replace(/\n/g, '</li>\n');
+    content = '<ul>' + content + '</ul>';
+
+    // Format bold text
+    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Format italics
+    content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    return content;
+}
