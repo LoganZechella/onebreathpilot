@@ -24,6 +24,7 @@ import json
 import gzip
 import openai
 from openai import OpenAI
+from bson.json_util import dumps
 
 load_dotenv()
 
@@ -473,11 +474,19 @@ def ai_analysis():
         # Fetch all documents from the analyzedsamples collection
         analyzed_samples = list(analyzed_collection.find({}, {'_id': 0}))
         
-        # Convert Decimal128 fields to float for JSON serialization
-        analyzed_samples = [convert_decimal128(sample) for sample in analyzed_samples]
+        # Convert Decimal128 fields to float and datetime to string for JSON serialization
+        def convert_sample(sample):
+            for key, value in sample.items():
+                if isinstance(value, Decimal128):
+                    sample[key] = float(value.to_decimal())
+                elif isinstance(value, datetime):
+                    sample[key] = value.isoformat()
+            return sample
         
-        # Prepare data for OpenAI API
-        data_summary = json.dumps(analyzed_samples[:10])  # Limit to 10 samples for brevity
+        analyzed_samples = [convert_sample(sample) for sample in analyzed_samples]
+        
+        # Prepare data for OpenAI API using bson.json_util.dumps
+        data_summary = dumps(analyzed_samples[:10])  # Limit to 10 samples for brevity
         
         # Call OpenAI API
         response = client.chat.completions.create(
