@@ -492,12 +492,11 @@ def ai_analysis():
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "You are an expert in analyzing scientific breath analysis data. You are working with data from breath analysis tests, which include levels of various chemical compounds, CO2 levels, timestamps, and other metadata. Your task is to: - Identify trends in the data and highlight emerging patterns. - Provide clear and comprehensible summaries of the chemical compound levels.- Spot and highlight any outliers or unusual patterns in the dataset. - Provide both high-level summaries (e.g., overall trends) and more detailed analysis (e.g., highlighting specific compound level variations). Keep your analysis informative, yet concise, providing actionable insights and making the data easy to interpret for a non-expert but also informative enough for professionals."},
-                {"role": "user", "content": f"""Here is a set of breath analysis results from multiple patients. Each record contains various compound levels, CO2 levels, and additional metadata. Please analyze the dataset and provide:
+                {"role": "system", "content": "You are an expert in analyzing scientific breath analysis data. You are working with data from breath analysis tests, which include levels of various chemical compounds (in nanomoles per liter of breath), CO2 levels, timestamps, and other metadata. Your task is to: - Identify trends in the data and highlight emerging patterns. - Provide clear and comprehensible summaries of the chemical compound levels.- Spot and highlight any outliers or unusual patterns in the dataset. - Provide both high-level summaries (e.g., overall trends) and more detailed analysis (e.g., highlighting specific compound level variations). Keep your analysis informative, yet concise, providing actionable insights and making the data easy to interpret for a non-expert but also informative enough for professionals."},
+                {"role": "user", "content": f"""Here is a set of breath analysis results from multiple patients. Each record contains various compound levels (in nanomoles per liter of breath), CO2 levels, and additional metadata. Please analyze the dataset and provide:
                 1. A high-level summary of the key trends in the compound levels.
                 2. Any outliers or unusual patterns (e.g., significantly high or low compound concentrations).
                 3. A detailed analysis of the most notable entries, explaining why they stand out.
-                4. If possible, suggest any hypotheses or potential next steps for further investigation.
                 Data: {data_summary}"""}
             ]
         )
