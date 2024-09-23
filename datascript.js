@@ -353,3 +353,38 @@ function toggleMenu() {
     const navLinks = document.getElementById('nav-links');
     navLinks.classList.toggle('responsive');
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const aiAnalysisBtn = document.getElementById('ai-analysis-btn');
+    const aiInsightsModal = document.getElementById('ai-insights-modal');
+    const closeModal = aiInsightsModal.querySelector('.close');
+    const aiInsightsContent = document.getElementById('ai-insights-content');
+
+    aiAnalysisBtn.addEventListener('click', function () {
+        aiInsightsContent.innerHTML = '<p>Generating insights...</p>';
+        aiInsightsModal.style.display = 'block';
+
+        fetch('https://onebreathpilot.onrender.com/ai_analysis')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    aiInsightsContent.innerHTML = `<p>${data.insights}</p>`;
+                } else {
+                    aiInsightsContent.innerHTML = `<p>Error: ${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                aiInsightsContent.innerHTML = `<p>Error: ${error.message}</p>`;
+            });
+    });
+
+    closeModal.addEventListener('click', function () {
+        aiInsightsModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == aiInsightsModal) {
+            aiInsightsModal.style.display = 'none';
+        }
+    });
+});
