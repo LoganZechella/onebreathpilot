@@ -9,3 +9,4 @@ Flask-Mail==0.10.0
 twilio==9.2.3
 apscheduler>=3.10.1
 pytz>=2023.3
+openai>=1.2.0
