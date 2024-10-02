@@ -47,6 +47,56 @@
         selectElement.parentNode.insertBefore(label, selectElement);
     }
 
+    function formatFieldName(fieldName) {
+        const formattingRules = {
+            'chip_id': 'Chip ID',
+            'batch_number': 'Batch Number',
+            'mfg_date': 'Manufacturing Date',
+            'location': 'Location',
+            'timestamp': 'Date',
+            'patient_id': 'Patient ID',
+            'average_co2': 'Average CO2 (%)',
+            'final_volume': 'Final Volume (mL)',
+            '2-Butanone': '2-Butanone (nmole/L breath)',
+            'Pentanal': 'Pentanal (nmole/L breath)',
+            'Decanal': 'Decanal (nmole/L breath)',
+            '2-hydroxy-acetaldehyde': '2-hydroxy-acetaldehyde (nmole/L breath)',
+            '2-hydroxy-3-butanone': '2-hydroxy-3-butanone (nmole/L breath)',
+            '4-HHE': '4-HHE (nmole/L breath)',
+            '4HNE': '4HNE (nmole/L breath)',
+            'Dx': 'Diagnosis'
+        };
+
+        return formattingRules[fieldName] || fieldName;
+    }
+
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        const options = {
+            timeZone: 'America/Kentucky/Louisville',
+            year: '2-digit',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        };
+        return date.toLocaleString('en-US', options).replace(',', '');
+    }
+
+    function formatFieldValue(value, field) {
+        if (field === 'timestamp') {
+            return formatTimestamp(value);
+        }
+        if (field === 'average_co2' && typeof value === 'object') {
+            return parseFloat(value.$numberDecimal);
+        }
+        if (field === 'final_volume') {
+            return parseInt(value);
+        }
+        return value;
+    }
+
     function populateAxisOptions() {
         const xAxis = document.getElementById('x-axis');
         const yAxis = document.getElementById('y-axis');
@@ -59,24 +109,24 @@
             '2-hydroxy-3-butanone', '4-HHE', '4HNE'
         ];
         const dateFields = ['timestamp', 'mfg_date'];
-        const categoricalFields = ['location', 'patient_id', 'chip_id', 'status', 'Dx'];
+        const categoricalFields = ['location', 'patient_id', 'chip_id', 'Dx'];
 
         xAxis.innerHTML = '';
         yAxis.innerHTML = '';
         aggregation.innerHTML = '<option value="none">None</option>';
 
         numericFields.forEach(field => {
-            xAxis.add(new Option(field, field));
-            yAxis.add(new Option(field, field));
+            xAxis.add(new Option(formatFieldName(field), field));
+            yAxis.add(new Option(formatFieldName(field), field));
         });
 
         dateFields.forEach(field => {
-            xAxis.add(new Option(field, field));
+            xAxis.add(new Option(formatFieldName(field), field));
         });
 
         categoricalFields.forEach(field => {
-            xAxis.add(new Option(field, field));
-            aggregation.add(new Option(field, field));
+            xAxis.add(new Option(formatFieldName(field), field));
+            aggregation.add(new Option(formatFieldName(field), field));
         });
     }
 
@@ -98,9 +148,9 @@
         let processedData = processData(completedSamples, xAxis, yAxis, aggregation);
 
         if (chartType === 'boxplot') {
-            createD3BoxPlot(processedData, xAxis, yAxis, chartContainer);
+            createD3BoxPlot(processedData, formatFieldName(xAxis), formatFieldName(yAxis), chartContainer);
         } else {
-            createChartJsChart(chartType, processedData, xAxis, yAxis, chartContainer);
+            createChartJsChart(chartType, processedData, formatFieldName(xAxis), formatFieldName(yAxis), chartContainer);
         }
     }
 
@@ -288,20 +338,6 @@
                 let xValue = formatFieldValue(sample[xField], xField);
                 let yValue = parseFloat(sample[yField]);
 
-                // Handle special cases for average_co2 and final_volume
-                if (xField === 'average_co2' && typeof sample[xField] === 'object') {
-                    xValue = parseFloat(sample[xField].$numberDecimal);
-                }
-                if (yField === 'average_co2' && typeof sample[yField] === 'object') {
-                    yValue = parseFloat(sample[yField].$numberDecimal);
-                }
-                if (xField === 'final_volume') {
-                    xValue = parseInt(sample[xField]);
-                }
-                if (yField === 'final_volume') {
-                    yValue = parseInt(sample[yField]);
-                }
-
                 processedData.labels.push(xValue);
                 processedData.data.push(yValue || 0);
             });
@@ -322,19 +358,6 @@
         }
 
         return processedData;
-    }
-
-    function formatFieldValue(value, field) {
-        if (field === 'timestamp' || field === 'mfg_date') {
-            return new Date(value).toLocaleDateString();
-        }
-        if (field === 'average_co2' && typeof value === 'object') {
-            return parseFloat(value.$numberDecimal);
-        }
-        if (field === 'final_volume') {
-            return parseInt(value);
-        }
-        return value;
     }
 
     function average(arr) {
