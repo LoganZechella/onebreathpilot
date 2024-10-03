@@ -182,6 +182,10 @@ p {
         padding: 1em 0.5em 1em 0.5em;
         overflow-x: scroll;
     }
+
+    .error-popover {
+        font-size: 10px;
+    }
 }
 
 #nav-title-text>strong {
@@ -553,7 +557,7 @@ p {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     max-width: 250px;
     z-index: 1000;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.4;
     color: #000;
 }
