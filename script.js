@@ -491,44 +491,49 @@ async function uploadFileToGCS(destinationBlobName, contents) {
     }
 }
 
-document.getElementById('confirm-upload-button').addEventListener('click', async () => {
-    const chipId = window.chipId || document.getElementById('chipID').value;
-    const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
+safeAddEventListener('confirm-upload-button', 'click', async () => {
+    const chipId = window.chipId || document.getElementById('chipID')?.value;
+    const scannedImages = Array.from(document.getElementById('scanned-images')?.getElementsByTagName('img') || []).map(img => img.src);
 
     const reviewSection = document.querySelectorAll('.review-non-loader');
     const loader = document.getElementById('document-upload-loader');
-    reviewSection.forEach(section => section.style.display = 'none');
-    loader.style.display = 'inline-block';
+    
+    if (reviewSection.length > 0 && loader) {
+        reviewSection.forEach(section => section.style.display = 'none');
+        loader.style.display = 'inline-block';
 
-    try {
-        const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
-            const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                body: JSON.stringify({ file_name: `document_${chipId}.jpeg` })
-            });
-            const data = await response.json();
-            if (data.success) {
-                const fullUrl = data.url;
-                const imageUrl = data.url.split('?')[0];
-                const short_blob_name = imageUrl.split('/')[4];
-                console.log(short_blob_name);
-                await uploadFileToGCS(short_blob_name, image).then(() => {
-                    uploadDocumentMetadata(chipId, imageUrl)
+        try {
+            const documentUrls = await Promise.all(scannedImages.map(async (image, index) => {
+                const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    body: JSON.stringify({ file_name: `document_${chipId}.jpeg` })
                 });
-                loader.style.display = 'none';
-                alert('Document uploaded successfully.');
-                window.location.reload();
-            }
-        }));
-    } catch (error) {
-        console.error('Error during document upload:', error);
-        alert('Document upload failed. Please try again.');
-        loader.style.display = 'none';
-        reviewSection.style.display = 'flex';
+                const data = await response.json();
+                if (data.success) {
+                    const fullUrl = data.url;
+                    const imageUrl = data.url.split('?')[0];
+                    const short_blob_name = imageUrl.split('/')[4];
+                    console.log(short_blob_name);
+                    await uploadFileToGCS(short_blob_name, image).then(() => {
+                        uploadDocumentMetadata(chipId, imageUrl)
+                    });
+                    loader.style.display = 'none';
+                    alert('Document uploaded successfully.');
+                    window.location.reload();
+                }
+            }));
+        } catch (error) {
+            console.error('Error during document upload:', error);
+            alert('Document upload failed. Please try again.');
+            loader.style.display = 'none';
+            reviewSection.forEach(section => section.style.display = 'flex');
+        }
+    } else {
+        console.warn('Required elements for document upload not found');
     }
 });
 
@@ -549,34 +554,40 @@ function startDocumentScanningFromEditMenu() {
 }
 
 function uploadFromFile() {
-    // Reference the existing file input element
     const fileInput = document.getElementById('capture-input');
+    if (!fileInput) {
+        console.warn('File input element not found');
+        return;
+    }
 
-    // Trigger the file browser when the input is clicked
     fileInput.click();
 
-    // Handle file selection
     fileInput.addEventListener('change', async function (event) {
         const file = event.target.files[0];
         const loader = document.getElementById('document-upload-loader');
         const scanner = document.getElementById('scanner-container');
         const reviewSection = document.getElementById('review-section');
         const captureButtons = document.getElementById('back-button-intake-container');
-        scanner.style.display = 'none';
-        captureButtons.style.display = 'none';
-        reviewSection.style.display = 'flex';
-        document.getElementById('rescan-button').innerText = 'Select New File';
+        
+        if (scanner) scanner.style.display = 'none';
+        if (captureButtons) captureButtons.style.display = 'none';
+        if (reviewSection) reviewSection.style.display = 'flex';
+        
+        const rescanButton = document.getElementById('rescan-button');
+        if (rescanButton) rescanButton.innerText = 'Select New File';
+        
         if (file) {
             const reader = new FileReader();
             reader.onloadend = async function () {
                 const imageDataUrl = reader.result;
                 const chipId = window.chipId;
-                // Display the uploaded image
-                    const capturedImage = document.getElementById('scanned-images');
+                const capturedImage = document.getElementById('scanned-images');
+                if (capturedImage) {
                     const imgElement = document.createElement('img');
                     imgElement.src = imageDataUrl;
                     capturedImage.appendChild(imgElement);
                     capturedImage.style.display = 'flex';
+                }
                 try {
                     const response = await fetch('https://onebreathpilot.onrender.com/generate_presigned_url', {
                         method: 'POST',
