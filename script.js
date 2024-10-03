@@ -463,11 +463,6 @@ function handleDocumentScanResult(result) {
     }
 }
 
-document.getElementById('rescan-button').addEventListener('click', () => {
-    document.getElementById('review-section').style.display = 'none';
-    startDocumentScanning();
-});
-
 // Function to upload file contents to GCS
 async function uploadFileToGCS(destinationBlobName, contents) {
     try {
