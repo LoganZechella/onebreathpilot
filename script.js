@@ -29,10 +29,27 @@ function checkAuthState() {
         mainContent.style.display = 'none';
         signInButton.textContent = 'Sign In';
     }
+
+    signInButton.onclick = async (e) => {
+        e.preventDefault();
+        if (user) {
+            try {
+                await window.firebaseAuth.signOut();
+                checkAuthState();
+            } catch (error) {
+                console.error('Sign out error:', error);
+                alert('Sign out failed: ' + error.message);
+            }
+        } else {
+            signInContainer.style.display = 'flex';
+            mainContent.style.display = 'none';
+        }
+    };
 }
 
 function updateUIForAuthenticatedUser() {
     fetchSamplesAndUpdateUI();
+    setupDocumentScanning();
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -61,29 +78,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('Sign-in form not found');
     }
 
-    if (signInButton) {
-        signInButton.addEventListener('click', async function(e) {
-            e.preventDefault();
-            if (window.firebaseAuth?.currentUser) {
-                try {
-                    await window.firebaseAuth.signOut();
-                    checkAuthState();
-                } catch (error) {
-                    console.error('Sign out error:', error);
-                    alert('Sign out failed: ' + error.message);
-                }
-            } else {
-                const signInContainer = document.getElementById('sign-in-container');
-                const mainContent = document.getElementById('blocker');
-                if (signInContainer && mainContent) {
-                    signInContainer.style.display = 'flex';
-                    mainContent.style.display = 'none';
-                }
-            }
-        });
-    } else {
-        console.error('Sign-in button not found');
-    }
 });
 
 const animateCSS = (element, animation, options = {}) =>
@@ -1347,4 +1341,27 @@ function setupSampleEventListeners() {
             window.location.href = '/completed.html';
         }
     });
+}
+
+function setupDocumentScanning() {
+    const scanDocumentButton = document.getElementById('scan-document-button');
+    if (scanDocumentButton) {
+        scanDocumentButton.addEventListener('click', () => {
+            startDocumentScanning();
+            document.getElementById('option-container').style.display = 'none';
+        });
+    }
+
+    const rescanButton = document.getElementById('rescan-button');
+    if (rescanButton) {
+        rescanButton.addEventListener('click', () => {
+            document.getElementById('review-section').style.display = 'none';
+            startDocumentScanning();
+        });
+    }
+
+    const changeCameraButton = document.getElementById('change-camera-button');
+    if (changeCameraButton) {
+        changeCameraButton.addEventListener('click', uploadFromFile);
+    }
 }
