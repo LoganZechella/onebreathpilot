@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from
 
 let firebaseApp;
 let auth;
+let authStateReady = false;
 
 async function initializeFirebase() {
     try {
@@ -17,47 +18,42 @@ async function initializeFirebase() {
 }
 
 function setupAuthListeners() {
-    // Function to handle auth state changes
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // User is signed in
-            window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
-        } else {
-            // No user is signed in
-            window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user: null } }));
-        }
-        // Update window.user here instead
         window.user = user;
+        authStateReady = true;
+        window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
     });
 
-    // Expose auth for other scripts to use
     window.firebaseAuth = auth;
 
     document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('show-sign-in').addEventListener('click', (event) => {
-            event.preventDefault();
-            if (auth.currentUser) {
-                auth.signOut().then(() => {
-                    window.location.reload();
-                }).catch((error) => {
-                    console.error('Sign out error:', error);
-                });
-            } else {
-                const event = new Event('showSignIn');
-                window.dispatchEvent(event);
-            }
-        });
+        const signInButton = document.getElementById('show-sign-in');
+        if (signInButton) {
+            signInButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                if (auth.currentUser) {
+                    signOut(auth).then(() => {
+                        window.location.reload();
+                    }).catch((error) => {
+                        console.error('Sign out error:', error);
+                    });
+                } else {
+                    window.location.href = '/index.html';
+                }
+            });
+        }
 
-        if (document.getElementById('sign-in')) {    
-            document.getElementById('sign-in').addEventListener('click', async () => {
+        const signInForm = document.getElementById('sign-in');
+        if (signInForm) {
+            signInForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
-                    // Consider updating UI here instead of reloading
+                    window.location.reload();
                 } catch (error) {
                     console.error('Login failed:', error);
-                    // Add user-facing error message
                     alert('Login failed: ' + error.message);
                 }
             });
@@ -65,5 +61,14 @@ function setupAuthListeners() {
     });
 }
 
-// Initialize Firebase when the script loads
+window.waitForAuthReady = function() {
+    return new Promise((resolve) => {
+        if (authStateReady) {
+            resolve();
+        } else {
+            window.addEventListener('authStateChanged', () => resolve(), { once: true });
+        }
+    });
+};
+
 initializeFirebase();
