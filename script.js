@@ -55,14 +55,11 @@ function updateUIForAuthenticatedUser() {
 document.addEventListener('DOMContentLoaded', async function() {
     await initPage();
 
-    const signInForm = document.getElementById('sign-in-form');
-    const signInButton = document.getElementById('show-sign-in');
-
-    if (signInForm) {
-        signInForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    safeAddEventListener('sign-in-form', 'submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email')?.value;
+        const password = document.getElementById('password')?.value;
+        if (email && password) {
             try {
                 if (!window.firebaseAuth || typeof window.firebaseAuth.signInWithEmailAndPassword !== 'function') {
                     throw new Error('Firebase Auth not initialized properly');
@@ -73,14 +70,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.error('Sign in error:', error);
                 alert('Sign in failed: ' + error.message);
             }
-        });
-    } else {
-        console.error('Sign-in form not found');
-    }
+        } else {
+            console.error('Email or password not found');
+        }
+    });
 
     // Only initialize document scanning if the user is already authenticated
     if (window.firebaseAuth?.currentUser) {
-        initializeDocumentScanningIfNeeded();
+        setupDocumentScanning();
     }
 });
 
@@ -1289,7 +1286,7 @@ function toggleMenu() {
 }
 
 function setupSampleEventListeners() {
-    document.getElementById('pickup-form').addEventListener('submit', function (event) {
+    safeAddEventListener('pickup-form', 'submit', function (event) {
         event.preventDefault();
         const chipId = event.target.elements['confirm-pickup-button'].classList[0];
         const volume = event.target.elements['final-volume'].value;
@@ -1299,7 +1296,7 @@ function setupSampleEventListeners() {
             updateStatusToReadyForAnalysis(chipId, volume, co2, error).then(() => {
                 hideElementWithAnimation('pickup-form-modal', 'fadeOut', 'duration-500ms', 'delay-0s');
                 document.getElementById('pickup-form').reset();
-                
+
             }).catch(error => {
                 console.error('Failed to update sample status:', error);
                 alert('Failed to update sample status.');
@@ -1315,7 +1312,7 @@ function setupSampleEventListeners() {
         }
     });
 
-    document.getElementById('pickup-close-button').addEventListener('click', function () {
+    safeAddEventListener('pickup-close-button', 'click', function () {
         hideElementWithAnimation('pickup-form-modal', 'fadeOut', { duration: '1000ms', delay: '0s' });
     });
 
@@ -1346,33 +1343,23 @@ function setupSampleEventListeners() {
 }
 
 function setupDocumentScanning() {
-    const scanDocumentButton = document.getElementById('scan-document-button');
-    const rescanButton = document.getElementById('rescan-button');
-    const changeCameraButton = document.getElementById('change-camera-button');
+    safeAddEventListener('scan-document-button', 'click', () => {
+        startDocumentScanning();
+        const optionContainer = document.getElementById('option-container');
+        if (optionContainer) {
+            optionContainer.style.display = 'none';
+        }
+    });
 
-    if (scanDocumentButton) {
-        scanDocumentButton.addEventListener('click', () => {
-            startDocumentScanning();
-            const optionContainer = document.getElementById('option-container');
-            if (optionContainer) {
-                optionContainer.style.display = 'none';
-            }
-        });
-    }
+    safeAddEventListener('rescan-button', 'click', () => {
+        const reviewSection = document.getElementById('review-section');
+        if (reviewSection) {
+            reviewSection.style.display = 'none';
+        }
+        startDocumentScanning();
+    });
 
-    if (rescanButton) {
-        rescanButton.addEventListener('click', () => {
-            const reviewSection = document.getElementById('review-section');
-            if (reviewSection) {
-                reviewSection.style.display = 'none';
-            }
-            startDocumentScanning();
-        });
-    }
-
-    if (changeCameraButton) {
-        changeCameraButton.addEventListener('click', uploadFromFile);
-    }
+    safeAddEventListener('change-camera-button', 'click', uploadFromFile);
 }
 
 window.addEventListener('authStateChanged', (event) => {
@@ -1389,5 +1376,14 @@ function initializeDocumentScanningIfNeeded() {
 
     if (scanDocumentButton || rescanButton || changeCameraButton) {
         setupDocumentScanning();
+    }
+}
+
+function safeAddEventListener(elementId, eventType, handler) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.addEventListener(eventType, handler);
+    } else {
+        console.warn(`Element with id '${elementId}' not found. Event listener not added.`);
     }
 }
