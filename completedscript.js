@@ -3,75 +3,48 @@ function toggleMenu() {
     navLinks.classList.toggle('responsive');
 }
 
-async function initPage() {
-    if (typeof window.waitForAuthReady !== 'function') {
-        console.error('Auth module not loaded properly');
-        return;
-    }
-
-    await window.waitForAuthReady();
-    checkAuthState();
-}
-
-function checkAuthState() {
-    const user = window.firebaseAuth.currentUser;
-    const signInButton = document.getElementById('show-sign-in');
-    const mainContent = document.getElementById('main-content');
-    const signInContainer = document.getElementById('sign-in-container');
-
-    if (user) {
-        signInContainer.style.display = 'none';
-        mainContent.style.display = 'block';
-        signInButton.textContent = 'Sign Out';
-        updateUIForAuthenticatedUser();
-    } else {
-        signInContainer.style.display = 'block';
-        mainContent.style.display = 'none';
-        signInButton.textContent = 'Sign In';
-    }
-}
-
-function updateUIForAuthenticatedUser() {
-    loadCompletedSamples();
-}
-
-const existingDOMContentLoaded = document.onDOMContentLoaded;
-document.addEventListener('DOMContentLoaded', async function () {
-    if (existingDOMContentLoaded) {
-        existingDOMContentLoaded.call(document);
-    }
-    await initPage();
-
-    const signInForm = document.getElementById('sign-in-form');
-    const signInButton = document.getElementById('show-sign-in');
-
-    signInForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        try {
-            await window.firebaseAuth.signInWithEmailAndPassword(email, password);
-            checkAuthState();
-        } catch (error) {
-            console.error('Sign in error:', error);
-            alert('Sign in failed: ' + error.message);
-        }
+document.addEventListener('DOMContentLoaded', function () {
+    const auth = window.firebaseAuth;
+    auth.onAuthStateChanged((user) => {
+        updateUIBasedOnAuth(user);
     });
 
-    signInButton.addEventListener('click', async function (e) {
-        e.preventDefault();
-        if (window.firebaseAuth.currentUser) {
-            try {
-                await window.firebaseAuth.signOut();
-                checkAuthState();
-            } catch (error) {
-                console.error('Sign out error:', error);
-                alert('Sign out failed: ' + error.message);
-            }
+    function updateUIBasedOnAuth(user) {
+        const authButton = document.getElementById('show-sign-in');
+        const tableSection = document.getElementById('table-section');
+        const signInContainer = document.getElementById('sign-in-container');
+        const mainContent = document.getElementById('main-content');
+
+        if (user) {
+            authButton.textContent = 'Sign Out';
+            authButton.addEventListener('click', () => auth.signOut());
+            tableSection.style.display = 'flex';
+            signInContainer.hidden = true;
+            loadCompletedSamples();
         } else {
-            document.getElementById('sign-in-container').style.display = 'block';
-            document.getElementById('main-content').style.display = 'none';
+            authButton.textContent = 'Sign In';
+            authButton.addEventListener('click', () => {
+                signInContainer.hidden = false;
+                tableSection.style.display = 'none';
+            });
+            tableSection.style.display = 'none';
+            signInContainer.hidden = false;
         }
+    }
+
+    document.getElementById('sign-in').addEventListener('click', function () {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                updateUIBasedOnAuth(user);
+            })
+            .catch((error) => {
+                console.error('Error during sign-in:', error.message);
+                alert('Sign-in failed. Please check your credentials and try again.');
+            });
     });
 
     // Function to fetch and populate completed samples

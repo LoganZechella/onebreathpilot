@@ -1,75 +1,3 @@
-async function initPage() {
-    if (typeof window.waitForAuthReady !== 'function') {
-        console.error('Auth module not loaded properly');
-        return;
-    }
-
-    await window.waitForAuthReady();
-    checkAuthState();
-}
-
-function checkAuthState() {
-    const user = window.firebaseAuth.currentUser;
-    const signInButton = document.getElementById('show-sign-in');
-    const mainContent = document.getElementById('main-content');
-    const signInContainer = document.getElementById('sign-in-container');
-
-    if (user) {
-        signInContainer.style.display = 'none';
-        mainContent.style.display = 'block';
-        signInButton.textContent = 'Sign Out';
-        updateUIForAuthenticatedUser();
-    } else {
-        signInContainer.style.display = 'block';
-        mainContent.style.display = 'none';
-        signInButton.textContent = 'Sign In';
-    }
-}
-
-function updateUIForAuthenticatedUser() {
-    init();
-}
-
-const existingDOMContentLoaded = document.onDOMContentLoaded;
-document.addEventListener('DOMContentLoaded', async function() {
-    if (existingDOMContentLoaded) {
-        existingDOMContentLoaded.call(document);
-    }
-    await initPage();
-
-    const signInForm = document.getElementById('sign-in-form');
-    const signInButton = document.getElementById('show-sign-in');
-
-    signInForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        try {
-            await window.firebaseAuth.signInWithEmailAndPassword(email, password);
-            checkAuthState();
-        } catch (error) {
-            console.error('Sign in error:', error);
-            alert('Sign in failed: ' + error.message);
-        }
-    });
-
-    signInButton.addEventListener('click', async function(e) {
-        e.preventDefault();
-        if (window.firebaseAuth.currentUser) {
-            try {
-                await window.firebaseAuth.signOut();
-                checkAuthState();
-            } catch (error) {
-                console.error('Sign out error:', error);
-                alert('Sign out failed: ' + error.message);
-            }
-        } else {
-            document.getElementById('sign-in-container').style.display = 'block';
-            document.getElementById('main-content').style.display = 'none';
-        }
-    });
-});
-
 (function () {
     let completedSamples = [];
     let currentChart = null;
@@ -101,10 +29,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     async function fetchData() {
-        if (!window.user) {
-            console.error('User not authenticated');
-            return;
-        }
         try {
             const response = await fetch('https://onebreathpilot.onrender.com/analyzed');
             const allSamples = await response.json();
@@ -440,7 +364,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         return arr.reduce((a, b) => a + b, 0) / arr.length;
     }
 
-    // Modify the existing initialization at the end of the IIFE
+    // Wait for the DOM to be fully loaded before initializing
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
@@ -459,29 +383,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeModal = aiInsightsModal.querySelector('.close');
     const aiInsightsContent = document.getElementById('ai-insights-content');
 
-    if (aiAnalysisBtn) {
-        aiAnalysisBtn.style.display = window.user ? 'block' : 'none';
+    aiAnalysisBtn.addEventListener('click', function() {
+        aiInsightsContent.innerHTML = '<p>Generating insights...</p>';
+        aiInsightsModal.style.display = 'block';
 
-        aiAnalysisBtn.addEventListener('click', function() {
-            aiInsightsContent.innerHTML = '<p>Generating insights...</p>';
-            aiInsightsModal.style.display = 'block';
-
-            fetch('https://onebreathpilot.onrender.com/ai_analysis')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Format the insights
-                        const formattedInsights = formatInsights(data.insights);
-                        aiInsightsContent.innerHTML = formattedInsights;
-                    } else {
-                        aiInsightsContent.innerHTML = `<p>Error: ${data.error}</p>`;
-                    }
-                })
-                .catch(error => {
-                    aiInsightsContent.innerHTML = `<p>Error: ${error.message}</p>`;
-                });
-        });
-    }
+        fetch('https://onebreathpilot.onrender.com/ai_analysis')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Format the insights
+                    const formattedInsights = formatInsights(data.insights);
+                    aiInsightsContent.innerHTML = formattedInsights;
+                } else {
+                    aiInsightsContent.innerHTML = `<p>Error: ${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                aiInsightsContent.innerHTML = `<p>Error: ${error.message}</p>`;
+            });
+    });
 
     closeModal.addEventListener('click', function() {
         aiInsightsModal.style.display = 'none';

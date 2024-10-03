@@ -10,13 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <script src="assets/html5scanner/html5-qrcode 2.3.8.min.js" type="module"></script>
-    <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
-    <script src="./server/auth.js" type="module"></script>
-    <script src="script.js"></script>
     <title>OneBreath Sample Dashboard</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <meta name="description"
@@ -49,17 +42,16 @@
         </ul>
     </nav>
 
-    <div id="sign-in-container" class="animate__animated animate__fadeIn" data-aos="fade-up" data-aos-duration="500">
+    <div id="sign-in-container" class="animate__animated animate__fadeIn" data-aos="fade-up" data-aos-duration="500"
+        hidden>
         <img src="assets/images/BREATH DIAGNOSTICS-2.png" alt="Logo of Breath Diagnostics"
             style="width: 200px; display: block; margin: 0 auto 20px;">
         <div id="loading-spinner" class="spinner"></div>
-        <form id="sign-in-form">
-            <label for="email">Email:</label>
-            <input type="email" id="email" placeholder="Required" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" placeholder="Required" required>
-            <button type="submit" id="sign-in">Sign In</button>
-        </form>
+        <label for="email">Email:</label>
+        <input type="email" id="email" placeholder="Required" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Required" required>
+        <button id="sign-in">Sign In</button>
         <button id="sign-in-google" type="button" disabled hidden>Sign In with Google</button>
     </div>
 
@@ -323,7 +315,13 @@
     <script>
         AOS.init();
     </script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
+    <script src="./server/auth.js" type="module"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="assets/html5scanner/html5-qrcode 2.3.8.min.js" type="module"></script>
+    <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
