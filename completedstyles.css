@@ -10,7 +10,7 @@
 body {
     background: linear-gradient(15deg, #014969, #0F92BB, #00E8C6, #0F92BB, #014969);
     font-family: var(--primaryFont);
-    background-size: cover;
+    background-size: 100%;
     backdrop-filter: blur(100px);
     background-position: center;
     background-repeat: repeat;
@@ -84,7 +84,7 @@ p {
     width: 300px;
     position: fixed;
     left: 50vw;
-    top: 25vh;
+    top: 50vh;
     justify-self: center;
     transform: translate(-50%, -50%);
     z-index: 100;
@@ -538,4 +538,22 @@ p {
     flex-wrap: wrap;
     align-content: stretch;
     justify-content: center;
+}
+
+.error-code {
+    cursor: pointer;
+}
+
+.error-popover {
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    max-width: 250px;
+    z-index: 1000;
+    font-size: 10px;
+    line-height: 1.4;
+    color: #000;
 }

@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
             authButton.addEventListener('click', () => auth.signOut());
             tableSection.style.display = 'flex';
             signInContainer.hidden = true;
+            mainContent.style.display = 'block'; // Show main content when user is signed in
             loadCompletedSamples();
         } else {
             authButton.textContent = 'Sign In';
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             tableSection.style.display = 'none';
             signInContainer.hidden = false;
+            mainContent.style.display = 'none'; // Hide main content when user is not signed in
         }
     }
 
@@ -86,6 +88,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const errorCodeCell = document.createElement('td');
                     errorCodeCell.textContent = sample.error || 'N/A';
+                    if (sample.error && sample.error !== 'N/A') {
+                        errorCodeCell.dataset.errorCode = sample.error;
+                        errorCodeCell.classList.add('error-code');
+                    }
 
                     const uploadCell = document.createElement('td');
                     const uploadButton = document.createElement('button');
@@ -105,11 +111,62 @@ document.addEventListener('DOMContentLoaded', function () {
                     tableBody.appendChild(row);
                 });
                 document.getElementById('sample-count').textContent = `Total: ${completedCount}`;
+
+                // Add event listeners for error code cells after populating the table
+                addErrorCodeListeners();
             })
             .catch(error => {
                 console.error('Error fetching completed samples:', error);
             });
     }
+
+    function addErrorCodeListeners() {
+        const errorCells = document.querySelectorAll('.error-code');
+        errorCells.forEach(cell => {
+            cell.addEventListener('mouseover', showErrorDescription);
+            cell.addEventListener('mouseout', () => {
+                setTimeout(hideErrorDescription, 300); // Delay hiding to allow moving to popover
+            });
+        });
+    }
+
+    let activePopover = null;
+
+    function showErrorDescription(event) {
+        const errorCode = event.target.dataset.errorCode;
+        const description = errorDescriptions[errorCode];
+        
+        if (description) {
+            // Remove any existing popover
+            hideErrorDescription();
+            
+            const popover = document.createElement('div');
+            popover.className = 'error-popover';
+            popover.textContent = description;
+            
+            document.body.appendChild(popover);
+            
+            const rect = event.target.getBoundingClientRect();
+            popover.style.left = `${rect.left}px`;
+            popover.style.top = `${rect.bottom + window.scrollY}px`;
+            
+            activePopover = popover;
+        }
+    }
+
+    function hideErrorDescription() {
+        if (activePopover) {
+            activePopover.remove();
+            activePopover = null;
+        }
+    }
+
+    // Add a global click event listener to hide the popover when clicking outside
+    document.addEventListener('click', (event) => {
+        if (activePopover && !event.target.closest('.error-code') && !event.target.closest('.error-popover')) {
+            hideErrorDescription();
+        }
+    });
 
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('upload-icon')) {
@@ -232,3 +289,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
+
+// Add this object at the top of your file, outside any function
+const errorDescriptions = {
+    '3': 'Flow is too high: This likely indicates a system leak, which may have occurred due to loose or incorrect connections in the setup.',
+    '4': 'Flow is too low:  This is probably caused by either a closed bag valve or a blockage in the cassette, restricting airflow.',
+    '5': 'Alveolar Breath Insufficient: This suggests that the patient did not provide a deep enough breath, resulting in insufficient alveolar breath for analysis.',
+    '6': 'Low CO2: A leak is likely present in the system, causing the CO2 levels to drop and triggering the pump to stop.',
+    '7': 'Decreased CO2 during evacuation: This error typically points to a leak that developed during the evacuation process, reducing CO2 levels and stopping the pump.'
+};
