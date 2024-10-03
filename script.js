@@ -123,6 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupOptionContainerEventListeners();
     setupBackButtonIntakeEventListener();
     enumerateVideoDevices();
+    if (window.user) {
+        setupDocumentScanning();
+    }
 });
 
 function showElementWithAnimation(elementId, animation, options = {}) {
@@ -1345,23 +1348,39 @@ function setupSampleEventListeners() {
 
 function setupDocumentScanning() {
     const scanDocumentButton = document.getElementById('scan-document-button');
+    const rescanButton = document.getElementById('rescan-button');
+    const changeCameraButton = document.getElementById('change-camera-button');
+
     if (scanDocumentButton) {
         scanDocumentButton.addEventListener('click', () => {
             startDocumentScanning();
-            document.getElementById('option-container').style.display = 'none';
+            const optionContainer = document.getElementById('option-container');
+            if (optionContainer) {
+                optionContainer.style.display = 'none';
+            }
         });
     }
 
-    const rescanButton = document.getElementById('rescan-button');
     if (rescanButton) {
         rescanButton.addEventListener('click', () => {
-            document.getElementById('review-section').style.display = 'none';
+            const reviewSection = document.getElementById('review-section');
+            if (reviewSection) {
+                reviewSection.style.display = 'none';
+            }
             startDocumentScanning();
         });
+    } else {
+        console.warn("Rescan button not found in the DOM");
     }
 
-    const changeCameraButton = document.getElementById('change-camera-button');
     if (changeCameraButton) {
         changeCameraButton.addEventListener('click', uploadFromFile);
     }
 }
+
+window.addEventListener('authStateChanged', (event) => {
+    const user = event.detail.user;
+    if (user) {
+        setupDocumentScanning();
+    }
+});
