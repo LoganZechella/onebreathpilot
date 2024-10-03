@@ -176,15 +176,6 @@ window.addEventListener('showSignIn', () => {
     showElementWithAnimation('sign-in-container', 'fadeIn');
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.user) {
-        updateUIBasedOnAuth(window.user);
-    } else {
-        updateUIBasedOnAuth(null);
-    }
-});
-
-
 function initApp() {
     setTimeout(() => {
         hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '1000ms' });
