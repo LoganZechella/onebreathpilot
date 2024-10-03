@@ -3,7 +3,40 @@ function toggleMenu() {
     navLinks.classList.toggle('responsive');
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+async function initPage() {
+    if (typeof window.waitForAuthReady !== 'function') {
+        console.error('Auth module not loaded properly');
+        return;
+    }
+
+    await window.waitForAuthReady();
+    if (window.user) {
+        document.getElementById('sign-in-container').style.display = 'none';
+        document.getElementById('blocker').style.display = 'flex';
+        updateUIForAuthenticatedUser();
+    } else {
+        document.getElementById('sign-in-container').style.display = 'flex';
+        document.getElementById('blocker').style.display = 'none';
+    }
+}
+
+function updateUIForAuthenticatedUser() {
+    const signInButton = document.getElementById('show-sign-in');
+    if (signInButton) {
+        signInButton.textContent = 'Sign Out';
+    }
+    // Other UI updates specific to this page
+    loadCompletedSamples();
+}
+
+const existingDOMContentLoaded = document.onDOMContentLoaded;
+document.addEventListener('DOMContentLoaded', async function() {
+    if (existingDOMContentLoaded) {
+        existingDOMContentLoaded.call(document);
+    }
+    await initPage();
+
+    // Keep the existing code inside the DOMContentLoaded listener
     const auth = window.firebaseAuth;
     auth.onAuthStateChanged((user) => {
         updateUIBasedOnAuth(user);
@@ -17,18 +50,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (user) {
             authButton.textContent = 'Sign Out';
-            authButton.addEventListener('click', () => auth.signOut());
             tableSection.style.display = 'flex';
-            signInContainer.hidden = true;
+            signInContainer.style.display = 'none';
             loadCompletedSamples();
         } else {
             authButton.textContent = 'Sign In';
-            authButton.addEventListener('click', () => {
-                signInContainer.hidden = false;
-                tableSection.style.display = 'none';
-            });
             tableSection.style.display = 'none';
-            signInContainer.hidden = false;
+            signInContainer.style.display = 'flex';
         }
     }
 

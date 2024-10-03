@@ -1,3 +1,37 @@
+const existingDOMContentLoaded = document.onDOMContentLoaded;
+document.addEventListener('DOMContentLoaded', async function() {
+    if (existingDOMContentLoaded) {
+        existingDOMContentLoaded.call(document);
+    }
+    await initPage();
+});
+
+async function initPage() {
+    if (typeof window.waitForAuthReady !== 'function') {
+        console.error('Auth module not loaded properly');
+        return;
+    }
+
+    await window.waitForAuthReady();
+    if (window.user) {
+        document.getElementById('sign-in-container').style.display = 'none';
+        document.getElementById('blocker').style.display = 'flex';
+        updateUIForAuthenticatedUser();
+    } else {
+        document.getElementById('sign-in-container').style.display = 'flex';
+        document.getElementById('blocker').style.display = 'none';
+    }
+}
+
+function updateUIForAuthenticatedUser() {
+    const signInButton = document.getElementById('show-sign-in');
+    if (signInButton) {
+        signInButton.textContent = 'Sign Out';
+    }
+    // Other UI updates specific to this page
+    fetchSamplesAndUpdateUI();
+}
+
 const animateCSS = (element, animation, options = {}) =>
     new Promise((resolve, reject) => {
         const { prefix = 'animate__', delay, duration, iterationCount } = options;
