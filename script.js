@@ -49,7 +49,7 @@ function checkAuthState() {
 
 function updateUIForAuthenticatedUser() {
     fetchSamplesAndUpdateUI();
-    setupDocumentScanning();
+    initializeDocumentScanningIfNeeded();
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -78,6 +78,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('Sign-in form not found');
     }
 
+    // Only initialize document scanning if the user is already authenticated
+    if (window.firebaseAuth?.currentUser) {
+        initializeDocumentScanningIfNeeded();
+    }
 });
 
 const animateCSS = (element, animation, options = {}) =>
@@ -1364,8 +1368,6 @@ function setupDocumentScanning() {
             }
             startDocumentScanning();
         });
-    } else {
-        console.warn("Rescan button not found in the DOM");
     }
 
     if (changeCameraButton) {
@@ -1376,6 +1378,16 @@ function setupDocumentScanning() {
 window.addEventListener('authStateChanged', (event) => {
     const user = event.detail.user;
     if (user) {
-        setupDocumentScanning();
+        initializeDocumentScanningIfNeeded();
     }
 });
+
+function initializeDocumentScanningIfNeeded() {
+    const scanDocumentButton = document.getElementById('scan-document-button');
+    const rescanButton = document.getElementById('rescan-button');
+    const changeCameraButton = document.getElementById('change-camera-button');
+
+    if (scanDocumentButton || rescanButton || changeCameraButton) {
+        setupDocumentScanning();
+    }
+}
