@@ -1,11 +1,3 @@
-const existingDOMContentLoaded = document.onDOMContentLoaded;
-document.addEventListener('DOMContentLoaded', async function() {
-    if (existingDOMContentLoaded) {
-        existingDOMContentLoaded.call(document);
-    }
-    await initPage();
-});
-
 async function initPage() {
     if (typeof window.waitForAuthReady !== 'function') {
         console.error('Auth module not loaded properly');
@@ -13,24 +5,86 @@ async function initPage() {
     }
 
     await window.waitForAuthReady();
-    if (window.user) {
-        document.getElementById('sign-in-container').style.display = 'none';
-        document.getElementById('blocker').style.display = 'flex';
+    checkAuthState();
+}
+
+function checkAuthState() {
+    const user = window.firebaseAuth?.currentUser;
+    const signInButton = document.getElementById('show-sign-in');
+    const mainContent = document.getElementById('blocker');
+    const signInContainer = document.getElementById('sign-in-container');
+
+    if (!signInButton || !mainContent || !signInContainer) {
+        console.error('Required DOM elements not found');
+        return;
+    }
+
+    if (user) {
+        signInContainer.style.display = 'none';
+        mainContent.style.display = 'flex';
+        signInButton.textContent = 'Sign Out';
         updateUIForAuthenticatedUser();
     } else {
-        document.getElementById('sign-in-container').style.display = 'flex';
-        document.getElementById('blocker').style.display = 'none';
+        signInContainer.style.display = 'flex';
+        mainContent.style.display = 'none';
+        signInButton.textContent = 'Sign In';
     }
 }
 
 function updateUIForAuthenticatedUser() {
-    const signInButton = document.getElementById('show-sign-in');
-    if (signInButton) {
-        signInButton.textContent = 'Sign Out';
-    }
-    // Other UI updates specific to this page
     fetchSamplesAndUpdateUI();
 }
+
+document.addEventListener('DOMContentLoaded', async function() {
+    await initPage();
+
+    const signInForm = document.getElementById('sign-in-form');
+    const signInButton = document.getElementById('show-sign-in');
+
+    if (signInForm) {
+        signInForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                if (!window.firebaseAuth || typeof window.firebaseAuth.signInWithEmailAndPassword !== 'function') {
+                    throw new Error('Firebase Auth not initialized properly');
+                }
+                await window.firebaseAuth.signInWithEmailAndPassword(email, password);
+                checkAuthState();
+            } catch (error) {
+                console.error('Sign in error:', error);
+                alert('Sign in failed: ' + error.message);
+            }
+        });
+    } else {
+        console.error('Sign-in form not found');
+    }
+
+    if (signInButton) {
+        signInButton.addEventListener('click', async function(e) {
+            e.preventDefault();
+            if (window.firebaseAuth?.currentUser) {
+                try {
+                    await window.firebaseAuth.signOut();
+                    checkAuthState();
+                } catch (error) {
+                    console.error('Sign out error:', error);
+                    alert('Sign out failed: ' + error.message);
+                }
+            } else {
+                const signInContainer = document.getElementById('sign-in-container');
+                const mainContent = document.getElementById('blocker');
+                if (signInContainer && mainContent) {
+                    signInContainer.style.display = 'flex';
+                    mainContent.style.display = 'none';
+                }
+            }
+        });
+    } else {
+        console.error('Sign-in button not found');
+    }
+});
 
 const animateCSS = (element, animation, options = {}) =>
     new Promise((resolve, reject) => {
@@ -163,15 +217,6 @@ function initApp() {
     } else {
         document.getElementById('landing-main').style.display = 'flex';
         document.getElementById('add-sample-main').style.display = 'none';
-    }
-}
-
-function checkAuthState() {
-    const user = window.firebaseAuth;
-    if (user) {
-        return true;
-    } else {
-        return false;
     }
 }
 

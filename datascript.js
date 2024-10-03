@@ -1,3 +1,75 @@
+async function initPage() {
+    if (typeof window.waitForAuthReady !== 'function') {
+        console.error('Auth module not loaded properly');
+        return;
+    }
+
+    await window.waitForAuthReady();
+    checkAuthState();
+}
+
+function checkAuthState() {
+    const user = window.firebaseAuth.currentUser;
+    const signInButton = document.getElementById('show-sign-in');
+    const mainContent = document.getElementById('main-content');
+    const signInContainer = document.getElementById('sign-in-container');
+
+    if (user) {
+        signInContainer.style.display = 'none';
+        mainContent.style.display = 'block';
+        signInButton.textContent = 'Sign Out';
+        updateUIForAuthenticatedUser();
+    } else {
+        signInContainer.style.display = 'block';
+        mainContent.style.display = 'none';
+        signInButton.textContent = 'Sign In';
+    }
+}
+
+function updateUIForAuthenticatedUser() {
+    init();
+}
+
+const existingDOMContentLoaded = document.onDOMContentLoaded;
+document.addEventListener('DOMContentLoaded', async function() {
+    if (existingDOMContentLoaded) {
+        existingDOMContentLoaded.call(document);
+    }
+    await initPage();
+
+    const signInForm = document.getElementById('sign-in-form');
+    const signInButton = document.getElementById('show-sign-in');
+
+    signInForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        try {
+            await window.firebaseAuth.signInWithEmailAndPassword(email, password);
+            checkAuthState();
+        } catch (error) {
+            console.error('Sign in error:', error);
+            alert('Sign in failed: ' + error.message);
+        }
+    });
+
+    signInButton.addEventListener('click', async function(e) {
+        e.preventDefault();
+        if (window.firebaseAuth.currentUser) {
+            try {
+                await window.firebaseAuth.signOut();
+                checkAuthState();
+            } catch (error) {
+                console.error('Sign out error:', error);
+                alert('Sign out failed: ' + error.message);
+            }
+        } else {
+            document.getElementById('sign-in-container').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+        }
+    });
+});
+
 (function () {
     let completedSamples = [];
     let currentChart = null;
@@ -453,37 +525,3 @@ function formatContent(content) {
 
     return content;
 }
-
-async function initPage() {
-    if (typeof window.waitForAuthReady !== 'function') {
-        console.error('Auth module not loaded properly');
-        return;
-    }
-
-    await window.waitForAuthReady();
-    if (window.user) {
-        document.getElementById('sign-in-container').style.display = 'none';
-        document.getElementById('blocker').style.display = 'flex';
-        updateUIForAuthenticatedUser();
-    } else {
-        document.getElementById('sign-in-container').style.display = 'flex';
-        document.getElementById('blocker').style.display = 'none';
-    }
-}
-
-function updateUIForAuthenticatedUser() {
-    const signInButton = document.getElementById('show-sign-in');
-    if (signInButton) {
-        signInButton.textContent = 'Sign Out';
-    }
-    // Other UI updates specific to this page
-    fetchData();
-}
-
-const existingDOMContentLoaded = document.onDOMContentLoaded;
-document.addEventListener('DOMContentLoaded', async function() {
-    if (existingDOMContentLoaded) {
-        existingDOMContentLoaded.call(document);
-    }
-    await initPage();
-});

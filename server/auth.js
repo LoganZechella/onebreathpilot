@@ -24,41 +24,12 @@ function setupAuthListeners() {
         window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
     });
 
-    window.firebaseAuth = auth;
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const signInButton = document.getElementById('show-sign-in');
-        if (signInButton) {
-            signInButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                if (auth.currentUser) {
-                    signOut(auth).then(() => {
-                        window.location.reload();
-                    }).catch((error) => {
-                        console.error('Sign out error:', error);
-                    });
-                } else {
-                    window.location.href = '/index.html';
-                }
-            });
-        }
-
-        const signInForm = document.getElementById('sign-in');
-        if (signInForm) {
-            signInForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                try {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    window.location.reload();
-                } catch (error) {
-                    console.error('Login failed:', error);
-                    alert('Login failed: ' + error.message);
-                }
-            });
-        }
-    });
+    // Expose Firebase Auth methods globally
+    window.firebaseAuth = {
+        signInWithEmailAndPassword: (email, password) => signInWithEmailAndPassword(auth, email, password),
+        signOut: () => signOut(auth),
+        currentUser: auth.currentUser
+    };
 }
 
 window.waitForAuthReady = function() {
