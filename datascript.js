@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeInsights = document.getElementById('close-insights');
 
     if (aiAnalysisBtn) {
-        aiAnalysisBtn.style.display = window.user ? 'block' : 'none';
+        aiAnalysisBtn.style.display = 'block';
 
         aiAnalysisBtn.addEventListener('click', function () {
             aiInsightsModal.style.display = 'block';
