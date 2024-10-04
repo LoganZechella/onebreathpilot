@@ -65,9 +65,9 @@
             <section id="visualization-section" class="animate__animated animate__slideInUp">
                 <div id="visual-header">
                     <h2 id="visual-title">Data Visualization</h2>
-                    <button id="ai-analysis-btn" class="ai-analysis-btn">Get Insights</button>    
+                    <button id="ai-analysis-btn" class="ai-analysis-btn">Get Insights</button>
                 </div>
-                
+
                 <div id="chart-controls">
                     <select id="chart-type">
                         <option value="bar">Bar Chart</option>
@@ -91,14 +91,17 @@
                 <div id="d3-container"></div>
             </section>
             
-            
+            <section id="insights-overlay" class="animate__animated animate__fadeIn" style="display: none;">
+                <button id="close-insights" class="close-btn">&times;</button>
+                <!-- AI insights content will be inserted here -->
+            </section>
         </main>
     </div>
 
     <div id="ai-insights-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>AI-Generated Insights</h2>
+            <h2>Generating AI Insights</h2>
             <div id="ai-insights-content"></div>
         </div>
     </div>

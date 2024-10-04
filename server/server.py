@@ -16,15 +16,12 @@ from bson.decimal128 import Decimal128
 from flask_mail import Mail, Message
 import threading
 import time
-from datetime import datetime, timedelta, timezone
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
+from datetime import datetime, timedelta
 import pytz
 import json
 import gzip
 import openai
 from openai import OpenAI
-from bson.json_util import dumps
 
 load_dotenv()
 
@@ -54,7 +51,6 @@ twilio_phone_number = os.getenv('TWILIO_PHONE_NUMBER')
 
 # Load recipient numbers from environment variable and split into a list
 twilio_recipient_numbers = os.getenv('TWILIO_RECIPIENT_NUMBERS', '').split(',')
-
 
 # Firebase Admin SDK settings
 cred = credentials.Certificate('/etc/secrets/Firebaseadminsdk.json')
@@ -118,6 +114,7 @@ analyzed_collection = db[ANALYZED_COLLECTION_NAME]
 # OpenAI client setup
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+ASSISTANT_ID = os.getenv("ASSISTANT_ID")
 
 def backup_database():
     try:
@@ -147,19 +144,6 @@ def backup_database():
         error_message = f"Database backup failed: {str(e)}"
         print(error_message)
         # send_email("Database Backup Failed", error_message)
-
-# Initialize the scheduler
-# scheduler = BackgroundScheduler()
-# scheduler.add_job(
-#     backup_database,
-#     trigger=CronTrigger(hour=22, minute=0, timezone=pytz.timezone('US/Eastern')),
-#     id='database_backup_job',
-#     name='Daily database backup at 10 PM EST',
-#     replace_existing=True
-# )
-
-# # Start the scheduler
-# scheduler.start()
 
 # Function to send email notification
 def send_email(subject, body):
@@ -220,47 +204,6 @@ def samples():
         return jsonify(sample_data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-# @app.route('/update_sample', methods=['POST'])
-# def update_sample():
-#     # Endpoint to update a sample based on 'chipID'.
-#     try:
-#         # Extracting data from the request
-#         update_data = request.json
-#         chip_id = update_data.get('chip_id')
-#         status = update_data.get('status')
-#         location = update_data.get('location')
-
-#         # Check if 'chip_id' and 'status' are provided
-#         if not chip_id or not status:
-#             return jsonify({"error": "Missing chipID or status in the submitted data."}), 400
-
-#         # Finding and updating the document in the database
-#         update_result = collection.update_one(
-#             {"chip_id": chip_id},
-#             {"$set": update_data}
-#         )
-
-#         # Check if the document was successfully updated
-#         if update_result.modified_count == 1:
-#             # Only send email if the status is "In Process" or "Ready for Pickup"
-#             if status in ["In Process", "Ready for Pickup"]:
-#                 subject = f"Sample Status Updated: {status}"
-#                 body = f"Sample with chip ID {chip_id} has been updated to '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
-#                 send_email(subject, body)
-                
-#                  # SMS Notification
-#                 # sms_body = f"Sample with chip ID {chip_id} is now '{status}' at '{location}'. Please check the dashboard at https://onebreathpilot.netlify.app for more details."
-#                 # send_sms(twilio_recipient_numbers, sms_body)
-
-#             return jsonify({"success": True, "message": "Sample updated successfully."}), 200
-#         else:
-#             return jsonify({"success": False, "message": "No sample found with the given chipID or no new data to update."}), 404
-
-#     except KeyError:
-#         return jsonify({"error": "Missing chipID in the submitted data."}), 400
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
 
 @app.route('/update_sample', methods=['POST'])
 def update_sample():
@@ -485,25 +428,36 @@ def ai_analysis():
         
         analyzed_samples = [convert_sample(sample) for sample in analyzed_samples]
         
-        # Prepare data for OpenAI API using bson.json_util.dumps
-        data_summary = dumps(analyzed_samples[:10])  # Limit to 10 samples for brevity
+        # Prepare data for OpenAI API using json.dumps (no need for bson.json_util here)
+        data_summary = json.dumps(analyzed_samples[:10])  # Limit to 10 samples for brevity
         
-        # Call OpenAI API
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are an expert in analyzing scientific breath analysis data. You are working with data from breath analysis tests, which include levels of various chemical compounds (in nanomoles per liter of breath), CO2 levels, timestamps, and other metadata. Your task is to: - Identify trends in the data and highlight emerging patterns. - Provide clear and comprehensible summaries of the chemical compound levels.- Spot and highlight any outliers or unusual patterns in the dataset. - Provide both high-level summaries (e.g., overall trends) and more detailed analysis (e.g., highlighting specific compound level variations). Keep your analysis informative, yet concise, providing actionable insights and making the data easy to interpret for a non-expert but also informative enough for professionals."},
-                {"role": "user", "content": f"""Here is a set of breath analysis results from multiple patients. Each record contains various compound levels (in nanomoles per liter of breath), CO2 levels, and additional metadata. Please analyze the dataset and provide:
-                1. A high-level summary of the key trends in the compound levels.
-                2. Any outliers or unusual patterns (e.g., significantly high or low compound concentrations).
-                3. A detailed analysis of the most notable entries, explaining why they stand out.
-                Data: {data_summary}"""}
-            ]
+        # Create a thread
+        thread = client.beta.threads.create()
+
+        # Add a message to the thread
+        message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=f"Analyze this breath analysis data and provide insights: {data_summary}"
         )
+
+        # Run the assistant
+        run = client.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=ASSISTANT_ID
+        )
+
+        # Wait for the run to complete
+        while run.status != "completed":
+            time.sleep(1)
+            run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+
+        # Retrieve the messages
+        messages = client.beta.threads.messages.list(thread_id=thread.id)
+
+        # Extract the assistant's response
+        assistant_response = next(msg.content[0].text.value for msg in messages if msg.role == "assistant")
         
-        # Extract the AI-generated insights
-        insights = response.choices[0].message.content
-        
-        return jsonify({"success": True, "insights": insights}), 200
+        return jsonify({"success": True, "insights": assistant_response}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

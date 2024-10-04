@@ -382,35 +382,43 @@ document.addEventListener('DOMContentLoaded', function () {
     const aiInsightsModal = document.getElementById('ai-insights-modal');
     const closeModal = aiInsightsModal.querySelector('.close');
     const aiInsightsContent = document.getElementById('ai-insights-content');
+    const visualizationSection = document.getElementById('visualization-section');
+    const insightsOverlay = document.getElementById('insights-overlay');
+    const closeInsights = document.getElementById('close-insights');
 
-    aiAnalysisBtn.addEventListener('click', function() {
-        aiInsightsContent.innerHTML = '<p>Generating insights...</p>';
-        aiInsightsModal.style.display = 'block';
+    if (aiAnalysisBtn) {
+        aiAnalysisBtn.style.display = window.user ? 'block' : 'none';
 
-        fetch('https://onebreathpilot.onrender.com/ai_analysis')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Format the insights
-                    const formattedInsights = formatInsights(data.insights);
-                    aiInsightsContent.innerHTML = formattedInsights;
-                } else {
-                    aiInsightsContent.innerHTML = `<p>Error: ${data.error}</p>`;
-                }
-            })
-            .catch(error => {
-                aiInsightsContent.innerHTML = `<p>Error: ${error.message}</p>`;
-            });
-    });
+        aiAnalysisBtn.addEventListener('click', function () {
+            aiInsightsModal.style.display = 'block';
+            aiInsightsContent.innerHTML = '<div class="loader"></div>';
 
-    closeModal.addEventListener('click', function() {
+            fetch('https://onebreathpilot.onrender.com/ai_analysis')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const formattedInsights = formatInsights(data.insights);
+                        aiInsightsModal.style.display = 'none';
+                        insightsOverlay.innerHTML = formattedInsights;
+                        visualizationSection.style.display = 'none';
+                        insightsOverlay.style.display = 'block';
+                    } else {
+                        aiInsightsContent.innerHTML = `<p>Error: ${data.error}</p>`;
+                    }
+                })
+                .catch(error => {
+                    aiInsightsContent.innerHTML = `<p>Error: ${error.message}</p>`;
+                });
+        });
+    }
+
+    closeModal.addEventListener('click', function () {
         aiInsightsModal.style.display = 'none';
     });
 
-    window.addEventListener('click', function(event) {
-        if (event.target == aiInsightsModal) {
-            aiInsightsModal.style.display = 'none';
-        }
+    closeInsights.addEventListener('click', function () {
+        insightsOverlay.style.display = 'none';
+        visualizationSection.style.display = 'block';
     });
 });
 
