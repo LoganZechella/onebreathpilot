@@ -386,34 +386,70 @@ document.addEventListener('DOMContentLoaded', function () {
     const insightsOverlay = document.getElementById('insights-overlay');
     const closeInsights = document.getElementById('close-insights');
 
+    let currentFetch = null;
+    let controller = null;
+    let insightsLoaded = false;
+
     if (aiAnalysisBtn) {
         aiAnalysisBtn.style.display = 'block';
 
         aiAnalysisBtn.addEventListener('click', function () {
-            aiInsightsModal.style.display = 'block';
-            aiInsightsContent.innerHTML = '<div class="loader"></div>';
-
-            fetch('https://onebreathpilot.onrender.com/ai_analysis')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const formattedInsights = formatInsights(data.insights);
-                        aiInsightsModal.style.display = 'none';
-                        insightsOverlay.innerHTML = formattedInsights;
-                        visualizationSection.style.display = 'none';
-                        insightsOverlay.style.display = 'block';
-                    } else {
-                        aiInsightsContent.innerHTML = `<p>Error: ${data.error}</p>`;
-                    }
-                })
-                .catch(error => {
-                    aiInsightsContent.innerHTML = `<p>Error: ${error.message}</p>`;
-                });
+            if (insightsLoaded) {
+                // If insights are already loaded, just show the overlay
+                visualizationSection.style.display = 'none';
+                insightsOverlay.style.display = 'block';
+            } else {
+                // Fetch new insights
+                fetchInsights();
+            }
         });
+    }
+
+    function fetchInsights() {
+        aiInsightsModal.style.display = 'block';
+        aiInsightsContent.innerHTML = '<div class="loader"></div>';
+
+        // Create a new AbortController for each fetch
+        controller = new AbortController();
+        const signal = controller.signal;
+
+        currentFetch = fetch('https://onebreathpilot.onrender.com/ai_analysis', { signal })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const formattedInsights = formatInsights(data.insights);
+                    aiInsightsModal.style.display = 'none';
+                    const insightsContent = insightsOverlay.querySelector('#insights-content');
+                    if (insightsContent) {
+                        insightsContent.innerHTML = formattedInsights;
+                        insightsLoaded = true;
+                    } else {
+                        console.error('Insights content div not found');
+                    }
+                    visualizationSection.style.display = 'none';
+                    insightsOverlay.style.display = 'flex';
+                } else {
+                    aiInsightsContent.innerHTML = `<p>Error: ${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                if (error.name === 'AbortError') {
+                    console.log('Fetch aborted');
+                } else {
+                    aiInsightsContent.innerHTML = `<p>Error: ${error.message}</p>`;
+                }
+            })
+            .finally(() => {
+                currentFetch = null;
+                controller = null;
+            });
     }
 
     closeModal.addEventListener('click', function () {
         aiInsightsModal.style.display = 'none';
+        if (currentFetch && controller) {
+            controller.abort();
+        }
     });
 
     closeInsights.addEventListener('click', function () {
