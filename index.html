@@ -10,6 +10,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
+    <script src="./server/auth.js" type="module"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="assets/html5scanner/html5-qrcode 2.3.8.min.js" type="module"></script>
+    <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
+    <script src="script.js"></script>
     <title>OneBreath Sample Dashboard</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <meta name="description"
@@ -315,13 +322,6 @@
     <script>
         AOS.init();
     </script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
-    <script src="./server/auth.js" type="module"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <script src="assets/html5scanner/html5-qrcode 2.3.8.min.js" type="module"></script>
-    <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
-    <script src="script.js"></script>
 </body>
 
 </html>

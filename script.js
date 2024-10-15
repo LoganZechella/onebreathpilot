@@ -60,7 +60,7 @@ function hideElementWithAnimation(elementId, animation, options = {}) {
 function updateUIBasedOnAuth(user) {
     const blocker = document.querySelector('.blocker');
     const signInButton = document.getElementById('show-sign-in');
-
+    
     if (user) {
         hideElementWithAnimation('sign-in-container', 'fadeOut');
         if (window.location.search.includes('chipID') === true) {
@@ -101,13 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initApp() {
     setTimeout(() => {
-        hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '1000ms' });
-        showElementWithAnimation('sign-in-container', 'fadeIn', { duration: '1000ms' });
+        hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '500ms' });
+        showElementWithAnimation('sign-in-container', 'fadeIn', { duration: '500ms' });
         checkAuthState();
         if (checkAuthState() === true) {
-            hideElementWithAnimation('sign-in-container', 'fadeOut');
-            hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '1000ms' });
-            showElementWithAnimation('blocker', 'fadeIn', { delay: '1000ms', duration: '1000ms' });
+            hideElementWithAnimation('sign-in-container', 'fadeOut', { duration: '500ms' });
+            // hideElementWithAnimation('splash-screen', 'fadeOut', { duration: '500ms' });
+            showElementWithAnimation('blocker', 'zoonIn', { delay: '1500ms', duration: '500ms' });
             showElementWithAnimation('container-fluid', 'fadeIn', { delay: '1000ms', duration: '1000ms' });
             const nav = document.querySelector('.container-fluid');
             nav.style.display = 'flex';
@@ -133,12 +133,7 @@ function initApp() {
 }
 
 function checkAuthState() {
-    const user = window.firebaseAuth;
-    if (user) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!window.firebaseAuth.currentUser;
 }
 
 // Setup the confirm button to trigger animations and sample upload
@@ -387,10 +382,13 @@ function handleDocumentScanResult(result) {
     }
 }
 
-document.getElementById('rescan-button').addEventListener('click', () => {
-    document.getElementById('review-section').style.display = 'none';
-    startDocumentScanning();
-});
+const rescanButton = document.getElementById('rescan-button');
+if (rescanButton) {
+    rescanButton.addEventListener('click', () => {
+        document.getElementById('review-section').style.display = 'none';
+        startDocumentScanning();
+    });
+}
 
 // Function to upload file contents to GCS
 async function uploadFileToGCS(destinationBlobName, contents) {
@@ -419,7 +417,14 @@ async function uploadFileToGCS(destinationBlobName, contents) {
     }
 }
 
-document.getElementById('confirm-upload-button').addEventListener('click', async () => {
+function setupDocumentUploadListener() {
+    const confirmUploadButton = document.getElementById('confirm-upload-button');
+    if (confirmUploadButton) {
+        confirmUploadButton.addEventListener('click', handleDocumentUpload);
+    }
+}
+
+async function handleDocumentUpload() {
     const chipId = window.chipId || document.getElementById('chipID').value;
     const scannedImages = Array.from(document.getElementById('scanned-images').getElementsByTagName('img')).map(img => img.src);
 
@@ -456,9 +461,14 @@ document.getElementById('confirm-upload-button').addEventListener('click', async
         console.error('Error during document upload:', error);
         alert('Document upload failed. Please try again.');
         loader.style.display = 'none';
-        reviewSection.style.display = 'flex';
+        reviewSection.forEach(section => section.style.display = 'flex');
     }
-});
+}
+
+// Call this function when the document upload section becomes visible
+function showDocumentUploadSection() {
+    setupDocumentUploadListener();
+}
 
 function startDocumentScanningFromEditMenu() {
     const bodySections = {

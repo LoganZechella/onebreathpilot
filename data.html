@@ -12,10 +12,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
     <script src="/server/auth.js" type="module"></script>
-    <script src="datascript.js"></script>
-    <title>Completed Page</title>
+    <script src="datascript.js" type="module"></script>
+    <title>Data Viewer</title>
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
-    <meta name="description" content="Completed Page Description">
+    <meta name="description" content="Data Viewer">
 </head>
 
 <body>
@@ -106,7 +106,12 @@
         </div>
     </div>
 
-    <script src="datascript.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.getElementById('nav-links');
+            navLinks.classList.remove('responsive');
+        });
+    </script>
 </body>
 
 </html>

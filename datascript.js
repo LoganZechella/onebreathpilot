@@ -1,9 +1,39 @@
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+
+// At the top of the file, add this line:
+window.toggleMenu = toggleMenu;
+
+function toggleMenu() {
+    const navLinks = document.getElementById('nav-links');
+    navLinks.classList.toggle('responsive');
+}
+
 (function () {
     let completedSamples = [];
     let currentChart = null;
     let currentD3Chart = null;
+    const auth = getAuth();
 
     function init() {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, show the data viewer
+                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('blocker').style.display = 'flex';
+                document.getElementById('sign-in-container').hidden = true;
+                document.getElementById('show-sign-in').innerText = 'Sign Out'; 
+                initializeDataViewer();
+            } else {
+                // No user is signed in, show sign-in container
+                document.getElementById('main-content').style.display = 'none';
+                document.getElementById('blocker').style.display = 'flex';
+                document.getElementById('sign-in-container').hidden = false;
+                document.getElementById('sign-in-container').style.display = 'block';
+            }
+        });
+    }
+
+    function initializeDataViewer() {
         const chartType = document.getElementById('chart-type');
         const xAxis = document.getElementById('x-axis');
         const yAxis = document.getElementById('y-axis');
@@ -372,10 +402,11 @@
     }
 })();
 
-function toggleMenu() {
-    const navLinks = document.getElementById('nav-links');
-    navLinks.classList.toggle('responsive');
-}
+document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('nav-link')) {
+        toggleMenu();
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function () {
     const aiAnalysisBtn = document.getElementById('ai-analysis-btn');

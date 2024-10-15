@@ -1,40 +1,53 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
+// Function to fetch Firebase config from Netlify function
+async function getFirebaseConfig() {
+    try {
+        const response = await fetch('/.netlify/functions/getFirebaseConfig');
+        if (!response.ok) {
+            throw new Error('Failed to fetch Firebase config');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching Firebase config:', error);
+        throw error;
+    }
+}
 
 // Initialize Firebase App
-const firebaseConfig = {
-    apiKey: "AIzaSyC8LkfOZniLfcItfzU4vO-vxFw2Jcr15y0",
-    authDomain: "dashboard-424301.firebaseapp.com",
-    projectId: "dashboard-424301",
-    storageBucket: "dashboard-424301.appspot.com",
-    messagingSenderId: "121248577105",
-    appId: "1:121248577105:web:ad670277dad3b9cfd8aa70",
-    measurementId: "G-GSKZV0PKMN"
-};
+let app, auth;
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+async function initializeFirebase() {
+    const firebaseConfig = await getFirebaseConfig();
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
 
-// Function to handle auth state changes
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // User is signed in
-        window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
-    } else {
-        // No user is signed in
-        window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user: null } }));
-    }
-});
+    // Function to handle auth state changes
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in
+            window.user = user;
+            window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+        } else {
+            // No user is signed in
+            window.user = null;
+            window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user: null } }));
+        }
+    });
 
-// Expose auth for other scripts to use
-window.firebaseAuth = auth;
+    // Expose auth for other scripts to use
+    window.firebaseAuth = auth;
+}
+
+// Call the initialization function
+initializeFirebase().catch(console.error);
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('show-sign-in').addEventListener('click', (event) => {
         event.preventDefault();
         if (auth.currentUser) {
-            auth.signOut().then(() => {
+            signOut(auth).then(() => {
                 window.location.reload();
             }).catch((error) => {
                 console.error('Sign out error:', error);
