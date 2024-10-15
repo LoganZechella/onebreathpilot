@@ -4,10 +4,18 @@ function toggleMenu() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const auth = window.firebaseAuth;
-    auth.onAuthStateChanged((user) => {
-        updateUIBasedOnAuth(user);
-    });
+    let auth;
+
+    function initializeAuthListeners() {
+        auth = window.firebaseAuth;
+        if (auth) {
+            auth.onAuthStateChanged((user) => {
+                updateUIBasedOnAuth(user);
+            });
+        } else {
+            console.error('Firebase Auth not initialized');
+        }
+    }
 
     function updateUIBasedOnAuth(user) {
         const authButton = document.getElementById('show-sign-in');
@@ -20,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
             authButton.addEventListener('click', () => auth.signOut());
             tableSection.style.display = 'flex';
             signInContainer.hidden = true;
-            mainContent.style.display = 'block'; // Show main content when user is signed in
+            mainContent.style.display = 'block';
             loadCompletedSamples();
         } else {
             authButton.textContent = 'Sign In';
@@ -30,23 +38,36 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             tableSection.style.display = 'none';
             signInContainer.hidden = false;
-            mainContent.style.display = 'none'; // Hide main content when user is not signed in
+            mainContent.style.display = 'none';
         }
     }
 
+    // Check if Firebase is already initialized
+    if (window.firebaseAuth) {
+        initializeAuthListeners();
+    } else {
+        // If not, wait for the firebaseInitialized event
+        window.addEventListener('firebaseInitialized', initializeAuthListeners);
+    }
+
+    // Sign-in button event listener
     document.getElementById('sign-in').addEventListener('click', function () {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
 
-        auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                updateUIBasedOnAuth(user);
-            })
-            .catch((error) => {
-                console.error('Error during sign-in:', error.message);
-                alert('Sign-in failed. Please check your credentials and try again.');
-            });
+        if (auth) {
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    updateUIBasedOnAuth(user);
+                })
+                .catch((error) => {
+                    console.error('Error during sign-in:', error.message);
+                    alert('Sign-in failed. Please check your credentials and try again.');
+                });
+        } else {
+            console.error('Firebase Auth not initialized');
+        }
     });
 
     // Function to fetch and populate completed samples
@@ -298,3 +319,4 @@ const errorDescriptions = {
     '6': 'Low CO2: A leak is likely present in the system, causing the CO2 levels to drop and triggering the pump to stop.',
     '7': 'Decreased CO2 during evacuation: This error typically points to a leak that developed during the evacuation process, reducing CO2 levels and stopping the pump.'
 };
+
