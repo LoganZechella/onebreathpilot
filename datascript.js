@@ -1,4 +1,4 @@
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+// import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // At the top of the file, add this line:
 window.toggleMenu = toggleMenu;
@@ -8,14 +8,34 @@ function toggleMenu() {
     navLinks.classList.toggle('responsive');
 }
 
-(function () {
+// Wait for Firebase to be initialized before accessing auth
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        if (window.firebaseAuth) {
+            resolve(window.firebaseAuth);
+        } else {
+            window.addEventListener('firebaseInitialized', () => {
+                resolve(window.firebaseAuth);
+            });
+        }
+    });
+}
+
+(async function () {
     let completedSamples = [];
     let currentChart = null;
     let currentD3Chart = null;
-    const auth = getAuth();
+    let auth;
+
+    try {
+        auth = await waitForFirebase();
+    } catch (error) {
+        console.error('Error initializing Firebase:', error);
+        return;
+    }
 
     function init() {
-        onAuthStateChanged(auth, (user) => {
+        auth.onAuthStateChanged((user) => {
             if (user) {
                 // User is signed in, show the data viewer
                 document.getElementById('main-content').style.display = 'block';
