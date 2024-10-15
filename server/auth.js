@@ -38,28 +38,35 @@ async function initializeFirebase() {
 
     // Expose auth for other scripts to use
     window.firebaseAuth = auth;
+
+    // Set up event listeners after Firebase is initialized
+    setupEventListeners();
+
+    // Add this at the end of initializeFirebase() function
+    window.dispatchEvent(new Event('firebaseInitialized'));
 }
 
-// Call the initialization function
-initializeFirebase().catch(console.error);
+function setupEventListeners() {
+    const showSignInButton = document.getElementById('show-sign-in');
+    if (showSignInButton) {
+        showSignInButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (auth.currentUser) {
+                signOut(auth).then(() => {
+                    window.location.reload();
+                }).catch((error) => {
+                    console.error('Sign out error:', error);
+                });
+            } else {
+                const event = new Event('showSignIn');
+                window.dispatchEvent(event);
+            }
+        });
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('show-sign-in').addEventListener('click', (event) => {
-        event.preventDefault();
-        if (auth.currentUser) {
-            signOut(auth).then(() => {
-                window.location.reload();
-            }).catch((error) => {
-                console.error('Sign out error:', error);
-            });
-        } else {
-            const event = new Event('showSignIn');
-            window.dispatchEvent(event);
-        }
-    });
-
-    if (document.getElementById('sign-in')) {    
-        document.getElementById('sign-in').addEventListener('click', async () => {
+    const signInButton = document.getElementById('sign-in');
+    if (signInButton) {    
+        signInButton.addEventListener('click', async () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             try {
@@ -69,15 +76,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Login failed:', error);
             }
         });
-        window.user = auth.currentUser;
     }
 
-    // document.getElementById('sign-in-google').addEventListener('click', async () => {
-    //     const googleProvider = new GoogleAuthProvider();
-    //     try {
-    //         await signInWithPopup(auth, googleProvider);
-    //     } catch (error) {
-    //         console.error('Google sign-in failed:', error);
-    //     }
-    // });
+    window.user = auth.currentUser;
+}
+
+// Call the initialization function
+initializeFirebase().catch(console.error);
+
+// Wait for DOM content to be loaded before accessing DOM elements
+document.addEventListener('DOMContentLoaded', () => {
+    // If Firebase is not initialized yet, wait for it
+    if (!auth) {
+        window.addEventListener('firebaseInitialized', setupEventListeners);
+    } else {
+        setupEventListeners();
+    }
 });
