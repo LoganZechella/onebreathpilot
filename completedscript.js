@@ -75,80 +75,99 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('https://onebreathpilot.onrender.com/api/completed_samples')
             .then(response => response.json())
             .then(data => {
-                // Sort the data by timestamp (oldest first)
                 data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
+                
+                const fragment = document.createDocumentFragment();
                 const tableBody = document.querySelector('#completed-samples-table tbody');
-                tableBody.innerHTML = '';
                 let completedCount = 0;
                 
                 data.forEach(sample => {
                     if (sample.status === 'Complete') {
                         completedCount++;
                     }
-                    const row = document.createElement('tr');
-
-                    const sampleIdCell = document.createElement('td');
-                    sampleIdCell.textContent = sample.chip_id;
-
-                    const patientIdCell = document.createElement('td');
-                    patientIdCell.textContent = sample.patient_id || 'N/A';
-
-                    const dateCompletedCell = document.createElement('td');
-                    const formattedDate = sample.timestamp.split('T')[0];
-                    const parts = formattedDate.split('-');
-                    const shortYear = parts[0].split('0');
-                    const shortDate = `${parts[1]}/${parts[2]}/${shortYear[1]}`;
-                    dateCompletedCell.textContent = shortDate || 'N/A';
-
-                    const volumeCell = document.createElement('td');
-                    volumeCell.textContent = `${sample.final_volume} mL`;
-
-                    const co2Cell = document.createElement('td');
-                    co2Cell.textContent = `${sample.average_co2}%`
-
-                    const errorCodeCell = document.createElement('td');
-                    errorCodeCell.textContent = sample.error || 'N/A';
-                    if (sample.error && sample.error !== 'N/A') {
-                        errorCodeCell.dataset.errorCode = sample.error;
-                        errorCodeCell.classList.add('error-code');
-                    }
-
-                    const uploadCell = document.createElement('td');
-                    const uploadButton = document.createElement('button');
-                    uploadButton.innerHTML = '<img class="upload-icon" src="assets/images/icons8-upload-96.png" alt="Upload"/>';
-                    uploadButton.className = 'upload-button';
-                    uploadButton.dataset.chipId = sample.chip_id;
-                    uploadCell.appendChild(uploadButton);
-                    
-                    row.appendChild(dateCompletedCell);
-                    row.appendChild(sampleIdCell);
-                    row.appendChild(patientIdCell);
-                    row.appendChild(volumeCell);
-                    row.appendChild(co2Cell);
-                    row.appendChild(errorCodeCell);
-                    row.appendChild(uploadCell);
-
-                    tableBody.appendChild(row);
+                    const row = createTableRow(sample);
+                    fragment.appendChild(row);
                 });
+                
+                tableBody.innerHTML = '';
+                tableBody.appendChild(fragment);
+                
                 document.getElementById('sample-count').textContent = `Total: ${completedCount}`;
-
-                // Add event listeners for error code cells after populating the table
-                addErrorCodeListeners();
+                
+                initializeErrorCodeHandlers();
+                initializeUploadHandlers();
             })
             .catch(error => {
                 console.error('Error fetching completed samples:', error);
             });
     }
 
-    function addErrorCodeListeners() {
-        const errorCells = document.querySelectorAll('.error-code');
-        errorCells.forEach(cell => {
-            cell.addEventListener('mouseover', showErrorDescription);
-            cell.addEventListener('mouseout', () => {
-                setTimeout(hideErrorDescription, 300); // Delay hiding to allow moving to popover
-            });
-        });
+    // Separate function to create table row
+    function createTableRow(sample) {
+        const row = document.createElement('tr');
+        
+        // Create date cell
+        const dateCompletedCell = document.createElement('td');
+        const formattedDate = formatDate(sample.timestamp);
+        dateCompletedCell.textContent = formattedDate;
+        
+        // Create chip ID cell
+        const sampleIdCell = document.createElement('td');
+        sampleIdCell.textContent = sample.chip_id;
+        
+        // Create patient ID cell
+        const patientIdCell = document.createElement('td');
+        patientIdCell.textContent = sample.patient_id || 'N/A';
+        
+        // Create volume cell
+        const volumeCell = document.createElement('td');
+        volumeCell.textContent = `${sample.final_volume} mL`;
+        
+        // Create CO2 cell
+        const co2Cell = document.createElement('td');
+        co2Cell.textContent = `${sample.average_co2}%`;
+        
+        // Create error code cell
+        const errorCodeCell = document.createElement('td');
+        errorCodeCell.textContent = sample.error || 'N/A';
+        if (sample.error && sample.error !== 'N/A') {
+            errorCodeCell.dataset.errorCode = sample.error;
+            errorCodeCell.classList.add('error-code');
+        }
+        
+        // Create upload button cell
+        const uploadCell = document.createElement('td');
+        const uploadButton = createUploadButton(sample.chip_id);
+        uploadCell.appendChild(uploadButton);
+        
+        // Append all cells to row
+        row.append(
+            dateCompletedCell,
+            sampleIdCell,
+            patientIdCell,
+            volumeCell,
+            co2Cell,
+            errorCodeCell,
+            uploadCell
+        );
+        
+        return row;
+    }
+
+    // Helper function to create upload button
+    function createUploadButton(chipId) {
+        const uploadButton = document.createElement('button');
+        uploadButton.innerHTML = '<img class="upload-icon" src="assets/images/icons8-upload-96.png" alt="Upload"/>';
+        uploadButton.className = 'upload-button';
+        uploadButton.dataset.chipId = chipId;
+        return uploadButton;
+    }
+
+    // Helper function to format date
+    function formatDate(timestamp) {
+        const parts = timestamp.split('T')[0].split('-');
+        const shortYear = parts[0].split('0');
+        return `${parts[1]}/${parts[2]}/${shortYear[1]}`;
     }
 
     let activePopover = null;
@@ -157,10 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const errorCode = event.target.dataset.errorCode;
         const description = errorDescriptions[errorCode];
         
-        if (description) {
-            // Remove any existing popover
-            hideErrorDescription();
-            
+        if (description && !activePopover) {
             const popover = document.createElement('div');
             popover.className = 'error-popover';
             popover.textContent = description;
@@ -184,29 +200,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add a global click event listener to hide the popover when clicking outside
     document.addEventListener('click', (event) => {
-        if (activePopover && !event.target.closest('.error-code') && !event.target.closest('.error-popover')) {
+        if (activePopover && 
+            !event.target.classList.contains('error-code') && 
+            !event.target.closest('.error-popover')) {
             hideErrorDescription();
         }
     });
 
-    document.addEventListener('click', function (event) {
-        if (event.target.classList.contains('upload-icon')) {
-            const chipId = event.target.dataset.chipId;
-            if (auth.currentUser) {
-                showUploadMenu(chipId);
-            } else {
-                alert('You must be signed in to upload a file.');
+    // 1. Error Code Handling with Event Delegation
+    function initializeErrorCodeHandlers() {
+        const table = document.getElementById('completed-samples-table');
+        
+        // Single event listener for the entire table
+        table.addEventListener('mouseover', (event) => {
+            const target = event.target;
+            if (target.classList.contains('error-code')) {
+                showErrorDescription(event);
             }
-        }
-    });
+        });
 
-    // Download dataset button logic
-    document.getElementById('download-dataset-button').addEventListener('click', function () {
-        const confirmation = confirm('Are you sure you want to download the dataset as a CSV file?');
-        if (confirmation) {
-            window.location.href = 'https://onebreathpilot.onrender.com/download_dataset';
-        }
-    });
+        table.addEventListener('mouseout', (event) => {
+            const target = event.target;
+            if (target.classList.contains('error-code')) {
+                setTimeout(hideErrorDescription, 300);
+            }
+        });
+    }
+
+    // 2. Upload Icon Handling with Event Delegation
+    function initializeUploadHandlers() {
+        const table = document.getElementById('completed-samples-table');
+        
+        table.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.classList.contains('upload-icon')) {
+                const chipId = target.closest('.upload-button').dataset.chipId;
+                if (auth.currentUser) {
+                    showUploadMenu(chipId);
+                } else {
+                    alert('You must be signed in to upload a file.');
+                }
+            }
+        });
+    }
 
     function showUploadMenu(chipId) {
         clearImagePreview();
@@ -309,6 +345,23 @@ document.addEventListener('DOMContentLoaded', function () {
             imgPreviewDiv.remove();
         }
     }
+
+    // 6. Initialize all event handlers when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... existing auth code ...
+
+        // Initialize global event handlers
+        initializeErrorCodeHandlers();
+        initializeUploadHandlers();
+        
+        // Initialize download button handler
+        document.getElementById('download-dataset-button')?.addEventListener('click', function() {
+            const confirmation = confirm('Are you sure you want to download the dataset as a CSV file?');
+            if (confirmation) {
+                window.location.href = 'https://onebreathpilot.onrender.com/download_dataset';
+            }
+        });
+    });
 });
 
 // Add this object at the top of your file, outside any function

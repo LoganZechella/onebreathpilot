@@ -291,6 +291,8 @@ p {
     table-layout: fixed;
     width: 95vw;
     overflow-wrap: break-word;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 #table-title {

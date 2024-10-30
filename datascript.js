@@ -38,7 +38,7 @@ function waitForFirebase() {
         auth.onAuthStateChanged((user) => {
             if (user) {
                 // User is signed in, show the data viewer
-                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('main-content').style.display = 'flex';
                 document.getElementById('blocker').style.display = 'flex';
                 document.getElementById('sign-in-container').hidden = true;
                 document.getElementById('show-sign-in').innerText = 'Sign Out'; 
